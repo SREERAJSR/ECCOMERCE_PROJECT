@@ -13,10 +13,11 @@
     <meta property="og:image" content="">
 
 
-
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.2.0/css/bootstrap.min.css">
-    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.4/css/dataTables.bootstrap5.min.css">
+    <link rel="stylesheet" type="text/css" href="http://ajax.aspnetcdn.com/ajax/jquery.dataTables/1.9.0/css/jquery.dataTables.css">
+    <link rel="stylesheet" type="text/css" href="http://ajax.aspnetcdn.com/ajax/jquery.dataTables/1.9.0/css/jquery.dataTables_themeroller.css">
     
+    
+     
     
     <!-- Favicon -->
     <link rel="shortcut icon" type="image/x-icon" href="/images/admin/theme/favicon.svg">
@@ -50,22 +51,29 @@
                         </a>
                         
                     </li>
-                    <li class="menu-item active">
+                    <li class="menu-item has-submenu active">
+                        <a class="menu-link" href="page-sellers-cards.html"> <i class="icon material-icons md-store"></i>
+                            <span class="text">Products</span>
+                        </a>
+                        <div class="submenu">
+                            <a href="/admin/list-products">List Products</a>
+                            <a href="/admin/add-product">Add Product</a>
+                          
+                        </div>
+                    </li>
+                    <!-- <li class="menu-item active">
                         <a class="menu-link" href="/admin/add-product"> <i class="icon material-icons md-add_box"></i>
                             <span class="text">Add product</span>
                         </a>
             
-                    </li>
+                    </li> -->
+                   
 
-                <li class="menu-item has-submenu">
-                    <a class="menu-link" href="page-orders-1.html"> <i class="icon material-icons md-shopping_cart"></i>
-                        <span class="text">Orders</span>
+                <li class="menu-item active">
+                    <a class="menu-link"  data-bs-toggle="modal" data-bs-target="#exampleModal" data-bs-whatever="@mdo"  > <i class="icon material-icons md-shopping_cart"></i>
+                        <span class="text">Category</span>
                     </a>
-                    <div class="submenu">
-                        <a href="page-orders-1.html">Order list 1</a>
-                        <a href="page-orders-2.html">Order list 2</a>
-                        <a href="page-orders-detail.html">Order detail</a>
-                    </div>
+                   
                 </li>
                 <li class="menu-item has-submenu">
                     <a class="menu-link" href="page-sellers-cards.html"> <i class="icon material-icons md-store"></i>
@@ -187,6 +195,30 @@
                     </li>
                 </ul>
             </div>
+            <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                <div class="modal-dialog">
+                  <div class="modal-content">
+                    <div class="modal-header">
+                      <h5 class="modal-title" id="exampleModalLabel">Add category</h5>
+                      <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                      <form action="/admin/add-category" method="post" >
+                        <div class="mb-3">
+                          <label for="recipient-name" class="col-form-label">Category name</label>
+                          <input type="text" class="form-control" name="categoryName" id="recipient-name">
+                        </div>
+
+                  
+                    </div>
+                    <div class="modal-footer">
+                      <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                      <button type="submit"  class="btn btn-primary">Submit</button>
+                    </form>
+                    </div>
+                  </div>
+                </div>
+              </div>
         </header>
         
       

@@ -43,11 +43,11 @@
                         </div>
                         <div class="col-lg-7">
                             <label class="form-label">Category</label>
-                            <select class="form-select" name="category">
+                            <select class="form-select" name="category_name">
                                 <option selected disabled>Select a category</option>
-                                <option> Students laptop</option>
-                                <option> Office laptop</option>
-                                <option>Gaming laptop</option>
+                                <option> Students Laptop</option>
+                                <option> Office Laptop</option>
+                                <option>Gaming Laptop</option>
                             </select>
                         </div>
                         
@@ -77,8 +77,9 @@
                             </div>
                             <div class="mb-4">
                                 <label class="form-label">Upload images</label>
-                                <input type="file" name="images" multiple>                            </div>
-
+                                <input type="file" name="images" multiple onchange="previewImages(event)" accept="image/*">
+                                <div id="image-preview"></div>                       
+                             </div>
                         </div>
                         
 
@@ -109,3 +110,27 @@
            
     </div>
 </section> <!-- content-main end// -->
+
+<script>
+    function previewImages(event) {
+    const previewContainer = document.getElementById('image-preview');
+    previewContainer.innerHTML = ''; // Clear any previous preview
+
+    const files = event.target.files;
+    for (let i = 0; i < files.length; i++) {
+        const file = files[i];
+        const reader = new FileReader();
+
+        reader.onload = function () {
+            const imgElement = document.createElement('img');
+            imgElement.src = reader.result;
+            imgElement.classList.add('preview-image');
+
+            previewContainer.appendChild(imgElement);
+        };
+
+        reader.readAsDataURL(file);
+    }
+}
+
+</script>
