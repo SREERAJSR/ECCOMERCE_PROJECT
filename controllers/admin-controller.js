@@ -27,11 +27,25 @@ module.exports={
     user.isActive=true
    }
    await user.save()
-   res.redirect('/admin/user-manage')
+   res.json({ user }); 
     }catch(err){
       res.status(500).json({err:'Internal server error'})
 
   }
+
+},
+
+getaddProducts :(req,res)=>{
+
+  res.render('admin/add-product',{admin:true})
+}
+,
+
+
+addingProducts:(req,res)=>{
+
+  console.log(req.files);
+  console.log(req.body);
 
 }
 

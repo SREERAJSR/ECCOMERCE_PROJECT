@@ -1,16 +1,24 @@
-var express = require("express");
-var router = express.Router();
-const {findUser_info,changeUserStatus} = require('../controllers/admin-controller')
-
-router.get('/',(req,res)=>{
-
-    res.render('admin/list-users',{admin:true})
-
-})
+    var express = require("express");
+    var router = express.Router();
+    const {findUser_info,changeUserStatus,getaddProducts,addingProducts} = require('../controllers/admin-controller')
+    // const upload = require("../middlewares/multer-config")
+    const multer = require('multer')
+    const upload = multer({ dest: 'uploads/' })
 
 
-router.get('/user-manage',findUser_info)
+    router.get('/',(req,res)=>{
 
-router.patch('/userManage',changeUserStatus)
+        res.render('admin/list-users',{admin:true})
 
-module.exports = router;
+    })
+
+
+    router.get('/user-manage',findUser_info)
+
+    router.patch('/userManage',changeUserStatus)
+
+    router.get('/add-product',getaddProducts)
+
+    router.post('/add-product',upload.array('images',3),addingProducts)
+
+    module.exports = router;

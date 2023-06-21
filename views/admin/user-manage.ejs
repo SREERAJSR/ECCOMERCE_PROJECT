@@ -69,10 +69,10 @@
                             <td><%= user.createdDate  %></td>
 
                             <td> <% if (user.isActive) { %>
-                                <button class="btn btn-danger block-btn" data-action="block" onclick="blockUser('<%= user._id%>','block')">Block</button>
+                                <button class="btn btn-danger block-btn" id="blockButton_<%= user._id %>" data-action="block" onclick="blockUser('<%= user._id%>','block')">Block</button>
                                 <% } else { %>
-                                <button class="btn btn-success block-btn" data-action="unblock" onclick="unBlockUser('<%= user._id%>','unblock')" >Unblock</button>
-                                <% } %>
+                                    <button class="btn btn-success block-btn" id="blockButton_<%= user._id %>" data-action="unblock" onclick="unBlockUser('<%= user._id%>','unblock')">Unblock</button>
+                                    <% } %>
                                 </td>
 
                               
@@ -124,7 +124,9 @@
             data:{userId,action},
 
             success:(response)=>{
-                console.log(response);
+                const blockButton = $('#blockButton_' + userId);
+      blockButton.text('Unblock').removeClass('btn-danger').addClass('btn-success').data('action', 'unblock').attr('onclick', "unblockUser('" + userId + "', 'unblock')");
+      location.reload() 
             },
             error:(err)=>{
                 console.log(err);
@@ -142,8 +144,9 @@
             data:{userId,action},
 
             success:(response)=>{
-                console.log('hai');
-                
+                const blockButton = $('#blockButton_' + userId);
+      blockButton.text('Block').removeClass('btn-success').addClass('btn-danger').data('action', 'block').attr('onclick', "blockUser('" + userId + "', 'block')");
+                location.reload()
             },
             error:(err)=>{
                 console.log(err);

@@ -8,9 +8,8 @@ const ejs = require("ejs");
 const session = require('express-session')
 const expressLayouts = require("express-ejs-layouts");
 const mongoose = require("mongoose");
+
 var app = express();
-
-
 
 // Configure the cookie-parser middleware
 app.use(cookieParser());
