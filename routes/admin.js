@@ -1,49 +1,62 @@
-    var express = require("express");
-    var router = express.Router();
-    const {findUser_info,changeUserStatus,
-        getaddProducts,addingProducts,insertCategoryName
-        ,getListProductPage,getEditProductPage,
-        editProductAndSave,deleteProduct} = require('../controllers/admin-controller')
+var express = require("express");
+var router = express.Router();
+const {
+  getLoginPage,
+  loginAdmin,
+  findUser_info,
+  changeUserStatus,
+  getaddProducts,
+  addingProducts,
+  insertCategoryName,
+  getListProductPage,
+  getEditProductPage,
+  editProductAndSave,
+} = require("../controllers/admin-controller");
 
-        const {getCategoryPage} = require('../controllers/product-controller')
+const {
+  getCategoryPage,
+  deleteProduct,
+  getEditCategoryPage,
+  editCategoryName,
+  deleteCategory,
+} = require("../controllers/product-controller");
 
+// const upload = require("../middlewares/multer-config")
+const multer = require("multer");
+const upload = require("../middlewares/multer-config");
 
-    // const upload = require("../middlewares/multer-config")
-    const multer = require('multer')
-   const upload = require('../middlewares/multer-config')
+router.get("/", (req, res) => {
+  res.render("admin/list-users", { admin: true });
+});
 
+router.get('/admin-login',getLoginPage)
 
-    router.get('/',(req,res)=>{
+router.post('/admin-login',loginAdmin)
 
-        res.render('admin/list-users',{admin:true})
+router.get("/user-manage", findUser_info);
 
-    })
+router.patch("/userManage", changeUserStatus);
 
+router.get("/add-product", getaddProducts);
 
-    router.get('/user-manage',findUser_info)
+router.post("/add-product", upload.array("images", 4), addingProducts);
 
-    router.patch('/userManage',changeUserStatus)
+router.post("/add-category", insertCategoryName);
 
-    router.get('/add-product',getaddProducts)
+router.get("/edit-category", getEditCategoryPage);
 
-    router.post('/add-product',upload.array('images',4),addingProducts)
+router.post("/edit-category", editCategoryName);
 
-    router.post('/add-category',insertCategoryName)
+router.delete("/delete-category", deleteCategory);
 
-    router.get('/category',getCategoryPage)
+router.get("/category", getCategoryPage);
 
+router.get("/list-products", getListProductPage);
 
+router.get("/edit-product", getEditProductPage);
 
+router.post("/edit-product", upload.array("images", 4), editProductAndSave);
 
+router.delete("/delete-product", deleteProduct);
 
-    router.get('/list-products',getListProductPage)
-  
-    router.get('/edit-product',getEditProductPage)
-
-    router.post('/edit-product',upload.array('images',4),editProductAndSave)
-
-    router.delete('/delete-product',deleteProduct)
-
-    
-
-    module.exports = router;
+module.exports = router;

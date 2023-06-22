@@ -4,7 +4,6 @@ const twilio = require("twilio");
 const userHelpers = require("../helpers/user-helpers");
 const { clearCache } = require("ejs");
 
- 
 module.exports = {
   getSignup: (req, res) => {
     // console.log(req.session.user.username);
@@ -22,11 +21,13 @@ module.exports = {
         phone: phone,
         Email: email,
         password: hashedPassword,
-        isActive:true
+        isActive: true,
       });
-      await newUser. save() .then(() => {
-        req.session.user = newUser;
-         //req.session.phone=phone
+      await newUser
+        .save()
+        .then(() => {
+          req.session.user = newUser;
+          //req.session.phone=phone
           console.log(req.session.user);
           userHelpers.sendingOtp(req.session.user.phone).then(() => {
             const userPhone = "+91" + req.session.user.phone;
@@ -46,17 +47,16 @@ module.exports = {
   },
 
   getLogin: (req, res) => {
-    if(req.session.user){
+    if (req.session.user) {
       console.log("haii");
       res.setHeader("Cache-Control", "no-cache, no-store, must-revalidate");
       res.setHeader("Pragma", "no-cache");
       res.setHeader("Expires", "0");
-      res.redirect('/')
-    }else{
+      res.redirect("/");
+    } else {
       console.log("no hai");
       res.render("user/login", { u: false });
     }
- 
   },
 
   postLogin: async (req, res) => {
@@ -64,8 +64,8 @@ module.exports = {
       const { email, password } = req.body;
 
       const user = await User.findOne({ Email: email });
-      
-      req.session.user=user
+
+      req.session.user = user;
 
       console.log(user);
 
@@ -75,10 +75,10 @@ module.exports = {
       const passwordMatch = await bcrypt.compare(password, user.password);
 
       console.log(req.session.user);
-      if ( passwordMatch){
+      if (passwordMatch) {
         res.redirect("/");
       } else {
-        res.redirect('/login')
+        res.redirect("/login");
       }
     } catch (err) {
       console.log(err);
@@ -99,7 +99,7 @@ module.exports = {
         .services(process.env.verifySid)
         .verifications.create({ to: "+91" + phone, channel: "sms" });
       const userPhone = "+91" + phone;
-      req.session.phone=phone
+      req.session.phone = phone;
       res.render("user/otp-signup", { u: false, userPhone });
       // res.redirect(`/otp/${phone}`);
     } catch (err) {
@@ -119,13 +119,11 @@ module.exports = {
         .then((verification_check) => {
           console.log(verification_check.status);
 
-          if(req.session.phone){
+          if (req.session.phone) {
             res.redirect("/");
-          }else{
-            res.redirect('/login')
+          } else {
+            res.redirect("/login");
           }
-
-         
         })
         .catch((err) => {
           res.status(401).json({ message: "Invalid Otp" + err });
@@ -156,23 +154,23 @@ module.exports = {
       const { otp1, otp2, otp3, otp4, otp5, otp6 } = req.body;
       const otpcode = `${otp1}${otp2}${otp3}${otp4}${otp5}${otp6}`;
       console.log(otpcode);
-      console.log('SSSSSSSŠ'+req.session.user.phone);
+      console.log("SSSSSSSŠ" + req.session.user.phone);
       // const phone = req.session.phone;
 
-      userHelpers.validating(req.session.user.phone, otpcode).then(() => {
-
-        if(req.session.user){
-          res.redirect('/')
-        }else{
-          res.redirect('/login')
-        }
-        
-        }) 
+      userHelpers
+        .validating(req.session.user.phone, otpcode)
+        .then(() => {
+          if (req.session.user) {
+            res.redirect("/");
+          } else {
+            res.redirect("/login");
+          }
+        })
         .catch((err) => {
           res.status(401).json({ message: "Invalid Otp" + err });
         });
     } catch (err) {
-      console.log("ERROR IN OTP" + err); 
+      console.log("ERROR IN OTP" + err);
     }
   },
 };

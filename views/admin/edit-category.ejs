@@ -1,0 +1,31 @@
+<section class="content-main">
+    <div class="row">
+    <div class="col-9">
+        <div class="content-header">
+            <h2 class="content-title"><b>Edit category</b></h2>
+          
+        </div>
+       </div>
+      <div class="col-lg-6 " >
+        <div class="card mb-4">
+            
+            <div class="card-body">
+                <form method="post" action="/admin/edit-category?categoryId=<%= selectedCategory._id  %>" >
+                    <div class="mb-4">  
+                        <label for="product_name" class="form-label"><b>Category name</b></label>
+                        <input type="text" placeholder="Type here" name='category_name' class="form-control" value="<%= selectedCategory.CategoryName %>" id="product_name">
+                    </div>
+
+                    <button type="submit" class="btn btn-md rounded font-sm hover-up">Save</button>
+
+                </form>
+                       </div>
+                    </div> 
+                <!-- card end// -->
+        
+                  </div>
+                   
+      
+       
+</div>
+</section> 

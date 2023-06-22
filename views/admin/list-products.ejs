@@ -41,17 +41,17 @@
                 <% allProducts.forEach((product) => { %>
                 <div class="col">
                     <div class="card card-product-grid" >
-                        <a href="#" class="img-wrap"> <img src="/uploads/<%= product.ProductImages[0] %>" alt="Product"style="width: 150px; height: 120px;"  > </a>
+                        <a href="#" class="img-wrap"> <img src="/uploads/product_images/<%= product.ProductImages[0] %>" alt="Product"style="width: 150px; height: 120px;"  > </a>
                         <div class="info-wrap">
                             <a href="#" class="title text-truncate"><%= product.ProductName  %></a>
                             <div class="price mb-2">Rs.<%= product.SalePrice %></div> <!-- price.// -->
-                            <a href="/admin/edit-product?productId=<%= product._id %>" class="btn btn-sm font-sm rounded btn-brand">
+                            <a href="/admin/edit-product?productId=<%= product._id %>"  class="btn btn-sm font-sm rounded btn-brand">
                                 <i class="material-icons md-edit"></i> Edit
                             </a>
+                            <a href="#" onclick="showAlert('<%= product._id %>')" class="btn btn-sm font-sm btn-light rounded">
                             
-                            <a href="/admin/delete-product?productId=<%= product._id %>" class="btn btn-sm font-sm btn-light rounded">
-                                <i class="material-icons md-delete_forever"></i> Delete
-                               
+                            <i class="material-icons md-delete_forever" ></i> Delete
+                            
                             </a>
                         </div>
                     </div> <!-- card-product  end// -->
@@ -76,3 +76,39 @@
     </div>
 </section> <!-- content-main end// -->
 
+<script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
+<script>
+    function showAlert(productId){
+        // event.preventDefault()
+        swal({
+  title: "Are you sure?",
+  text: "Once deleted, you will not be able to recover this imaginary file!",
+  icon: "warning",
+  buttons: true,
+  dangerMode: true,
+})
+.then((willDelete) => {
+  if (willDelete) {
+
+    $.ajax({
+        url:'/admin/delete-product',
+        method:'delete',
+        data:{productId},
+        success:(response)=>{
+     swal("Poof! Your imaginary file has been deleted!", {
+      icon: "success",
+    });
+    location.reload()
+        }
+    })
+
+  
+  } else {
+    swal("Your imaginary file is safe!");
+  }
+});
+    }
+</script>
+
+    show
+</script>

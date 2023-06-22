@@ -138,6 +138,7 @@
       <% var u %>
 
      <% var admin%>
+     <% var admin_login %>
 
      <% if(u ===true) {%>
        <%- include('../partials/user/user-header') %>
@@ -148,11 +149,17 @@
        <%- include('../partials/admin/admin-header') %>
      <%- body %>
        <%- include('../partials/admin/admin-footer') %>
-     <% } else {%>
+     <% } else if (admin_login===true) {%>
+      <%- include('../partials/admin/admin-login-header') %>
+     <%- body %>
+       <%- include('../partials/admin/admin-login-footer') %>
 
-      <%- body %>
+      <% }else{ %>
 
-      <% } %>
+        <%- body  %>
+
+
+        <% } %>
     
     <!--===============================================================================================-->
     <script src="/vendor/jquery/jquery-3.2.1.min.js"></script>
