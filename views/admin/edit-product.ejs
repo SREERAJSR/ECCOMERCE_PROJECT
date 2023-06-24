@@ -102,7 +102,7 @@
                             <input type="file" name="images" multiple> </div>
                              <!-- Display the uploaded images -->
        <% for (let i = 0; i < product.ProductImages.length; i++) { %>
-        <img src="/uploads/<%= product.ProductImages[i] %>" alt="Product Image" style="width: 150px; height: 120px;">
+        <img src="/uploads/product_images/<%= product.ProductImages[i] %>" alt="Product Image" style="width: 150px; height: 120px;">
        <% } %>
 
                     </div>

@@ -22,6 +22,7 @@ module.exports = {
   deleteProduct: async (req, res) => {
     try {
       const { productId } = req.body;
+      console.log(productId);
 
       // Retrieve the product from the database
       const product = await Product.findById(productId);

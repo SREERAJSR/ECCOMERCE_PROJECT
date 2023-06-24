@@ -5,6 +5,9 @@ const userHelpers = require("../helpers/user-helpers");
 const category = require('../models/categorySchema')
 const { clearCache } = require("ejs");
 const {findCategory}= require('../helpers/product-helpers')
+const Product = require("../models/productSchema");
+const {categoryWiseFiltering}= require('../helpers/product-helpers')
+
 
 module.exports = {
   getSignup: (req, res) => {
@@ -180,19 +183,34 @@ module.exports = {
   },
 
   /////////////////////////////////////////User//////////////////////////////////////////////////////////
-  getHomePage :async(req, res)=> {
+  getHomePage: async (req, res) => {
+    try {
+      findCategory().then(async (categories) => {
+        let filter ={}
+         filter= await Promise.all(
+          categories.map(async (category) => {
+         
+         const res  =await Product.find({ 'Category.categoryName': category.CategoryName });
 
-    try{
+         return {res}
+          })
+        );
 
-      findCategory().then((categories)=>{
-      res.render("user/homepage", { u: true ,categories});
-      })
-
-    }catch{
-
+        const gaming = filter[0].res
+        const office = filter[1].res
+        const students = filter[2].res
+        console.log("haiiii", gaming);
+  
+        res.render("user/homepage", { u: true, categories ,gaming,office,students });
+      });
+    } catch (error) {
+      // Handle the error appropriately
     }
-
   }
+  
+
+
+   
   
 };
 

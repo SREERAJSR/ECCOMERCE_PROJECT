@@ -87,13 +87,13 @@ module.exports = {
 
     
   },
-  insertCategoryName: async (req, res) => {
+  insertCategoryName: async (req, res ,next) => {
     try {
       const { categoryName } = req.body;
       
-      const categoryImages = await  req.files.map((file)=> file.filename)
-      console.log(categoryImages);
-      
+      const CaetegoryImagesFileName = req.files.map((file) => file.filename);
+
+      console.log(CaetegoryImagesFileName[0]);
       // if existing category is there
       const existingcategory = await category.findOne({
         CategoryName: { $regex: new RegExp(`^${categoryName}$`, "i") },
@@ -104,11 +104,14 @@ module.exports = {
 
       const newCategory = new category({
         CategoryName: categoryName,
+        CategoryImage:CaetegoryImagesFileName[0]
+      
       });
       await newCategory
         .save()
         .then(() => {
           res.redirect("/admin/category");
+
         })
         .catch((err) => {
           console.log("category upload error" + err);
@@ -188,6 +191,8 @@ module.exports = {
 
       console.log(req.body);
       console.log(req.query.productId);
+      const productImagesFileName = req.files.map((file) => file.filename);
+
 
       const {
         product_name,
@@ -199,6 +204,7 @@ module.exports = {
         stock_quantity,
         regular_price,
         sale_price,
+
       } = req.body;
 
       const productSave = await Product.findByIdAndUpdate(
@@ -213,6 +219,7 @@ module.exports = {
           StockQuantity: stock_quantity,
           RegularPrice: regular_price,
           SalePrice: sale_price,
+          ProductImages:productImagesFileName
         },
         { new: true }
       );

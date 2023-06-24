@@ -23,5 +23,10 @@ module.exports = {
 
     })
 
+  },
+
+
+  categoryWiseFiltering:()=>{
+    
   }
 };

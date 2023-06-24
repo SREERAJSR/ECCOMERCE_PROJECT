@@ -24,7 +24,7 @@ const {
 
 // const upload = require("../middlewares/multer-config")
 const multer = require("multer");
-const upload = require("../middlewares/multer-config");
+const  {uploadProduct,uploadCategory} = require("../middlewares/multer-config");
 
 router.get("/",authenticateAdmin,(req, res) => {
   res.render("admin/list-users", { admin: true });
@@ -40,9 +40,9 @@ router.patch("/userManage",authenticateAdmin, changeUserStatus);
 
 router.get("/add-product", getaddProducts); 
 
-router.post("/add-product",authenticateAdmin, upload.array("images", 4), addingProducts);
+router.post("/add-product",authenticateAdmin, uploadProduct.array("images", 4), addingProducts);
 
-router.post("/add-category",authenticateAdmin, insertCategoryName);
+router.post("/add-category",authenticateAdmin,uploadCategory.array("images", 1),  insertCategoryName,);
 
 router.get("/edit-category",authenticateAdmin, getEditCategoryPage);
 
@@ -56,7 +56,7 @@ router.get("/list-products",authenticateAdmin, getListProductPage);
 
 router.get("/edit-product",authenticateAdmin, getEditProductPage);
 
-router.post("/edit-product", authenticateAdmin,upload.array("images", 4), editProductAndSave);
+router.post("/edit-product", authenticateAdmin,uploadProduct.array("images", 4), editProductAndSave);
 
 router.delete("/delete-product",authenticateAdmin, deleteProduct);
 
