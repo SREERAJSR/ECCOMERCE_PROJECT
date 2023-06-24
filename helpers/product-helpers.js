@@ -12,4 +12,16 @@ module.exports = {
         });
     });
   },
+
+  findCategory:()=>{
+    return new Promise(async(resolve,reject)=>{
+      await category.find({}).then((categories)=>{
+        resolve(categories)
+      }).catch((err)=>{
+        reject(err)
+      })
+
+    })
+
+  }
 };

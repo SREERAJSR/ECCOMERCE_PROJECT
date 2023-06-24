@@ -12,7 +12,8 @@ const {
   sendOtp,
   otpVerification,
   signupOtp,
-  validateSignUp
+  validateSignUp,
+  getHomePage 
 
 } = require("../controllers/userController");
 //SHA256:CXoHORZsVoQiTlBkcwyCuTYWR29M0IyeXdcy8GYOnfY sreerajsr03@gmail.com
@@ -23,14 +24,10 @@ const limiter = rateLimiter({
   max: 5, // Allow a maximum of 5 requests within the defined window
 });
 /* GET users listing. */
-router.get("/", authenticateSession, function (req, res, next) {
-  res.setHeader("Cache-Control", "no-cache, no-store, must-revalidate");
-  res.setHeader("Pragma", "no-cache");
-  res.setHeader("Expires", "0");
-  res.render("user/homepage", { u: true });
-});
+router.get("/",  getHomePage)
+  
 
-router.get("/view-products",authenticateSession, (req, res, next) => {
+router.get("/view-products",(req, res, next) => {
   res.render("user/view-products", { u: true });
 });
 
@@ -52,15 +49,15 @@ router.post("/signup", userSignup);
 
 router.get('/otp-signup',signupOtp)
 
-router.get("/login", getLogin);
+router.get("/login",authenticateSession, getLogin);
 
 router.post("/login", postLogin);
 
 router.get("/otp-number", loginOtp);
 
-router.post("/send-otp", limiter, sendOtp);
+router.post("/send-otp", limiter, sendOtp); 
 
-// router.get('/otp',getotpVerificationPage)
+// router.get('/otp',getotpVerificationPage) 
 
 router.post("/otp-signup/:id", otpVerification);
 

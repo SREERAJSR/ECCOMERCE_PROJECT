@@ -24,12 +24,13 @@ module.exports = {
       const client =  twilio(process.env.accountSid, process.env.authToken);
       await client.verify.v2
         .services(process.env.verifySid)
-        .verificationChecks.create({ to: "+91" + phone, code: otpcode })
+        .verificationChecks.create({ to: "+" + phone, code: otpcode })
         .then((verification_check) => {
           console.log(verification_check.status);
-          resolve(); 
+          resolve(verification_check.status); 
         })
         .catch((err) => {
+           console.log('hai there!!!!!!');
           reject(err);
         });
     });

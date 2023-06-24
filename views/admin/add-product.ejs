@@ -45,9 +45,10 @@
                             <label class="form-label">Category</label>
                             <select class="form-select" name="category_name">
                                 <option selected disabled>Select a category</option>
-                                <option> Students Laptop</option>
-                                <option> Office Laptop</option>
-                                <option>Gaming Laptop</option>
+                                <% categories.forEach((category)=>{%>
+                                <option><%= category.CategoryName %></option>
+                               <%}) %>
+                              
                             </select>
                         </div>
                         

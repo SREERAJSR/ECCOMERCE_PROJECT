@@ -1,22 +1,24 @@
 <section class="content-main">
     <div class="content-header">
         <div>
-            <h2 class="content-title card-title">Categories </h2>
-      
+            <h2 class="content-title card-title">Categories</h2>
         </div>
         <div>
             <input type="text" placeholder="Search Categories" class="form-control bg-white" id="categorySearch">
-
         </div>
     </div>
     <div class="card">
         <div class="card-body">
             <div class="row">
                 <div class="col-md-3">
-                    <form action="/admin/add-category" method="post">
+                    <form action="/admin/add-category" method="post" enctype="multipart/form-data">
                         <div class="mb-4">
                             <label for="product_name" class="form-label">Name</label>
                             <input name="categoryName" placeholder="Type here" class="form-control" id="product_name"/>
+                        </div>
+                        <div class="mb-4">
+                            <label for="product_name" class="form-label">Images</label>
+                            <input type="file" name="images" multiple accept="image/*">
                         </div>
                         <div class="d-grid">
                             <button type="submit" class="btn btn-primary">Create category</button>
@@ -28,7 +30,6 @@
                         <table class="table table-hover">
                             <thead>
                                 <tr>
-                                   
                                     <th><b>No</b></th>
                                     <th><b>Name</b></th>
                                     <th><b>Id</b></th>
@@ -36,26 +37,23 @@
                                 </tr>
                             </thead>
                             <tbody>
-                             
-                                <% categories.forEach((category,index )=> { %>
-                                <tr data-category="<%= category.CategoryName %>" >
-                                    
-                                    <td><%=index+1%></td>
-                                    <td><b> <%= category.CategoryName %></b></td>
-                                    <td><%= category._id  %></td>
+                                <% categories.forEach((category, index) => { %>
+                                <tr data-category="<%= category.CategoryName %>">
+                                    <td><%= index + 1 %></td>
+                                    <td><b><%= category.CategoryName %></b></td>
+                                    <td><%= category._id %></td>
                                     <td class="text-end">
                                         <div class="dropdown">
                                             <a href="#" data-bs-toggle="dropdown" class="btn btn-light rounded btn-sm font-sm"> <i class="material-icons md-more_horiz"></i> </a>
                                             <div class="dropdown-menu">
-                                                <a class="dropdown-item"  data-category-name="<%= category.CategoryName %>" href="/admin/edit-category?categoryId=<%= category._id%>">Edit info</a>
-
-                                                <a class="dropdown-item text-danger" onclick="deleteCategory('<%= category._id%>')" href="/admin/delete-category">Delete</a>
+                                                <a class="dropdown-item" data-category-name="<%= category.CategoryName %>" href="/admin/edit-category?categoryId=<%= category._id %>">Edit info</a>
+                                                <a class="dropdown-item text-danger" onclick="deleteCategory('<%= category._id %>')" href="/admin/delete-category">Delete</a>
                                             </div>
                                         </div> <!-- dropdown //end -->
                                     </td>
                                 </tr>
-                         <%    }); %>
-                              </tbody>
+                                <% }); %>
+                            </tbody>
                         </table>
                     </div>
                 </div> <!-- .col// -->
@@ -64,42 +62,39 @@
     </div> <!-- card .// -->
 
     <script>
-
-       function deleteCategory(categoryId){
-        event.preventDefault()
-        swal({
-       title: "Are you sure?",
-     text: "Once deleted, you will not be able to recover this imaginary file!",
-     icon: "warning",
-     buttons: true,
-      dangerMode: true,
-     })
-.then((willDelete) => {
-  if (willDelete) {
-    $.ajax({
-    
-      url:'/admin/delete-category',
-      method:'delete',
-     data:{categoryId},
-     success:(response)=>{  
-      swal("Poof! Your imaginary file has been deleted!", {
-      icon: "success",
-    });
-    location.reload()     
-}
-        })
-  }else{
-    swal("Your imaginary file is safe!");
-  }
-})
-  }
+        function deleteCategory(categoryId) {
+            event.preventDefault()
+            swal({
+                title: "Are you sure?",
+                text: "Once deleted, you will not be able to recover this imaginary file!",
+                icon: "warning",
+                buttons: true,
+                dangerMode: true,
+            }).then((willDelete) => {
+                if (willDelete) {
+                    $.ajax({
+                        url: '/admin/delete-category',
+                        method: 'delete',
+                        data: { categoryId },
+                        success: (response) => {
+                            swal("Poof! Your imaginary file has been deleted!", {
+                                icon: "success",
+                            });
+                            location.reload()
+                        }
+                    })
+                } else {
+                    swal("Your imaginary file is safe!");
+                }
+            })
+        }
     </script>
     <script>
         function searchCategories() {
             const input = document.getElementById('categorySearch');
             const filter = input.value.toUpperCase();
             const rows = document.querySelectorAll('tbody tr');
-    
+
             rows.forEach(row => {
                 const category = row.getAttribute('data-category');
                 if (category.toUpperCase().indexOf(filter) > -1) {
@@ -114,11 +109,4 @@
         const searchInput = document.getElementById('categorySearch');
         searchInput.addEventListener('input', searchCategories);
     </script>
-    
-    
-
-    
-</section
-
-
-
+</section>

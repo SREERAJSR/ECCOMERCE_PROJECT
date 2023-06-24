@@ -100,7 +100,7 @@ form button:hover {
         <i class="bx bxs-check-shield"></i>
       </header>
       <h4>Enter OTP Code</h4>
-      <form action="/user-signUp-otp" method="post">
+      <form action="/user-signUp-otp?phone=<%=userPhone%>" method="post">
         <div class="input-field">
           <input type="number" name="otp1" />
           <input type="number" name="otp2" disabled />

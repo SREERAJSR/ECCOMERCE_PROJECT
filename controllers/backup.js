@@ -2,9 +2,7 @@ const User = require("../models/userSchema");
 const bcrypt = require("bcrypt");
 const twilio = require("twilio");
 const userHelpers = require("../helpers/user-helpers");
-const category = require('../models/categorySchema')
 const { clearCache } = require("ejs");
-const {findCategory}= require('../helpers/product-helpers')
 
 module.exports = {
   getSignup: (req, res) => {
@@ -28,11 +26,11 @@ module.exports = {
       await newUser
         .save()
         .then(() => {
-          // req.session.user = newUser;
+          req.session.user = newUser;
           //req.session.phone=phone
           console.log(req.session.user);
-          userHelpers.sendingOtp(phone).then(() => {
-            const userPhone = "+91" + phone;
+          userHelpers.sendingOtp(req.session.user.phone).then(() => {
+            const userPhone = "+91" + req.session.user.phone;
             res.render("user/user-signUp-otp", { u: false, userPhone });
           });
         })
@@ -52,7 +50,6 @@ module.exports = {
 
     if (req.session.user) {
 
-      console.log(req.session);
       console.log("haii");
       res.setHeader("Cache-Control", "no-cache, no-store, must-revalidate");
       res.setHeader("Pragma", "no-cache");
@@ -60,7 +57,7 @@ module.exports = {
       res.redirect("/");
     } else { 
       console.log("no hai");
-     res.render('user/login',{u:false})
+      res.render("user/login", { u: false });
     }
   },
 
@@ -69,16 +66,15 @@ module.exports = {
       const { email, password } = req.body;
 
       const user = await User.findOne({ Email: email });
+
+      
       if (!user) { 
         return res.status(401).json({ message: "Invalid email or password" });
       }
       const passwordMatch = await bcrypt.compare(password, user.password);
 
-
-
-
+      console.log(req.session.user); 
       if (passwordMatch) {
-        req.session.user=user
         res.redirect("/");
       } else {
         res.redirect("/login");
@@ -154,22 +150,20 @@ module.exports = {
   },
   validateSignUp: async (req, res) => {
     try {
-      const{phone} = req.query
       const { otp1, otp2, otp3, otp4, otp5, otp6 } = req.body;
       const otpcode = `${otp1}${otp2}${otp3}${otp4}${otp5}${otp6}`;
       console.log(otpcode);
-      console.log("SSSSSSSŠ" + phone);
+      console.log("SSSSSSSŠ" + req.session.user.phone);
       // const phone = req.session.phone;
 
       userHelpers
-        .validating(phone, otpcode)
-        .then((sucess) => {
-          if (sucess) {
-
+        .validating(req.session.user.phone, otpcode)
+        .then(() => {
+          if (req.session.user) {
+            res.redirect("/");
+          } else {
             res.redirect("/login");
           }
-        }).catch((err)=>{
-          console.log(err);
         })
         .catch((err) => {
           res.status(401).json({ message: "Invalid Otp" + err });
@@ -178,21 +172,4 @@ module.exports = {
       console.log("ERROR IN OTP" + err);
     }
   },
-
-  /////////////////////////////////////////User//////////////////////////////////////////////////////////
-  getHomePage :async(req, res)=> {
-
-    try{
-
-      findCategory().then((categories)=>{
-      res.render("user/homepage", { u: true ,categories});
-      })
-
-    }catch{
-
-    }
-
-  }
-  
 };
-

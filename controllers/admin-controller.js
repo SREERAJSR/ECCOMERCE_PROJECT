@@ -4,50 +4,54 @@ const category = require("../models/categorySchema");
 const Product = require("../models/productSchema");
 const Admin = require('../models/adminSchema')
 const bcrypt = require('bcrypt')
+const {findCategory}= require('../helpers/product-helpers')
+
+
+
 
 
 module.exports = {
 
 
   getLoginPage: (req, res) => {
-    res.render("admin/admin-login", { admin_login: true });
+    res.render("admin/admin-login", { admin_login: true ,loggedErr:false});
   },
 
-    loginAdmin:async(req,res)=>{
+        loginAdmin:async(req,res)=>{
 
-      try{
-        const{UserName,password}= req.body
+          try{
+            const{UserName,password}= req.body
 
-        const admin =await Admin.findOne({Username:UserName})
+            const admin =await Admin.findOne({Username:UserName})
 
-          if(!admin){
-           return res.status(404).json({error:'not found using this username'})
-          }
-          else{
-            bcrypt.compare(password,admin.Password,(err,result)=>{
-
-              if(err){
-                ////////not working
-                  // Error occurred during password comparison
-             console.error('Error comparing passwords:', err);
-           res.status(500).json({ error: 'Internal server error' });
+              if(!admin){
+                const  passwordErr='invalid password'
+                const  userNameErr='invalid username'
+              res.render('admin/admin-login',{userNameErr,admin_login:true,loggedErr:true})
               }
+              else{
+                const passwordMatch =await  bcrypt.compare(password,admin.Password)
 
-              if(result){
-                res.redirect('/admin')
+                if(passwordMatch){
+                  req.session.admin=true
+                return res.redirect('/admin')
+                }else{
+                  const  passwordErr='invalid password'
+                  const  userNameErr='invalid username'
+                res.render('admin/admin-login',{passwordErr,admin_login:true,loggedErr:true})
+                
+                }
               }
-            })
+      
+          }catch(err){
+            console.error('Error finding admin:', err);
+          res.status(500).json({ error: 'Internal server error' +err});
+
           }
-  
-      }catch(err){
-        console.error('Error finding admin:', error);
-      res.status(500).json({ error: 'Internal server error' });
 
-      }
+      
 
-     
-
-    },
+      },
 
   findUser_info: async (req, res) => {
     const users = await User.find({});
@@ -58,7 +62,6 @@ module.exports = {
   changeUserStatus: async (req, res) => {
     try {
       const { userId, action } = req.body;
-
       console.log(req.body);
       const user = await User.findOne({ _id: userId });
       if (!user) {
@@ -66,6 +69,7 @@ module.exports = {
       }
       if (user.isActive === true && action === "block") {
         user.isActive = false;
+       
       } else if (user.isActive === false && action === "unblock") {
         user.isActive = true;
       }
@@ -77,11 +81,19 @@ module.exports = {
   },
 
   getaddProducts: (req, res) => {
-    res.render("admin/add-product", { admin: true });
+    findCategory().then((categories)=>{
+      res.render("admin/add-product", { admin: true ,categories});
+    })
+
+    
   },
   insertCategoryName: async (req, res) => {
     try {
       const { categoryName } = req.body;
+      
+      const categoryImages = await  req.files.map((file)=> file.filename)
+      console.log(categoryImages);
+      
       // if existing category is there
       const existingcategory = await category.findOne({
         CategoryName: { $regex: new RegExp(`^${categoryName}$`, "i") },

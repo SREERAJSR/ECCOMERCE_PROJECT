@@ -10,15 +10,35 @@
 		      	</div>
 		      	<h3 class="text-center mb-4">ADMIN LOGIN</h3>
 						<form action="/admin/admin-login" method="post" class="login-form">
+							
+					<% var loggedErr ,passwordErr,userNameErr; %>
+							<% if (loggedErr===false) {%>
 		      		<div class="form-group">
-		      			<input type="text" class="form-control  rounded-left" placeholder="Username" name="UserName" required>
+		      			<input type="email" class="form-control  rounded-left" id="contact-email" placeholder="Username" onkeyup="validateEmail()" name="UserName" required>
+						<span id="emailErr"></span>
 		      		</div>
-	            <div class="form-group d-flex">
-	              <input type="password" class="form-control rounded-left" placeholder="Password" name="password" required>
-	            </div>
-	            <div class="form-group">
-	            	<button type="submit" class="form-control btn btn-primary rounded submit px-3">Login</button>
-	            </div>
+					  <div class="form-group d-flex">
+						<input type="password" class="form-control rounded-left" id="contact-password" placeholder="Password" onkeyup="validatePassword()"  name="password" required>
+					
+					  </div>
+					  <span id="passwordErr"></span>
+					  <% }else{ %>
+	
+						<div class="form-group">
+							<input type="email	" class="form-control  rounded-left" placeholder="Username" name="UserName" required>
+						</div>
+						<span><%=userNameErr%></span>
+						<div class="form-group d-flex">
+							<input type="password" class="form-control rounded-left" placeholder="Password" name="password" required>
+						</div>
+						<span ><%=passwordErr%></span>
+				
+							<% } %>
+							
+							<div class="form-group">
+								<button type="submit" onclick="return validateForm()" class="form-control btn btn-primary rounded submit px-3">Login</button>
+								<span id="submitErr"></span>
+							</div>
 	            <div class="form-group d-md-flex">
 	            	<div class="w-50">
 	            		
@@ -35,3 +55,54 @@
 	</section>
 
 	
+	<script>
+		const passErr = document.getElementById('passwordErr')
+		const emailErr = document.getElementById('emailErr')
+		const submitErr = document.getElementById('submitErr')
+
+		function validateEmail(){
+
+var emailField = document.getElementById('contact-email').value;
+
+if(emailField.length===0)
+{
+	emailErr.innerHTML="Email is required";
+	return false;
+}
+
+if(!emailField.match(/^[A-Za-z\._\-0-9]*[@][A-Za-z]*[\.][a-z]{2,4}$/)){
+emailErr.innerHTML="invalid email";
+return false;
+}else{
+emailErr.innerHTML='<i class="fa-solid fa-check"></i>';
+return true;
+}
+}
+
+function validatePassword(){
+
+	var passwordField = document.getElementById('contact-password').value
+	 
+	if(passwordField.length ===0){
+
+		passErr.innerHTML="password is required";
+	return false;
+	}else{
+		passErr.innerHTML='<i class="fa-solid fa-check"></i>';
+		return true
+
+	}	
+}
+function validateForm(){
+if(  !validateEmail()||!validatePassword()){
+
+    submitErr.innerHTML="Please fix these error to sumbit ";
+    return false;    
+}
+}
+
+
+
+
+		
+	</script>

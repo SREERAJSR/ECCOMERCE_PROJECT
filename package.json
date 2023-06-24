@@ -6,7 +6,7 @@
     "start": "nodemon ./bin/www"
   },
   "dependencies": {
-    "bcrypt": "^5.1.0",
+    "bcrypt": "^5.0.1",
     "cookie-parser": "~1.4.4",
     "debug": "~2.6.9",
     "dotenv": "^16.3.1",
@@ -15,6 +15,7 @@
     "express-ejs-layouts": "^2.5.1",
     "express-rate-limit": "^6.7.0",
     "express-session": "^1.17.3",
+    "express-validator": "^7.0.1",
     "http-errors": "~1.6.3",
     "jquery": "^3.7.0",
     "mongoose": "^7.2.4",
@@ -23,7 +24,7 @@
     "rate-limit": "^0.1.1",
     "rate-limiter": "^0.2.0",
     "sweetalert": "^2.1.2",
-    "sweetalert2": "^11.7.12",
+    "sweetalert2": "^11.4.8",
     "twilio": "^4.11.2"
   }
 }

@@ -1,5 +1,6 @@
 var express = require("express");
 var router = express.Router();
+const {authenticateAdmin,authenticateForLogin} = require('../middlewares/middlware')
 const {
   getLoginPage,
   loginAdmin,
@@ -25,38 +26,38 @@ const {
 const multer = require("multer");
 const upload = require("../middlewares/multer-config");
 
-router.get("/", (req, res) => {
+router.get("/",authenticateAdmin,(req, res) => {
   res.render("admin/list-users", { admin: true });
 });
 
-router.get('/admin-login',getLoginPage)
+router.get('/admin-login',authenticateForLogin, getLoginPage)
 
 router.post('/admin-login',loginAdmin)
 
-router.get("/user-manage", findUser_info);
+router.get("/user-manage",authenticateAdmin, findUser_info);
 
-router.patch("/userManage", changeUserStatus);
+router.patch("/userManage",authenticateAdmin, changeUserStatus);
 
-router.get("/add-product", getaddProducts);
+router.get("/add-product", getaddProducts); 
 
-router.post("/add-product", upload.array("images", 4), addingProducts);
+router.post("/add-product",authenticateAdmin, upload.array("images", 4), addingProducts);
 
-router.post("/add-category", insertCategoryName);
+router.post("/add-category",authenticateAdmin, insertCategoryName);
 
-router.get("/edit-category", getEditCategoryPage);
+router.get("/edit-category",authenticateAdmin, getEditCategoryPage);
 
-router.post("/edit-category", editCategoryName);
+router.post("/edit-category", authenticateAdmin,editCategoryName);
 
-router.delete("/delete-category", deleteCategory);
+router.delete("/delete-category",authenticateAdmin, deleteCategory);
 
-router.get("/category", getCategoryPage);
+router.get("/category",authenticateAdmin, getCategoryPage);
 
-router.get("/list-products", getListProductPage);
+router.get("/list-products",authenticateAdmin, getListProductPage);
 
-router.get("/edit-product", getEditProductPage);
+router.get("/edit-product",authenticateAdmin, getEditProductPage);
 
-router.post("/edit-product", upload.array("images", 4), editProductAndSave);
+router.post("/edit-product", authenticateAdmin,upload.array("images", 4), editProductAndSave);
 
-router.delete("/delete-product", deleteProduct);
+router.delete("/delete-product",authenticateAdmin, deleteProduct);
 
 module.exports = router;
