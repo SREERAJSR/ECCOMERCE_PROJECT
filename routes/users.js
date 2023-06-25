@@ -13,7 +13,10 @@ const {
   otpVerification,
   signupOtp,
   validateSignUp,
-  getHomePage 
+  getHomePage,
+  getShopPage,
+  getProductDetailPage,
+  userLogout 
 
 } = require("../controllers/userController");
 //SHA256:CXoHORZsVoQiTlBkcwyCuTYWR29M0IyeXdcy8GYOnfY sreerajsr03@gmail.com
@@ -27,13 +30,9 @@ const limiter = rateLimiter({
 router.get("/",  getHomePage)
   
 
-router.get("/view-products",(req, res, next) => {
-  res.render("user/view-products", { u: true });
-});
+router.get("/view-products",getShopPage)
 
-router.get("/product-details", function (req, res, next) {
-  res.render("user/product-details", { u: true });
-});
+router.get("/product-details",getProductDetailPage)
 
 router.get("/shopping-cart", (req, res, next) => {
   res.render("user/shopping-cart",{u:true});
@@ -52,6 +51,8 @@ router.get('/otp-signup',signupOtp)
 router.get("/login",authenticateSession, getLogin);
 
 router.post("/login", postLogin);
+
+router.get('/logout',userLogout)
 
 router.get("/otp-number", loginOtp);
 

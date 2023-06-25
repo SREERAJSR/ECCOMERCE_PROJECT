@@ -3845,3 +3845,20 @@ input.input100 {
     opacity: 1;
   }
 }
+/*-------------*/
+.account-dropdown-horizontal ul {
+  display: flex;
+  flex-direction: row;
+  padding: 0;
+}
+
+.account-dropdown-horizontal li {
+  margin-right: 10px;
+  list-style: none;
+}
+
+.account-dropdown-horizontal li a {
+  display: block;
+  text-decoration: none;
+  color: #000;
+}

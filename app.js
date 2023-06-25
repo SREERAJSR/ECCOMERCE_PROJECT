@@ -19,7 +19,7 @@ app.use(cookieParser());
 app.use(session({
   secret:"key",
   resave:false,
-  saveUninitialized:true,
+  saveUninitialized:false,
   cookie: { maxAge: 600000 } 
 }))
 

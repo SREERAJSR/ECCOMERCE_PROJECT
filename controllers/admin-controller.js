@@ -226,7 +226,7 @@ module.exports = {
 
       console.log(req.files);
       if (productSave) {
-        res.redirect("/admin/list-products");
+        res.redirect("/admin/list-products"); 
       }
     } catch (error) {
       res.status(500).json({ message: "Failed to update the product" });

@@ -6,7 +6,9 @@ const category = require('../models/categorySchema')
 const { clearCache } = require("ejs");
 const {findCategory}= require('../helpers/product-helpers')
 const Product = require("../models/productSchema");
-const {categoryWiseFiltering}= require('../helpers/product-helpers')
+const {categoryWiseFiltering}= require('../helpers/product-helpers');
+const { error } = require("jquery");
+const { default: mongoose } = require("mongoose");
 
 
 module.exports = {
@@ -82,7 +84,11 @@ module.exports = {
 
       if (passwordMatch) {
         req.session.user=user
-        res.redirect("/");
+
+        const UserDetails =req.session.user
+
+
+      res.redirect('/')
       } else {
         res.redirect("/login");
       }
@@ -92,6 +98,16 @@ module.exports = {
   },
   loginOtp: (req, res) => {
     res.render("user/numberOtp", { u: false });
+  },
+
+  userLogout:(req,res)=>{
+
+    if(req.session.user){
+      console.log(req.session);
+      req.session.destroy((err) => {
+        res.redirect('/') // will always fire after session is destroyed
+      })
+    }
   },
 
   sendOtp: async (req, res) => {
@@ -189,25 +205,85 @@ module.exports = {
         let filter ={}
          filter= await Promise.all(
           categories.map(async (category) => {
+
+           
+         
+         const res  =await Product.find({ 'Category.categoryName': category.CategoryName, });
+
+         return {res}
+          })
+        );
+        const gaming = filter[0].res
+        const office = filter[1].res
+        const students = filter[2].res
+        const userDetails = req.session.user
+
+        if(req.session.user){
+          res.render("user/homepage", { u: true, categories ,gaming,office,students,userDetails });
+
+        }else{
+          res.render("user/homepage", { u: true, categories ,gaming,office,students });
+
+        }
+  
+      });
+    } catch (error) {
+      // Handle the error appropriately
+    }
+  },
+  getShopPage:  async(req, res, next) => {
+
+    try {
+      findCategory().then(async (categories) => {
+        let filter ={}
+         filter= await Promise.all(
+          categories.map(async (category) => {
          
          const res  =await Product.find({ 'Category.categoryName': category.CategoryName });
 
          return {res}
           })
         );
-
         const gaming = filter[0].res
         const office = filter[1].res
         const students = filter[2].res
-        console.log("haiiii", gaming);
+       
   
-        res.render("user/homepage", { u: true, categories ,gaming,office,students });
+        res.render("user/view-products", { u: true, categories ,gaming,office,students });
       });
     } catch (error) {
       // Handle the error appropriately
     }
+  
+  },
+
+  getProductDetailPage:async(req, res, next)=> {
+
+    try{
+    const {productId}= req.query
+    const categoryId = req.query.categoryId.trim()
+    console.log(categoryId);
+
+    const catProd=await Product.aggregate([{$match:{'Category.categoryId': new mongoose.Types.ObjectId(categoryId) }}])
+    
+       await Product.findById(productId).then(async(product)=>{
+
+      
+      if(product){
+        res.render("user/product-details", { u: true ,product ,catProd});
+      }else{
+        res.redirect('/view-products')
+      }
+    }).catch((err)=>{
+      console.log(err);
+    })
+  }catch(err){
+
+    console.log(err);
+    res.status(500).json({ error: err});
   }
   
+}
 
 
    

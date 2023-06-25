@@ -4,7 +4,7 @@ module.exports={
     authenticateSession:(req,res,next)=>{
         console.log('1');
         console.log(req.session);
-        if(req.session.user){
+        if(req.session.user ){
            next()
         }else{
             console.log('3');
