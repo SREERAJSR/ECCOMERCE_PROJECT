@@ -52,6 +52,16 @@ module.exports = {
       
 
       },
+      logoutAdmin:(req,res)=>{
+
+        if(req.session.admin){
+
+          req.session.destroy((err)=>{
+            res.redirect('/admin/admin-login')
+          })
+        }
+
+      },
 
   findUser_info: async (req, res) => {
     const users = await User.find({});
@@ -62,16 +72,21 @@ module.exports = {
   changeUserStatus: async (req, res) => {
     try {
       const { userId, action } = req.body;
-      console.log(req.body);
+ 
       const user = await User.findOne({ _id: userId });
       if (!user) {
         return res.status(404).json({ error: "User not found" });
       }
+      console.log(req.session);
       if (user.isActive === true && action === "block") {
-        user.isActive = false;
+        user.isActive = false; 
+        // req.session.user=null
        
       } else if (user.isActive === false && action === "unblock") {
         user.isActive = true;
+        // req.session.user=user
+      
+      
       }
       await user.save();
       res.json({ user });

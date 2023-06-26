@@ -34,7 +34,9 @@ Paragrap        : 18px/1.6 '', Arial, sans-serif;
 Input, textarea : 14px/1.6 '', Arial, sans-serif;
 -------------------------------------------------------------------*/
 
-
+a{
+  text-decoration: none;
+}
 
 
 /*//////////////////////////////////////////////////////////////////
@@ -3564,6 +3566,7 @@ iframe {
   top: 0;
   left: 0;
   background-color: rgba(54,84,99,0.7);
+  
 }
 
 
@@ -3846,7 +3849,7 @@ input.input100 {
   }
 }
 /*-------------*/
-.account-dropdown-horizontal ul {
+/* .account-dropdown-horizontal ul {
   display: flex;
   flex-direction: row;
   padding: 0;
@@ -3861,4 +3864,4 @@ input.input100 {
   display: block;
   text-decoration: none;
   color: #000;
-}
+} */

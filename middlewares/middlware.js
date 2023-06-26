@@ -1,10 +1,11 @@
-
+const User = require("../models/userSchema");
 module.exports={
 
-    authenticateSession:(req,res,next)=>{
+        authenticateSession:(req,res,next)=>{
         console.log('1');
         console.log(req.session);
-        if(req.session.user ){
+        if(req.session.user){
+            console.log(376);
            next()
         }else{
             console.log('3');
@@ -12,12 +13,12 @@ module.exports={
         }
     },
 authenticateAdmin:((req,res,next)=>{
-    console.log('nimi');
+
     if(req.session.admin){
-        console.log('sha');
+       
         next()
     }else{
-        console.log("ps");
+
         res.redirect('/admin/admin-login')
     }
 }),
@@ -27,7 +28,21 @@ authenticateForLogin:((req,res,next)=>{
     }else{
         next()
     }
-})
+}),
+
+authenticateForUser:async(req,res,next)=>{
+    console.log(req.session);
+
+   const phone = req.session.user.phone
+
+   const user = await User.findOne({phone:phone})
+
+    if(user.isActive){
+        next()
+    }else{
+        res.render('user/login',{u:false})
+    }
+}
 
    
      

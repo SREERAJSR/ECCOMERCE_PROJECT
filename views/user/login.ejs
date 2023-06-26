@@ -3,9 +3,9 @@
 	<div class="limiter">
 		<div class="container-login100">
 			<div class="wrap-login100">
-				<div class="login100-form-title" style="background-image: url(images/bg-01.jpg);">
+				<div class="login100-form-title" style="background-image: url(	/images/signup-cover.jpg);">
 					<span class="login100-form-title-1">
-						Sign In
+			         <b>LOGIN</b>
 					</span>
 				</div>
 
@@ -16,6 +16,10 @@
 						<span class="focus-input100"></span> 
 					</div>
 					<span id="email_err"></span>
+					<% var emailErr %>
+					<%if(emailErr){  %>
+					<span><%=emailErr  %></span>
+					<% } %>
 
 					<div class="wrap-input100 validate-input m-b-18" data-validate = "Password is required">
 						<span class="label-input100">Password</span>
@@ -23,6 +27,11 @@
 						<span class="focus-input100"></span>
 					</div>
 					<span id="password_err"></span>
+					<% var passErr %>
+						<%if(passErr){  %>
+						<span><%=passErr  %></span>
+						
+						<% } %>
 
 					<div class="flex-sb-m w-full p-b-30">
 						<div class="contact100-form-checkbox">
@@ -38,7 +47,6 @@
 							</a>
 							
 						</div>
-						
 						
 					</div>
 
@@ -82,17 +90,17 @@ return true;
 
 function validatePassword(){
 
-	var passwordField = document.getElementById('contact-password').value
-	 
-	if(passwordField.length ===0){
+	var passField = document.getElementById('contact-password').value;
 
-		passErr.innerHTML="password is required";
-	return false;
-	}else{
-		passErr.innerHTML='<i class="fa-solid fa-check"></i>';
-		return true
+if(passField.length <8){
 
-	}	
+    passErr.innerHTML = "Password should be at least 8 characters long";
+  return false;
+
+        }else{
+            passErr.innerHTML='<i class="fa-solid fa-check"></i>';
+            return true
+        }
 }
 function validateForm(){
 if(  !validateEmail()||!validatePassword()){

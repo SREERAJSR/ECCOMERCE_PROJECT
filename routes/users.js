@@ -1,6 +1,8 @@
-const {authenticateSession} =require('../middlewares/middlware')
+const {authenticateSession,authenticateForUser} =require('../middlewares/middlware')
 const rateLimiter =require('express-rate-limit')
+const User = require("../models/userSchema");
 var express = require("express");
+
 var router = express.Router();
 const {
   resendOtp,
@@ -27,12 +29,16 @@ const limiter = rateLimiter({
   max: 5, // Allow a maximum of 5 requests within the defined window
 });
 /* GET users listing. */
-router.get("/",  getHomePage)
-  
 
-router.get("/view-products",getShopPage)
+router.get("/login",authenticateSession, getLogin);
 
-router.get("/product-details",getProductDetailPage)
+router.post("/login", postLogin);
+
+router.get("/", getHomePage)
+
+router.get("/view-products", getShopPage)
+
+router.get("/product-details", getProductDetailPage)
 
 router.get("/shopping-cart", (req, res, next) => {
   res.render("user/shopping-cart",{u:true});
@@ -48,9 +54,7 @@ router.post("/signup", userSignup);
 
 router.get('/otp-signup',signupOtp)
 
-router.get("/login",authenticateSession, getLogin);
 
-router.post("/login", postLogin);
 
 router.get('/logout',userLogout)
 

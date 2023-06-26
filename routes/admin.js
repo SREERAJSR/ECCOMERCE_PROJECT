@@ -12,6 +12,7 @@ const {
   getListProductPage,
   getEditProductPage,
   editProductAndSave,
+  logoutAdmin
 } = require("../controllers/admin-controller");
 
 const {
@@ -33,6 +34,8 @@ router.get("/",authenticateAdmin,(req, res) => {
 router.get('/admin-login',authenticateForLogin, getLoginPage)
 
 router.post('/admin-login',loginAdmin)
+
+router.get('/admin-logout',authenticateAdmin, logoutAdmin)
 
 router.get("/user-manage",authenticateAdmin, findUser_info);
 

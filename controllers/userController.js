@@ -11,6 +11,9 @@ const { error } = require("jquery");
 const { default: mongoose } = require("mongoose");
 
 
+
+
+
 module.exports = {
   getSignup: (req, res) => {
     // console.log(req.session.user.username);
@@ -54,8 +57,10 @@ module.exports = {
   },
  
   getLogin: (req, res) => {
+ 
 
     if (req.session.user) {
+
 
       console.log(req.session);
       console.log("haii");
@@ -75,22 +80,24 @@ module.exports = {
 
       const user = await User.findOne({ Email: email });
       if (!user) { 
-        return res.status(401).json({ message: "Invalid email or password" });
+        const emailErr ='invalid email'
+       return res.render("user/login",{u:false, emailErr });
+       
       }
       const passwordMatch = await bcrypt.compare(password, user.password);
+      const UserDetails =req.session.user
 
-
-
-
-      if (passwordMatch) {
+      if (passwordMatch && user.isActive===true) {
         req.session.user=user
-
-        const UserDetails =req.session.user
-
-
       res.redirect('/')
-      } else {
-        res.redirect("/login");
+      } else if( passwordMatch && user.isActive===false) {
+
+        res.redirect('/login')
+
+      }else if(!passwordMatch){
+        
+        const passErr ='incorrect password'
+        res.render("user/login",{u:false, passErr });
       }
     } catch (err) {
       console.log(err);
@@ -121,7 +128,7 @@ module.exports = {
         .services(process.env.verifySid)
         .verifications.create({ to: "+91" + phone, channel: "sms" });
       const userPhone = "+91" + phone;
-      req.session.phone = phone;
+      // req.session.phone = phone;
       res.render("user/otp-signup", { u: false, userPhone });
       // res.redirect(`/otp/${phone}`);
     } catch (err) {
@@ -138,10 +145,16 @@ module.exports = {
       await client.verify.v2
         .services(process.env.verifySid)
         .verificationChecks.create({ to: phone, code: otpcode })
-        .then((verification_check) => {
+        .then(async(verification_check) => {
           console.log(verification_check.status);
 
-          if (req.session.phone) {
+                 // Remove '+91' from the phone number
+        const formattedPhone = phone.substring(3);
+          const user =await  User.findOne({phone:formattedPhone})
+
+          console.log(user);
+          req.session.user = user
+          if (user.isActive) {
             res.redirect("/");
           } else {
             res.redirect("/login");
@@ -208,23 +221,36 @@ module.exports = {
 
            
          
-         const res  =await Product.find({ 'Category.categoryName': category.CategoryName, });
+         const resp  =await Product.find({ 'Category.categoryName': category.CategoryName, });
 
-         return {res}
+         return {resp}
           })
         );
-        const gaming = filter[0].res
-        const office = filter[1].res
-        const students = filter[2].res
+        const gaming = filter[0].resp
+        const office = filter[1].resp
+        const students = filter[2].resp
         const userDetails = req.session.user
-
+      
+       
         if(req.session.user){
-          res.render("user/homepage", { u: true, categories ,gaming,office,students,userDetails });
+
+          const userPhone = req.session.user.phone
+   
+          const user = await User.findOne({phone:userPhone})
+        if(user.isActive===true){
+          
+          res.render("user/homepage", { u: true, categories ,gaming,office,students,userDetails });   
+        }
+        else{
+
+          res.render("user/homepage", { u: true, categories ,gaming,office,students });
+        }
 
         }else{
           res.render("user/homepage", { u: true, categories ,gaming,office,students });
 
         }
+
   
       });
     } catch (error) {
@@ -243,13 +269,30 @@ module.exports = {
 
          return {res}
           })
-        );
+        ); 
         const gaming = filter[0].res
-        const office = filter[1].res
+        const office = filter[1].res 
         const students = filter[2].res
-       
-  
-        res.render("user/view-products", { u: true, categories ,gaming,office,students });
+        if(req.session.user){
+          const userPhone = req.session.user.phone
+          const userDetails = req.session.user
+          const user = await User.findOne({phone:userPhone})
+             if(user.isActive===true){
+               res.render("user/view-products", { u: true, categories ,gaming,office,students,userDetails});
+      
+             }  
+             else{
+   
+               res.render("user/view-products", { u: true, categories ,gaming,office,students });
+             }
+
+        }else{
+          res.render("user/view-products", { u: true, categories ,gaming,office,students });
+
+
+        }
+
+      
       });
     } catch (error) {
       // Handle the error appropriately
@@ -270,7 +313,26 @@ module.exports = {
 
       
       if(product){
-        res.render("user/product-details", { u: true ,product ,catProd});
+
+        if(req.session.user){
+
+          const userPhone = req.session.user.phone
+          const userDetails = req.session.user
+          const user = await User.findOne({phone:userPhone})
+          if(user.isActive===true){
+            res.render("user/product-details", { u: true ,product ,catProd,userDetails});
+          }else{
+  
+            res.render("user/product-details", { u: true ,product ,catProd});
+          }
+      
+
+        }else{
+          res.render("user/product-details", { u: true ,product ,catProd});
+
+
+        }
+        
       }else{
         res.redirect('/view-products')
       }
