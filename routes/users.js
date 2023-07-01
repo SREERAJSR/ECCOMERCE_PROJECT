@@ -18,7 +18,11 @@ const {
   getHomePage,
   getShopPage,
   getProductDetailPage,
-  userLogout 
+  userLogout,
+  getForgotpasswordPage,
+  forgotPasswordSendOtp,
+  forgotPasswordOtpVerification,
+  passwordValidationForConfirm 
 
 } = require("../controllers/userController");
 //SHA256:CXoHORZsVoQiTlBkcwyCuTYWR29M0IyeXdcy8GYOnfY sreerajsr03@gmail.com
@@ -54,6 +58,12 @@ router.post("/signup", userSignup);
 
 router.get('/otp-signup',signupOtp)
 
+router.get('/forgot-password' , getForgotpasswordPage)
+
+router.post('/forgot-password-sendingOtp', forgotPasswordSendOtp)
+router.post('/otp-forgotpassword/:id',forgotPasswordOtpVerification )
+
+router.post('/confirm-password',passwordValidationForConfirm)
 
 
 router.get('/logout',userLogout)
@@ -61,6 +71,8 @@ router.get('/logout',userLogout)
 router.get("/otp-number", loginOtp);
 
 router.post("/send-otp", limiter, sendOtp); 
+
+
 
 // router.get('/otp',getotpVerificationPage) 
 

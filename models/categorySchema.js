@@ -10,6 +10,9 @@ const categorySchema = new mongoose.Schema({
     },
     CategoryImage:{
         type:String
+    },
+    isActive:{
+        type:Boolean
     }
    
 })

@@ -53,7 +53,10 @@ const productSchema = new mongoose.Schema({
     ProductImages:[{
         type:String,
 
-    }]
+    }],
+    isActive:{
+        type:Boolean
+    }
     
 })
 

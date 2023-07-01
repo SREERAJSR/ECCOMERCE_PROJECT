@@ -1,13 +1,12 @@
 <section class="content-main">
     <div class="content-header">
         <div>
-            <h2 class="content-title card-title">Products grid</h2>
-            <p>Lorem ipsum dolor sit amet.</p>
+            <h2 class="content-title card-title">All products</h2>
+            
         </div>
         <div>
-            <a href="#" class="btn btn-light rounded font-md">Export</a>
-            <a href="#" class="btn btn-light rounded  font-md">Import</a>
-            <a href="#" class="btn btn-primary btn-sm rounded">Create new</a>
+            <a href="/admin/add-product" class="btn btn-primary btn-sm rounded">Create new</a>
+            <a href="/admin/unlist-product" class="btn btn-primary btn-sm rounded">Unlisted products</a>
         </div>
     </div>
     <div class="card mb-4">
@@ -92,7 +91,7 @@
 
     $.ajax({
         url:'/admin/delete-product',
-        method:'delete',
+        method:'patch',
         data:{productId},
         success:(response)=>{
      swal("Poof! Your imaginary file has been deleted!", {

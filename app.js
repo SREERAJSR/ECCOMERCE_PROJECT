@@ -8,6 +8,7 @@ const ejs = require("ejs");
 const session = require('express-session')
 const expressLayouts = require("express-ejs-layouts");
 const mongoose = require("mongoose");
+const flash = require('connect-flash');
 
 var app = express();
 
@@ -18,11 +19,11 @@ app.use(cookieParser());
 
 app.use(session({
   secret:"key",
-  resave:false,
+  resave:false,  
   saveUninitialized:false,
   cookie: { maxAge: 600000 } 
 }))
-
+app.use(flash());
 var adminRouter = require("./routes/admin");
 var usersRouter = require("./routes/users");
 
@@ -44,6 +45,10 @@ mongoose
 // view engine setup
 app.set("views", path.join(__dirname, "views"));
 app.set("view engine", "ejs");
+app.use(function(req, res, next){
+  res.locals.message = req.flash();
+  next();
+});
 app.set("layout", "layouts/layout"); // Set the layout file
 // Set the partials directory
 app.set("view options", { partials: path.join(__dirname, "views/partials") });

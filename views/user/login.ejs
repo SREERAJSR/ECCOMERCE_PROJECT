@@ -1,113 +1,119 @@
-
-	
-	<div class="limiter">
-		<div class="container-login100">
-			<div class="wrap-login100">
-				<div class="login100-form-title" style="background-image: url(	/images/signup-cover.jpg);">
-					<span class="login100-form-title-1">
-			         <b>LOGIN</b>
-					</span>
-				</div>
-
-				<form class="login100-form validate-form" action="/login" method="post">
-					<div class="wrap-input100 validate-input m-b-26" data-validate="Username is required">
-						<span class="label-input100">Email </span> 
-						<input class="input100" id="contact-email" onkeyup="validateEmail()" type="text" name="email" placeholder="Enter email"> 
-						<span class="focus-input100"></span> 
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.1/dist/css/bootstrap.min.css" rel="stylesheet" type="text/css" >
+ 
+		<div class="limiter">
+			<div class="container-login100">
+				<div class="wrap-login100">
+					<div class="login100-form-title" style="background-image: url(	/images/signup-cover.jpg);">
+						<span class="login100-form-title-1">
+						<b>LOGIN</b>
+						</span>
 					</div>
-					<span id="email_err"></span>
-					<% var emailErr %>
-					<%if(emailErr){  %>
-					<span><%=emailErr  %></span>
-					<% } %>
 
-					<div class="wrap-input100 validate-input m-b-18" data-validate = "Password is required">
-						<span class="label-input100">Password</span>
-						<input class="input100" id="contact-password" onkeyup="validatePassword()" type="password" name="password" placeholder="Enter password">
-						<span class="focus-input100"></span>
-					</div>
-					<span id="password_err"></span>
-					<% var passErr %>
-						<%if(passErr){  %>
-						<span><%=passErr  %></span>
+					<% if(message.success)	{ %>
+						<div class="alert alert-success" role="alert">
+							<%= message.success %>
+						</div>
+						<% } %>
 						
+					<form class="login100-form validate-form" action="/login" method="post">
+						<div class="wrap-input100 validate-input m-b-26" data-validate="Username is required">
+							<span class="label-input100">Email </span> 
+							<input class="input100" id="contact-email" onkeyup="validateEmail()" type="text" name="email" placeholder="Enter email"> 
+							<span class="focus-input100"></span> 
+						</div>
+						<span id="email_err"></span>
+						<% var emailErr %>
+						<%if(emailErr){  %>
+						<span><%=emailErr  %></span>
 						<% } %>
 
-					<div class="flex-sb-m w-full p-b-30">
-						<div class="contact100-form-checkbox">
-							<input class="input-checkbox100" id="ckb1" type="checkbox" name="remember-me">
-							<label class="label-checkbox100" for="ckb1">
-								Remember me
-							</label>
+						<div class="wrap-input100 validate-input m-b-18" data-validate = "Password is required">
+							<span class="label-input100">Password</span>
+							<input class="input100" id="contact-password" onkeyup="validatePassword()" type="password" name="password" placeholder="Enter password">
+							<span class="focus-input100"></span>
 						</div>
+						<span id="password_err"></span>
+						<% var passErr %>
+							<%if(passErr){  %>
+							<span><%=passErr  %></span>
+							
+							<% } %>
 
-						<div>
-							<a href="#" class="txt1">
-								Forgot Password?
-							</a>
+						<div class="flex-sb-m w-full p-b-30">
+							<div class="contact100-form-checkbox">
+								<input class="input-checkbox100" id="ckb1" type="checkbox" name="remember-me">
+								<label class="label-checkbox100" for="ckb1">
+									Remember me
+								</label>
+							</div>
+
+							<div>
+								<a href="/forgot-password" class="txt1">
+									Forgot Password?
+								</a>
+								
+							</div>
 							
 						</div>
-						
-					</div>
 
-					<div class="container-login100-form-btn">
-						<button onclick="return validateForm()" class="login100-form-btn" type="submit">
-							Login
-						</button>
-						<span id="submit_err"></span>
-					</div>
-					
-					<p id="qstnAcc">Don't have a account? <a href="/signup">Signup</a></p>
-					<a href="/otp-number">Signin using otp</a>
-				</form>
+						<div class="container-login100-form-btn">
+							<button onclick="return validateForm()" class="login100-form-btn" type="submit">
+								Login
+							</button>
+							<span id="submit_err"></span>
+						</div>
+						
+						<p id="qstnAcc">Don't have a account? <a href="/signup">Signup</a></p>
+						<a href="/otp-number">Signin using otp</a>
+					</form>
+				</div>
 			</div>
 		</div>
-	</div>
 
-	<script>
-		const passErr = document.getElementById('password_err')
-		const emailErr = document.getElementById('email_err')
-		const submitErr = document.getElementById('submit_err')
+		<script>
+			const passErr = document.getElementById('password_err')
+			const emailErr = document.getElementById('email_err')
+			const submitErr = document.getElementById('submit_err')
 
-		function validateEmail(){
+			function validateEmail(){
 
-var emailField = document.getElementById('contact-email').value;
+	var emailField = document.getElementById('contact-email').value;
 
-if(emailField.length===0)
-{
-	emailErr.innerHTML="Email is required";
+	if(emailField.length===0)
+	{
+		emailErr.innerHTML="Email is required";
+		return false;
+	}
+
+	if(!emailField.match(/^[A-Za-z\._\-0-9]*[@][A-Za-z]*[\.][a-z]{2,4}$/)){
+	emailErr.innerHTML="invalid email";
 	return false;
-}
+	}else{
+	emailErr.innerHTML='<i class="fa-solid fa-check"></i>';
+	return true;
+	}
+	}
 
-if(!emailField.match(/^[A-Za-z\._\-0-9]*[@][A-Za-z]*[\.][a-z]{2,4}$/)){
-emailErr.innerHTML="invalid email";
-return false;
-}else{
-emailErr.innerHTML='<i class="fa-solid fa-check"></i>';
-return true;
-}
-}
+	function validatePassword(){
 
-function validatePassword(){
+		var passField = document.getElementById('contact-password').value;
 
-	var passField = document.getElementById('contact-password').value;
+	if(passField.length <8){
 
-if(passField.length <8){
+		passErr.innerHTML = "Password should be at least 8 characters long";
+	return false;
 
-    passErr.innerHTML = "Password should be at least 8 characters long";
-  return false;
+			}else{
+				passErr.innerHTML='<i class="fa-solid fa-check"></i>';
+				return true
+			}
+	}
+	function validateForm(){
+	if(  !validateEmail()||!validatePassword()){
 
-        }else{
-            passErr.innerHTML='<i class="fa-solid fa-check"></i>';
-            return true
-        }
-}
-function validateForm(){
-if(  !validateEmail()||!validatePassword()){
+		submitErr.innerHTML="Please fix these error to sumbit ";
+		return false;    
+	}
+	}
 
-    submitErr.innerHTML="Please fix these error to sumbit ";
-    return false;    
-}
-}
-
-</script>
+	</script>

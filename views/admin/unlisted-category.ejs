@@ -43,17 +43,14 @@
                                     </div> -->
                             </th>
                             <th>No</th>
-                            <th>Name</th>
-                            <th>Email</th>
-                            <th>Phone</th>
-                            <th>Created Date</th>
+                            <th>CategoryName</th>
                             <th>Status</th>
   
                         </tr>
                     </thead>
                     <tbody>
 
-                        <% users.forEach((user, index) => { %>
+                        <%unlistedcategories.forEach((category, index) => { %>
 
                         <tr>
                             <td>
@@ -62,16 +59,12 @@
                                     </div> -->
                             </td>
                             <td><%= index + 1 %></td>
-                            <td><b> <%= user.Name  %>  </b></td>
-                            <td><%= user.Email  %></td>
-                            <td>  <%= user.phone  %></td>
-                            
-                            <td><%= user.createdDate  %></td>
-
-                            <td> <% if (user.isActive) { %>
-                                <button class="btn btn-danger block-btn" id="blockButton_<%= user._id %>" data-action="block" onclick="blockUser('<%= user._id%>','block')">Block</button>
+                            <td><b> <%= category.CategoryName  %>  </b></td>
+                    
+                            <td> <% if (category.isActive) { %>
+                                <button class="btn btn-danger block-btn" id="blockButton_<%= category._id %>" data-action="block" onclick="blockUser('<%= category._id%>','block')">Block</button>
                                 <% } else { %>
-                                    <button class="btn btn-success block-btn" id="blockButton_<%= user._id %>" data-action="unblock" onclick="unBlockUser('<%= user._id%>','unblock')">Unblock</button>
+                                    <button class="btn btn-success block-btn" id="blockButton_<%= category._id %>" data-action="unblock" onclick="unBlockUser('<%= category._id%>','unblock')">Unblock</button>
                                     <% } %>
                                 </td>
 
@@ -116,16 +109,16 @@
 
 
 <script>
-    blockUser=(userId,action)=>{
+    blockUser=(categoryId,action)=>{
 
         $.ajax({
-            url:'/admin/userManage',
+            url:'/admin/unlistCategory',
             method:'patch',
-            data:{userId,action},
+            data:{categoryId,action},
 
             success:(response)=>{
-                const blockButton = $('#blockButton_' + userId);
-      blockButton.text('Unblock').removeClass('btn-danger').addClass('btn-success').data('action', 'unblock').attr('onclick', "unblockUser('" + userId + "', 'unblock')");
+                const blockButton = $('#blockButton_' +categoryId);
+      blockButton.text('Unblock').removeClass('btn-danger').addClass('btn-success').data('action', 'unblock').attr('onclick', "unblockUser('" + categoryId + "', 'unblock')");
       location.reload() 
             },
             error:(err)=>{
@@ -136,16 +129,16 @@
     }
 </script>
 <script>
-    unBlockUser=(userId,action)=>{
+    unBlockUser=(categoryId,action)=>{
 
         $.ajax({
-            url:'/admin/userManage',
+            url:'/admin/unlistCategory',
             method:'patch',
-            data:{userId,action},
+            data:{categoryId,action},
 
             success:(response)=>{
-                const blockButton = $('#blockButton_' + userId);
-      blockButton.text('Block').removeClass('btn-success').addClass('btn-danger').data('action', 'block').attr('onclick', "blockUser('" + userId + "', 'block')");
+                const blockButton = $('#blockButton_' + categoryId);
+         blockButton.text('Block').removeClass('btn-success').addClass('btn-danger').data('action', 'block').attr('onclick', "blockUser('" + categoryId + "', 'block')");
                 location.reload()
             },
             error:(err)=>{

@@ -3,12 +3,10 @@ module.exports = {
   getCategory: (categoryId) => {
     return new Promise(async (resolve, reject) => {
       await category
-        .findById(categoryId)
-        .then((selectedCategory) => {
+        .findById(categoryId).then((selectedCategory) => {
           resolve(selectedCategory);
         })
-        .catch((err) => {
-          reject(err);
+        .catch((err) => {reject(err);
         });
     });
   },

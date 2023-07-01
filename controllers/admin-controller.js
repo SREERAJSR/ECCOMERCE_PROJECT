@@ -4,7 +4,9 @@ const category = require("../models/categorySchema");
 const Product = require("../models/productSchema");
 const Admin = require('../models/adminSchema')
 const bcrypt = require('bcrypt')
-const {findCategory}= require('../helpers/product-helpers')
+const {findCategory}= require('../helpers/product-helpers');
+const sharp = require("sharp");
+const { error } = require("jquery");
 
 
 
@@ -47,13 +49,10 @@ module.exports = {
             console.error('Error finding admin:', err);
           res.status(500).json({ error: 'Internal server error' +err});
 
-          }
-
-      
-
+          }   
       },
       logoutAdmin:(req,res)=>{
-
+ 
         if(req.session.admin){
 
           req.session.destroy((err)=>{
@@ -102,40 +101,6 @@ module.exports = {
 
     
   },
-  insertCategoryName: async (req, res ,next) => {
-    try {
-      const { categoryName } = req.body;
-      
-      const CaetegoryImagesFileName = req.files.map((file) => file.filename);
-
-      console.log(CaetegoryImagesFileName[0]);
-      // if existing category is there
-      const existingcategory = await category.findOne({
-        CategoryName: { $regex: new RegExp(`^${categoryName}$`, "i") },
-      });
-      if (existingcategory) {
-        return res.status(400).json({ error: "Category name already exists" });
-      }
-
-      const newCategory = new category({
-        CategoryName: categoryName,
-        CategoryImage:CaetegoryImagesFileName[0]
-      
-      });
-      await newCategory
-        .save()
-        .then(() => {
-          res.redirect("/admin/category");
-
-        })
-        .catch((err) => {
-          console.log("category upload error" + err);
-        });
-    } catch {
-      return res.status(400).json({ error: "Category uploaded error" });
-    }
-  },
-
   addingProducts: async (req, res) => {
     try {
       console.log(req.files);
@@ -174,19 +139,22 @@ module.exports = {
         RegularPrice: regular_price,
         SalePrice: sale_price,
         ProductImages: productImagesFileName,
+        isActive:true
       });
       await newProduct.save().then(() => {
         console.log("sucessfull product added");
         res.redirect("/admin/list-products");
-      });
+      }).catch((err)=>{
+        console.log(err);
+      })
     } catch (err) {
       res.status(400).json({ error: "product uploaded error" + err });
     }
   },
-
   getListProductPage: async (req, res) => {
     try {
-      const allProducts = await Product.find({});
+      const allProducts = await Product.aggregate([{$match:{isActive:true}}])
+      // const allProducts = await Product.find()
 
       res.render("admin/list-products", { admin: true, allProducts });
     } catch {}
@@ -238,7 +206,7 @@ module.exports = {
         },
         { new: true }
       );
-
+ 
       console.log(req.files);
       if (productSave) {
         res.redirect("/admin/list-products"); 

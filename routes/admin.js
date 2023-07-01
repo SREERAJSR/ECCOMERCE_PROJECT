@@ -8,7 +8,6 @@ const {
   changeUserStatus,
   getaddProducts,
   addingProducts,
-  insertCategoryName,
   getListProductPage,
   getEditProductPage,
   editProductAndSave,
@@ -17,10 +16,15 @@ const {
 
 const {
   getCategoryPage,
+  insertCategoryName,
   deleteProduct,
   getEditCategoryPage,
   editCategoryName,
   deleteCategory,
+  getUnlistedPage,
+  changeCategoryStatus,
+  getUnlistProductPage,
+  changeProductStatus
 } = require("../controllers/product-controller");
 
 // const upload = require("../middlewares/multer-config")
@@ -28,7 +32,7 @@ const multer = require("multer");
 const  {uploadProduct,uploadCategory} = require("../middlewares/multer-config");
 
 router.get("/",authenticateAdmin,(req, res) => {
-  res.render("admin/list-users", { admin: true });
+  res.render("admin/dashboard", { admin: true });
 });
 
 router.get('/admin-login',authenticateForLogin, getLoginPage)
@@ -45,13 +49,17 @@ router.get("/add-product", getaddProducts);
 
 router.post("/add-product",authenticateAdmin, uploadProduct.array("images", 4), addingProducts);
 
-router.post("/add-category",authenticateAdmin,uploadCategory.array("images", 1),  insertCategoryName,);
+router.post("/add-category",authenticateAdmin,uploadCategory.single("images", 1),  insertCategoryName,);
 
 router.get("/edit-category",authenticateAdmin, getEditCategoryPage);
 
-router.post("/edit-category", authenticateAdmin,editCategoryName);
+router.post("/edit-category", authenticateAdmin,uploadCategory.single("images", 1),editCategoryName);
 
-router.delete("/delete-category",authenticateAdmin, deleteCategory);
+router.patch("/delete-category",authenticateAdmin, deleteCategory);
+
+router.get('/unlisted-category',authenticateAdmin,getUnlistedPage);
+
+router.patch('/unlistCategory',authenticateAdmin,changeCategoryStatus)
 
 router.get("/category",authenticateAdmin, getCategoryPage);
 
@@ -61,6 +69,10 @@ router.get("/edit-product",authenticateAdmin, getEditProductPage);
 
 router.post("/edit-product", authenticateAdmin,uploadProduct.array("images", 4), editProductAndSave);
 
-router.delete("/delete-product",authenticateAdmin, deleteProduct);
+router.patch("/delete-product",authenticateAdmin, deleteProduct);
+
+router.get("/unlist-product",authenticateAdmin,getUnlistProductPage)
+
+router.patch('/unlistproduct',authenticateAdmin,changeProductStatus)
 
 module.exports = router;

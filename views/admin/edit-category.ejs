@@ -1,31 +1,57 @@
+<!-- flash -->
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.1/dist/css/bootstrap.min.css" rel="stylesheet" type="text/css">
+
 <section class="content-main">
-    <div class="row">
+  <div class="row">
     <div class="col-9">
-        <div class="content-header">
-            <h2 class="content-title"><b>Edit category</b></h2>
-          
-        </div>
-       </div>
-      <div class="col-lg-6 " >
+      <div class="content-header">
+        <h2 class="content-title"><b>Edit category</b></h2>
+      </div>
+      <% if (message.success) { %>
+      <div class="alert alert-success" role="alert">
+        <%= message.success %>
+      </div>
+      <% } %>
+      <div class="col-lg-6">
         <div class="card mb-4">
-            
-            <div class="card-body">
-                <form method="post" action="/admin/edit-category?categoryId=<%= selectedCategory._id  %>" >
-                    <div class="mb-4">  
-                        <label for="product_name" class="form-label"><b>Category name</b></label>
-                        <input type="text" placeholder="Type here" name='category_name' class="form-control" value="<%= selectedCategory.CategoryName %>" id="product_name">
-                    </div>
+          <% var selectedCategory %>
 
-                    <button type="submit" class="btn btn-md rounded font-sm hover-up">Save</button>
+          <div class="card-body">
+            <form method="post" enctype="multipart/form-data"
+              action="/admin/edit-category?categoryId=<%= selectedCategory._id %>">
+              <div class="mb-4">
+                <label for="product_name" class="form-label"><b>Category name</b></label>
+                <input type="text" placeholder="Type here" name='category_name' class="form-control"
+                  value="<%= selectedCategory.CategoryName %>">
+              </div>
+              <div class="mb-4">
+                <input type="file" name="images" accept="image/*" onchange="showSelectedImage(this)">
+              </div>
 
-                </form>
-                       </div>
-                    </div> 
-                <!-- card end// -->
-        
-                  </div>
-                   
-      
-       
-</div>
-</section> 
+              <button type="submit" class="btn btn-md rounded font-sm hover-up">Save</button>
+              <img id="selectedImage" style="width: 100px; height: 50px; float: right;" src="/uploads/Cropped_CategoryImages/<%=selectedCategory.CategoryImage%>"
+                alt="Selected Image">
+            </form>
+          </div>
+        </div>
+        <!-- card end// -->
+      </div>
+    </div>
+  </div>
+</section>
+
+<script>
+    function showSelectedImage(input) {
+  if (input.files && input.files[0]) {
+    const reader = new FileReader();
+
+    reader.onload = function(e) {
+      const selectedImage = document.getElementById('selectedImage');
+      selectedImage.src = e.target.result;
+    };
+
+    reader.readAsDataURL(input.files[0]);
+  }
+}
+
+</script>
