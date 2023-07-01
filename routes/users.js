@@ -16,6 +16,7 @@ const {
   signupOtp,
   validateSignUp,
   getHomePage,
+  getProductPage,
   getShopPage,
   getProductDetailPage,
   userLogout,
@@ -40,7 +41,10 @@ router.post("/login", postLogin);
 
 router.get("/", getHomePage)
 
-router.get("/view-products", getShopPage)
+router.get("/view-products", getProductPage)
+
+
+router.get('/shop',getShopPage)
 
 router.get("/product-details", getProductDetailPage)
 

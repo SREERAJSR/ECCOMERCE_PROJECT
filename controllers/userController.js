@@ -345,7 +345,7 @@ res.redirect('/login')
       // Handle the error appropriately
     }
   },
-  getShopPage: async (req, res, next) => {
+  getProductPage: async (req, res, next) => {
     try {
       findCategory().then(async (categories) => {
         let filter = {};
@@ -396,6 +396,26 @@ res.redirect('/login')
     } catch (error) {
       // Handle the error appropriately
     }
+  },
+  getShopPage:async(req,res)=>{
+    
+    try{
+      const products = await Product.aggregate([{$match:{isActive:true}}])
+
+      console.log(products);
+
+      if(products){
+        res.render('user/shop',{u:true,products})
+      }else{
+
+        res.status(401).json({ message: "products not find" + err });
+      }
+
+    }catch{
+      res.status(401).json({ message: "products to shop page error" + err });
+    }
+ 
+
   },
 
   getProductDetailPage: async (req, res, next) => {
