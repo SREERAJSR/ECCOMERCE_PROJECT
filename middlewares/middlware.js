@@ -9,7 +9,7 @@ module.exports={
            next()
         }else{
             console.log('3');
-            res.render('user/login',{u:false})
+           res.render('user/login',{u:false})
         }
     },
 authenticateAdmin:((req,res,next)=>{

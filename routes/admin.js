@@ -6,15 +6,15 @@ const {
   loginAdmin,
   findUser_info,
   changeUserStatus,
+  logoutAdmin
+} = require("../controllers/admin-controller");
+
+const {
   getaddProducts,
   addingProducts,
   getListProductPage,
   getEditProductPage,
   editProductAndSave,
-  logoutAdmin
-} = require("../controllers/admin-controller");
-
-const {
   getCategoryPage,
   insertCategoryName,
   deleteProduct,

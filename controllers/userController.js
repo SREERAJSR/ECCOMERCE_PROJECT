@@ -1,12 +1,14 @@
+const Cart = require('../models/cartSchema')
 const User = require("../models/userSchema");
+const Product = require("../models/productSchema");
+const category = require("../models/categorySchema");
+const Wishlist = require('../models/wishlistSchema')
+const userHelpers = require("../helpers/user-helpers");
+const { findCategory } = require("../helpers/product-helpers");
+const { categoryWiseFiltering } = require("../helpers/product-helpers");
 const bcrypt = require("bcrypt");
 const twilio = require("twilio");
-const userHelpers = require("../helpers/user-helpers");
-const category = require("../models/categorySchema");
 const { clearCache } = require("ejs");
-const { findCategory } = require("../helpers/product-helpers");
-const Product = require("../models/productSchema");
-const { categoryWiseFiltering } = require("../helpers/product-helpers");
 const { error } = require("jquery");
 const { default: mongoose } = require("mongoose");
 
@@ -468,4 +470,104 @@ res.redirect('/login')
       res.status(500).json({ error: err });
     }
   },
-};
+
+  getWishlistPage:async(req,res)=>{
+
+    try{
+      const userId =req.session.user._id
+      const wishlist = await Wishlist.findOne({UserId:userId}).populate({
+        path:'Products',
+        select:'ProductName ProductImages SalePrice Category'
+      })
+        const products =wishlist.Products
+        res.render('user/wishlist',{products,u:true })
+
+    }catch(error){
+      res.status(500).json({error:'server error'})
+    }
+
+
+
+  },
+  checkWishlist:async(req,res)=>{
+    try {
+      const { productId } = req.query;
+      const userId = req.session.user._id;
+  
+      const userWishlist = await Wishlist.findOne({
+        UserId: userId,
+        Products: productId
+      });
+  
+      const isAdded = userWishlist ? true : false;
+  
+      res.status(200).json({ isAdded });
+    } catch (error) {
+      res.status(500).json({ error: 'An error occurred while checking the wishlist.' });
+    }
+
+  },
+  addToWishlist:async(req,res)=>{
+
+    try{
+      if(req.session.user){
+        const{productId} = req.body
+        const userId = req.session.user._id
+
+const userWishlist= await Wishlist.findOne({UserId:userId})
+
+// user not have wishlist
+if(!userWishlist){
+
+  const newWishlist = new Wishlist({
+    UserId:userId,
+    Products:[productId]
+  })
+  await newWishlist.save()
+
+  res.status(200).json({ message: 'Product added to wishlist.' });
+}// user have wishlist
+else{ 
+
+  
+  if(!userWishlist.Products.includes(productId)){ // In userwishlist there the product isn't exist
+    userWishlist.Products.push(productId)
+    await userWishlist.save()
+
+    res.status(200).json({ message: 'Product added to wishlist.' });
+  }else{   // product exist in wishlist 
+    res.status(409).json({ error: 'Product already exists in wishlist.' });
+  }
+}
+  }else{
+      // Display swal alert
+  // swal("Not Logged In", "Please log in to add items to your wishlist!", "error");
+  res.status(401).json({ error: 'Not logged in' });
+  }
+    }catch{{
+
+      res.status(500).json({error:'some internal server error'})
+
+    }}
+  },removeFromWishlist:async(req,res)=>{
+    try{
+   const { productId} = req.body
+   const userId = req.session.user._id
+   const userWishlist =  await Wishlist.findOneAndUpdate({UserId:userId},
+    {$pull:{Products:{$in:[productId]}}},
+    {new:true});
+console.log(userWishlist);
+    if(userWishlist){
+      res.status(200).json({ message: 'Product removed from wishlist successfully.' });
+    }else{
+      res.status(404).json({ error: 'Wishlist not found.' });
+
+    }
+  }catch(error){
+    res.status(500).json({ error: 'An error occurred while removing the product from the wishlist.' });
+  }
+
+   }
+
+  
+}

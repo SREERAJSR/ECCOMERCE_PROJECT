@@ -1,0 +1,272 @@
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+<script src="/javascripts/sweetalert2.all.js"></script>
+</div>
+
+
+<div class="bg0 m-t-23 p-b-140">
+    <div class="container">
+
+       <b><h1 style="font-size: 50px; " class="text-center" >WISHLIST</h1></b>
+
+  
+        <div class="row isotope-grid">
+
+               
+
+            <% products.forEach((product)=>  { %>
+
+            <div class="col-sm-6 col-md-4 col-lg-3 p-b-35 isotope-item Gaming">
+                <!-- Block2 -->
+                <div class="block2">
+                    <div class="block2-pic hov-img0">
+                        <img src="/uploads/product_images/<%=product.ProductImages[2]%>" alt="IMG-PRODUCT">
+
+                        <a href="/product-details?productId=<%=product._id%>&categoryId=<%= product.Category.categoryId%>" class="block2-btn flex-c-m stext-103 cl2 size-102 bg0 bor2 hov-btn1 p-lr-15 trans-04 ">
+                            Quick View
+                        </a>
+                    </div>
+
+                    <div class="block2-txt flex-w flex-t p-t-14">
+                        <div class="block2-txt-child1 flex-col-l ">
+                            <a href="product-detail.html" class="stext-104 cl4 hov-cl1 trans-04 js-name-b2 p-b-6">
+                               <%=product.ProductName  %>
+                            </a>
+
+                            <span class="stext-105 cl3">
+                                ₹<%=product.SalePrice  %>
+                            </span>
+                        </div>
+
+                        <div class="block2-txt-child2 flex-r p-t-3">
+                            <a href="#" class="btn-addwish-b2 dis-block pos-relative js-addwish-b2" data-productid="<%=product._id  %>">
+                                <img class="icon-heart1 dis-block trans-04" src="images/icons/icon-heart-01.png" alt="ICON">
+                                <img class="icon-heart2 dis-block trans-04 ab-t-l" src="images/icons/icon-heart-02.png" alt="ICON">
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+       <%  })  %>
+
+        </div>
+
+        <!-- Load more -->
+        <div class="flex-c-m flex-w w-full p-t-45">
+            <a href="#" class="flex-c-m stext-101 cl5 size-103 bg2 bor1 hov-btn1 p-lr-15 trans-04">
+                Load More
+            </a>
+        </div>
+    </div>
+</div>
+
+
+<script>
+    $('.js-show-modal1').on('click',function(e){
+        e.preventDefault();
+        $('.js-modal1').addClass('show-modal1');
+    });
+
+    $('.js-hide-modal1').on('click',function(){
+        $('.js-modal1').removeClass('show-modal1');
+    });
+</script>
+<script>
+    $(".js-addwish-b2").each(function () {
+  var nameProduct = $(this).parent().parent().find(".js-name-b2").html();
+  var $button = $(this);
+  var productId = $button.data('productid');
+
+  // Check if the product is already in the wishlist
+  $.ajax({
+    url: '/check_wishlist',
+    method: 'GET',
+    data: { productId: productId },
+    success: function (response) {
+      var isAdded = response.isAdded;
+
+      // Set the initial state of the button based on the isAdded value
+      if (isAdded) {
+        $button.addClass("js-addedwish-b2");
+      }
+
+      // Add the click event handler
+      $button.on("click", function () {
+        // Perform the corresponding action based on the state
+        if (isAdded) {
+          // Remove from wishlist
+          $.ajax({
+            url: '/remove_from_wishlist',
+            method: 'delete',
+            data: { productId: productId },
+            success: function (response) {
+              swal(nameProduct, "is removed from wishlist!", "success");
+              $button.removeClass("js-addedwish-b2");
+              isAdded = false; // Update the isAdded value
+              location.reload()
+            },
+            error: function (xhr, error, status) {
+              // Handle the error response
+              if (xhr.status === 404) {
+                Swal.fire({
+                  icon: 'error',
+                  title: 'Wishlist not found',
+                });
+              } else {
+                Swal.fire(
+                  'Some internal server error',
+                  'That thing is still around?',
+                  'question'
+                );
+              }
+            }
+          });
+        } else {
+          // Add to wishlist
+          $.ajax({
+            url: '/add_to_wishlist',
+            method: 'post',
+            data: { productId: productId },
+            success: function (response) {
+              swal(nameProduct, "is added to wishlist!", "success");
+              $button.addClass("js-addedwish-b2");
+              isAdded = true; // Update the isAdded value
+            },
+            error: function (xhr, error, status) {
+              // Handle the error response
+              if (xhr.status === 401) {
+                Swal.fire({
+                  icon: 'error',
+                  title: 'PLEASE LOGIN',
+                  text: 'Guest user not allowed to add in wishlist',
+                  footer: '<a href="/login">LOGIN</a>'
+                });
+              } else if (xhr.status === 409) {
+                Swal.fire({
+                  icon: 'error',
+                  title: 'Product already exists in wishlist',
+                });
+              } else {
+                Swal.fire(
+                  'Some internal server error',
+                  'That thing is still around?',
+                  'question'
+                );
+              }
+            }
+          });
+        }
+      });
+    },
+    error: function (xhr, error, status) {
+      // Handle the error response
+      console.log(error);
+    }
+  });
+});
+
+
+</script>
+
+<!-- <script>
+
+$(".js-addwish-b2").each(function () {
+  var nameProduct = $(this).parent().parent().find(".js-name-b2").html();
+  $(this).on("click", function () {
+    var $button = $(this);
+    var productId = $(this).data('productid')
+
+    // console.log(productId);
+
+    // Check if the button is already in the "added" state
+    var isAdded = $button.hasClass("js-addedwish-b2");
+
+    // Perform the corresponding action based on the state
+    if (isAdded) {
+      // Remove from wishlist
+
+      $.ajax({
+
+        url:'/remove_from_wishlist',
+        method:'delete',
+        data:{productId:productId},
+        success:(response)=>{
+            
+                swal(nameProduct, "is removed from wishlist!", "success");
+                 $button.removeClass("js-addedwish-b2");
+
+        },error:(xhr,error,status)=>{
+            if(xhr.status ===404){
+                Swal.fire({
+            icon: 'error',
+            title: 'Wishlist not found',
+          })
+            }else{
+                Swal.fire(
+  'Some internal server error',
+  'That thing is still around?',
+  'question'
+)
+            }
+
+        }
+
+      })
+
+
+
+    } else {
+      // Add to wishlist
+      $.ajax({
+url:'/add_to_wishlist',
+method:'post',
+data:{productId:productId},
+success:(response)=>{
+    
+ swal(nameProduct, "is added to wishlist!", "success");
+  $button.addClass("js-addedwish-b2");
+
+},error:(xhr,error,status)=>{
+    if(xhr.status ===401){
+    
+        Swal.fire({
+            icon: 'error',
+            title: 'PLEASE LOGIN',
+            text: 'Guest user not allowed to add in wishlist',
+            footer: '<a href="/login">LOGIN</a>'
+          });
+}else if( xhr.status ===409){
+    Swal.fire({
+            icon: 'error',
+            title: 'Product already exist in wishlist',
+        
+          });
+
+} else {
+Swal.fire(
+  'Some internal server error',
+  'That thing is still around?',
+  'question'
+)
+}
+    }
+
+      })
+    }
+  });
+});
+        </script> -->
+        <!-- $(".js-addwish-detail").each(function () {
+          var nameProduct = $(this)
+            .parent()
+            .parent()
+            .parent()
+            .find(".js-name-detail")
+            .html();
+  
+          $(this).on("click", function () {
+            swal(nameProduct, "is added to wishlist !", "success");
+  
+            $(this).addClass("js-addedwish-detail");
+            $(this).off("click");
+          });
+        }); -->

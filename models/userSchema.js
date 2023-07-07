@@ -1,5 +1,6 @@
 const mongoose = require('mongoose');
 const moment = require('moment');
+const addressSchema = require('./addressSchema')
 
 const userSchema = new mongoose.Schema({
   Name: {
@@ -30,6 +31,8 @@ const userSchema = new mongoose.Schema({
       return moment(value).format('YYYY-MM-DD');
     },
   },
+  address:[addressSchema]
+
 }, {
   versionKey: false,
 });

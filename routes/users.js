@@ -2,6 +2,10 @@ const {authenticateSession,authenticateForUser} =require('../middlewares/middlwa
 const rateLimiter =require('express-rate-limit')
 const User = require("../models/userSchema");
 var express = require("express");
+const { addToCart,
+  getShoppingCart,
+  updateQuantity,
+  deleteCartItem}= require('../controllers/Order-controller')
 
 var router = express.Router();
 const {
@@ -23,7 +27,11 @@ const {
   getForgotpasswordPage,
   forgotPasswordSendOtp,
   forgotPasswordOtpVerification,
-  passwordValidationForConfirm 
+  passwordValidationForConfirm ,
+  getWishlistPage,
+  checkWishlist,
+  addToWishlist,
+  removeFromWishlist
 
 } = require("../controllers/userController");
 //SHA256:CXoHORZsVoQiTlBkcwyCuTYWR29M0IyeXdcy8GYOnfY sreerajsr03@gmail.com
@@ -48,9 +56,6 @@ router.get('/shop',getShopPage)
 
 router.get("/product-details", getProductDetailPage)
 
-router.get("/shopping-cart", (req, res, next) => {
-  res.render("user/shopping-cart",{u:true});
-});
 
 router.get("/contact", (req, res, next) => {
   res.render("user/contact",{u:true});
@@ -85,5 +90,24 @@ router.post("/otp-signup/:id", otpVerification);
 router.get('/resend-otp/:id',resendOtp)
 
 router.post('/user-signUp-otp',validateSignUp)
+
+
+router.get('/wishlist', authenticateSession ,getWishlistPage)
+router.get('/check_wishlist',checkWishlist)
+router.post('/add_to_wishlist',addToWishlist)
+
+router.delete('/remove_from_wishlist',removeFromWishlist)
+
+
+//////cart-- start//////
+
+router.post('/add-to-cart',addToCart)
+
+router.get('/shopping-cart',authenticateSession,  getShoppingCart)
+
+router.patch('/updateQuantity',updateQuantity)
+
+router.delete('/deleteCartItem',deleteCartItem)
+
 
 module.exports = router;

@@ -1,3 +1,5 @@
+<!-- Add this in the <head> section -->
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
 
 	<!-- Cart -->
 	<div class="wrap-header-cart js-panel-cart">
@@ -7,6 +9,7 @@
 			<div class="header-cart-title flex-w flex-sb-m p-b-8">
 				<span class="mtext-103 cl2">
 					Your Cart
+					
 				</span>
 
 				<div class="fs-35 lh-10 cl2 p-lr-5 pointer hov-cl1 trans-04 js-hide-cart">
@@ -16,6 +19,9 @@
 			
 			<div class="header-cart-content flex-w js-pscroll">
 				<ul class="header-cart-wrapitem w-full">
+					
+					
+					
 					<li class="header-cart-item flex-w flex-t m-b-12">
 						<div class="header-cart-item-img">
 							<img src="images/item-cart-01.jpg" alt="IMG">
@@ -32,42 +38,12 @@
 						</div>
 					</li>
 
-					<li class="header-cart-item flex-w flex-t m-b-12">
-						<div class="header-cart-item-img">
-							<img src="images/item-cart-02.jpg" alt="IMG">
-						</div>
-
-						<div class="header-cart-item-txt p-t-8">
-							<a href="#" class="header-cart-item-name m-b-18 hov-cl1 trans-04">
-								Converse All Star
-							</a>
-
-							<span class="header-cart-item-info">
-								1 x $39.00
-							</span>
-						</div>
-					</li>
-
-					<li class="header-cart-item flex-w flex-t m-b-12">
-						<div class="header-cart-item-img">
-							<img src="images/item-cart-03.jpg" alt="IMG">
-						</div>
-
-						<div class="header-cart-item-txt p-t-8">
-							<a href="#" class="header-cart-item-name m-b-18 hov-cl1 trans-04">
-								Nixon Porter Leather
-							</a>
-
-							<span class="header-cart-item-info">
-								1 x $17.00
-							</span>
-						</div>
-					</li>
+			
 				</ul>
 				
 				<div class="w-full">
 					<div class="header-cart-total w-full p-tb-40">
-						Total: $75.00
+						Total: ₹75.00
 					</div>
 
 					<div class="header-cart-buttons flex-w w-full">
@@ -100,6 +76,7 @@
 	</div>
 		
 
+
 	<!-- Shoping Cart -->
 	<form class="bg0 p-t-75 p-b-85">
 		<div class="container">
@@ -113,56 +90,39 @@
 									<th class="column-2"></th>
 									<th class="column-3">Price</th>
 									<th class="column-4">Quantity</th>
-									<th class="column-5">Total</th>
-								</tr>
-
-								<tr class="table_row">
-									<td class="column-1">
+									<th class="column-5">Delete</th>
+									<th class="column-6">Total </th>
+								
+								</tr>			
+					 
+								<% cart.CartItems.forEach((item) => { %>
+									<tr class="table_row">
+									  <td class="column-1">
 										<div class="how-itemcart1">
-											<img src="images/item-cart-04.jpg" alt="IMG">
+										  <img src="/uploads/product_images/<%= item.ProductId.ProductImages[0] %>" alt="IMG">
 										</div>
-									</td>
-									<td class="column-2">Fresh Strawberries</td>
-									<td class="column-3">$ 36.00</td>
-									<td class="column-4">
+									  </td>
+									  <td class="column-2"><%= item.ProductId.ProductName %></td>
+									  <td class="column-3">₹<%= item.ProductId.SalePrice %></td>
+									  <td class="column-4">
 										<div class="wrap-num-product flex-w m-l-auto m-r-0">
-											<div class="btn-num-product-down cl8 hov-btn3 trans-04 flex-c-m">
-												<i class="fs-16 zmdi zmdi-minus"></i>
-											</div>
-
-											<input class="mtext-104 cl3 txt-center num-product" type="number" name="num-product1" value="1">
-
-											<div class="btn-num-product-up cl8 hov-btn3 trans-04 flex-c-m">
-												<i class="fs-16 zmdi zmdi-plus"></i>
-											</div>
+										  <div class="btn-num-product-down cl8 hov-btn3 trans-04 flex-c-m">
+											<i class="fs-16 zmdi zmdi-minus"></i>
+										  </div>
+								  
+										  <input class="mtext-104 cl3 txt-center num-product" id="qty-<%= item._id %>" data-cartId="<%= item._id %>" type="number" name="num-product1" value="<%= item.Quantity %>">
+								  
+										  <div class="btn-num-product-up cl8 hov-btn3 trans-04 flex-c-m">
+											<i class="fs-16 zmdi zmdi-plus"></i>
+										  </div>
 										</div>
-									</td>
-									<td class="column-5">$ 36.00</td>
-								</tr>
-
-								<tr class="table_row">
-									<td class="column-1">
-										<div class="how-itemcart1">
-											<img src="images/item-cart-05.jpg" alt="IMG">
-										</div>
-									</td>
-									<td class="column-2">Lightweight Jacket</td>
-									<td class="column-3">$ 16.00</td>
-									<td class="column-4">
-										<div class="wrap-num-product flex-w m-l-auto m-r-0">
-											<div class="btn-num-product-down cl8 hov-btn3 trans-04 flex-c-m">
-												<i class="fs-16 zmdi zmdi-minus"></i>
-											</div>
-
-											<input class="mtext-104 cl3 txt-center num-product" type="number" name="num-product2" value="1">
-
-											<div class="btn-num-product-up cl8 hov-btn3 trans-04 flex-c-m">
-												<i class="fs-16 zmdi zmdi-plus"></i>
-											</div>
-										</div>
-									</td>
-									<td class="column-5">$ 16.00</td>
-								</tr>
+									  </td>
+                                 <!-- Update the "trash" icon code -->
+                                <td  class="column-5"><i class="fas fa-trash"  data-cartid="<%= item._id %>"></i></td>
+									  <td class="column-6  total-price-<%= item._id %>">₹<%= item.Total %></td>
+									</tr>
+								  <% }) %>
+								  
 							</table>
 						</div>
 
@@ -196,8 +156,8 @@
 							</div>
 
 							<div class="size-209">
-								<span class="mtext-110 cl2">
-									$79.65
+								<span class="mtext-110 cl2" id="totalAmount">
+									₹<%=cart.TotalAmount  %>
 								</span>
 							</div>
 						</div>
@@ -255,7 +215,7 @@
 
 							<div class="size-209 p-t-1">
 								<span class="mtext-110 cl2">
-									$79.65
+									₹79.65
 								</span>
 							</div>
 						</div>
@@ -270,4 +230,87 @@
 	</form>
 		
 	
+	<script>
+		$(document).ready(function() {
+
+		  $('.btn-num-product-down').on('click', function(){
+    var numProduct = Number($(this).next().val());
+    const quantityId = $(this).next().data('cartid');
+    if (numProduct > 0) {
+      $(this).next().val(numProduct - 1);
+	  const status ='-'
+      updateQuantity(numProduct - 1, quantityId,'-',status);
+    }
+  });
+
+  $('.btn-num-product-up').on('click', function(){
+    var numProduct = Number($(this).prev().val());
+    const quantityId = $(this).prev().data('cartid');
+    $(this).prev().val(numProduct + 1);
+	const status ='+'
+    updateQuantity(numProduct + 1, quantityId,status);
+  });
+  function updateQuantity(quantity, quantityId,status) {
+    $.ajax({
+      url: '/updateQuantity',
+      type: 'Patch',
+      data: {
+        quantity: Number(quantity),
+        quantityId: quantityId,
+		status:status
+      },
+      success: function(response) {
+		  // Assuming the response contains the updated price and quantityId
+		  const updatedPrice = response.updatedPrice;
+     const quantityId = response.quantityId;
+	 const updateTotalAmount = response.updateTotalAmount
+  
+  // Update the HTML element with the updated price
+  $('.total-price-' + quantityId).text(updatedPrice);
+
+  $('#totalAmount').text(updateTotalAmount)
+
+        
+      },
+      error: function(error) {
+        console.log(error);
+        // Handle the error response here
+      }
+    });
+  }
+    // Your jQuery code here
+});
 		
+		</script>
+		
+		<script>
+			$(document).ready(()=>{
+				$('.fa-trash').on('click', function() {
+              var cartId = $(this).data('cartid');
+			  console.log(cartId);
+  
+			  // Make an AJAX request to delete the item
+       $.ajax({
+      url: '/deleteCartItem',
+      type: 'delete',
+      data: { cartId: cartId },
+      success: function(response) {
+        // Handle the success response
+        
+        // Remove the deleted item from the DOM
+        $(this).closest('.table_row').remove();
+
+        // Update the total price or any other relevant information
+        // Example:
+        const updatedTotalAmount = response.updatedTotalAmount;
+        $('.total-amount').text(updatedTotalAmount);
+		location.reload()
+      },
+      error: function(error) {
+        // Handle the error response
+        console.log(error);
+      }
+    });
+				})
+			})
+		</script>
