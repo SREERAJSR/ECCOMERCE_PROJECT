@@ -44,7 +44,7 @@
                         <div class="info-wrap">
                             <a href="#" class="title text-truncate"><%= product.ProductName  %></a>
                             <div class="price mb-2">Rs.<%= product.SalePrice %></div> <!-- price.// -->
-                            <a href="/admin/edit-product?productId=<%= product._id %>"  class="btn btn-sm font-sm rounded btn-brand">
+                            <a href="/admin/edit-product?productId=<%= product.Slug %>"  class="btn btn-sm font-sm rounded btn-brand">
                                 <i class="material-icons md-edit"></i> Edit
                             </a>
                             <a href="#" onclick="showAlert('<%= product._id %>')" class="btn btn-sm font-sm btn-light rounded">

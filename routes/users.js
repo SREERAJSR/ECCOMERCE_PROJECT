@@ -5,7 +5,8 @@ var express = require("express");
 const { addToCart,
   getShoppingCart,
   updateQuantity,
-  deleteCartItem}= require('../controllers/Order-controller')
+  deleteCartItem,
+  applyCoupon}= require('../controllers/Order-controller')
 
 var router = express.Router();
 const {
@@ -105,9 +106,10 @@ router.post('/add-to-cart',addToCart)
 
 router.get('/shopping-cart',authenticateSession,  getShoppingCart)
 
-router.patch('/updateQuantity',updateQuantity)
+router.patch('/updateQuantity',authenticateSession ,updateQuantity)
 
-router.delete('/deleteCartItem',deleteCartItem)
+router.delete('/deleteCartItem',authenticateSession,deleteCartItem)
 
+router.post('/apply-coupon',authenticateSession ,applyCoupon)
 
 module.exports = router;

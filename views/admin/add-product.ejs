@@ -1,3 +1,4 @@
+
 <section class="content-main">
         <div class="row">
         <div class="col-9">
@@ -78,10 +79,9 @@
                             </div>
                             <div class="mb-4">
                                 <label class="form-label">Upload images</label>
-                                <input type="file" name="images" multiple onchange="previewImages(event)" accept="image/*">
-                                <div id="image-preview"></div>                       
-                             </div>
-                        </div>
+                                <input type="file" id="images-input" name="images" multiple accept="image/*">
+                                <div id="image-preview"></div>
+                              </div>
                         
 
  
@@ -113,25 +113,23 @@
 </section> <!-- content-main end// -->
 
 <script>
-    function previewImages(event) {
-    const previewContainer = document.getElementById('image-preview');
-    previewContainer.innerHTML = ''; // Clear any previous preview
+    const imagePreview = document.getElementById("image-preview");
 
-    const files = event.target.files;
-    for (let i = 0; i < files.length; i++) {
-        const file = files[i];
-        const reader = new FileReader();
-
-        reader.onload = function () {
-            const imgElement = document.createElement('img');
-            imgElement.src = reader.result;
-            imgElement.classList.add('preview-image');
-
-            previewContainer.appendChild(imgElement);
-        };
-
-        reader.readAsDataURL(file);
-    }
-}
-
+const imagesInput = document.getElementById("images-input");
+imagesInput.addEventListener("change", function() {
+  const files = imagesInput.files;
+  for (const file of files) {
+    const image = document.createElement("img");
+    image.src = URL.createObjectURL(file);
+    const deleteButton = document.createElement("button");
+    deleteButton.textContent = "Delete";
+    deleteButton.addEventListener("click", function() {
+      image.remove();
+    });
+    const imagePreviewItem = document.createElement("div");
+    imagePreviewItem.appendChild(image);
+    imagePreviewItem.appendChild(deleteButton);
+    imagePreview.appendChild(imagePreviewItem);
+  }
+});
 </script>

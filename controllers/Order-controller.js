@@ -10,14 +10,16 @@ const { categoryWiseFiltering } = require("../helpers/product-helpers");
 const { error } = require("jquery");
 const { default: mongoose } = require("mongoose");
 const Cart = require('../models/cartSchema')
-
+const Coupon = require('../models/couponSchema')
+const {couponApplying,addingCouponToCart} = require('../helpers/order-helpers')
+const usedCoupon = require('../models/usedCoupons')
 
 module.exports={
 
     addToCart:async(req,res)=>{
 
         try{
-     
+         
           const {productId,qty} = req.body
           const quantity = Number(qty)
           const userId = req.session.user._id
@@ -52,8 +54,29 @@ module.exports={
           }
     
           // Update the total amount in the cart
-          cart.TotalAmount = totalAmount;
-    
+          cart.SubTotal = totalAmount;
+          // Check if any coupons are used by the user
+      const UsedCoupons = await usedCoupon.findOne({ UserId: req.session.user._id });
+
+      if (UsedCoupons && UsedCoupons.Coupons.length > 0) {
+        // Iterate over the used coupons and calculate the discount amount
+        let discountAmount = 0;
+        for (const couponCode of UsedCoupons.Coupons) {
+          const coupon = await Coupon.findOne({ CouponCode: couponCode });
+          if (coupon) {
+            const couponDiscount = (coupon.Discount / 100) * totalAmount;
+            discountAmount += couponDiscount;
+          }
+        }
+
+        // Subtract the discount amount from the FinalTotal
+        cart.FinalTotal = totalAmount - discountAmount;
+      } else {
+        // If no coupons are used, set the FinalTotal same as the SubTotal
+        cart.FinalTotal = totalAmount;
+      }
+
+        
           // Save the updated cart
           await cart.save();
     
@@ -79,86 +102,163 @@ module.exports={
           path:'CartItems.ProductId',
           select:'ProductName ProductImages SalePrice ' 
         })
-          
-       
-        res.render('user/shopping-cart', { u:true ,cart })
+        console.log(cart);
+
+        const coupons =  await Coupon.find()
+        res.render('user/shopping-cart', { u:true ,cart ,coupons })
       }catch{ 
       }
       },
-      updateQuantity:async(req,res)=>{
+          updateQuantity:async(req,res)=>{
+            console.log(req.body);
+            const{quantityId,status}= req.body
+            const quantity = Number(req.body.quantity)
+            
+            try {
+            
+            // Find the cart item by its _id
+          const cart = await Cart.findOne({ 'CartItems._id': quantityId });
         
-        const{quantityId,status}= req.body
-        const quantity = Number(req.body.quantity)
-        try {
-              // Find the cart item by its _id
-      const cart = await Cart.findOne({ 'CartItems._id': quantityId });
-    
-        // Get the cart item from the CartItems array
-        const cartItem = cart.CartItems.find((item) => item._id.toString() === quantityId);
-        if (cartItem) {
-          // Increment or decrement the quantity based on the status
-          if (status === '+') {
-            cartItem.Quantity += 1
-          } else if (status === '-') {
-            cartItem.Quantity -= 1
-          }
-           // Ensure the quantity does not go below zero
-        if (cartItem.Quantity < 0) {
-          cartItem.Quantity = 0;
-        }
-   // Recalculate the total price
-   const product =  await Product.findById(cartItem.ProductId)
-   const price = Number(product.SalePrice)
-   console.log(price);
-        cartItem.Total = cartItem.Quantity * price;
-         // Update the TotalAmount field by summing up the individual totals
-         const totalAmount = cart.CartItems.reduce((sum, item) => sum + item.Total, 0);
-         cart.TotalAmount = totalAmount;
-        // Save the updated cart document
-        await cart.save(); 
-        // Send a success response back to the client
-        res.status(200).json({ message: 'Quantity updated successfully.',updatedPrice: cartItem.Total, quantityId: quantityId,updateTotalAmount:cart.TotalAmount });
-      } else {
-        // Send an error response if the cart item is not found
-        res.status(404).json({ error: 'Cart item not found.' });
-      }
-    } catch (error) {
-      // Handle any errors that occur during the update process
-      res.status(500).json({ error: 'An error occurred while updating the quantity.' });
+            // Get the cart item from the CartItems array
+            const cartItem = cart.CartItems.find((item) => item._id.toString() === quantityId);
+            if (cartItem) {
+              // Increment or decrement the quantity based on the status
+              if (status === '+') {
+                cartItem.Quantity += 1
+              } else if (status === '-') {
+                cartItem.Quantity -= 1
+              }
+              // Ensure the quantity does not go below zero
+            if (cartItem.Quantity < 0) {
+              cartItem.Quantity = 0;
+            }
+            //COUPON APPPLIED LOOKING DB
+
+
+            
+      // Recalculate the total price
+      const product =  await Product.findById(cartItem.ProductId)
+      const price = Number(product.SalePrice)
+      console.log(price);
+            cartItem.Total = cartItem.Quantity * price;
+            // Update the TotalAmount field by summing up the individual totals
+            const totalAmount = cart.CartItems.reduce((sum, item) => sum + item.Total, 0);
+            cart.SubTotal= totalAmount;
+// Check if any coupons are used by the user
+const UsedCoupons = await usedCoupon.findOne({ UserId: req.session.user._id });
+
+if (UsedCoupons && UsedCoupons.Coupons.length > 0) {
+  // Iterate over the used coupons and calculate the discount amount
+  let discountAmount = 0;
+  for (const couponCode of UsedCoupons.Coupons) {
+    const coupon = await Coupon.findOne({ CouponCode: couponCode });
+    if (coupon) {
+      const couponDiscount = (coupon.Discount / 100) * totalAmount;
+      discountAmount += couponDiscount;
     }
-      }  ,
-      deleteCartItem:async(req,res)=>{
-        const{cartId} = req.body
-    try {
-      // Find the cart by its _id
-      const userId =req.session.user._id
-      const cart = await Cart.findOne({UserId:userId})
-      console.log(cart);
-  
-      if (!cart) {
-        // If the cart is not found, send an error response
-        return res.status(404).json({ error: 'Cart not found.' });
-      }
-      // Find the index of the cart item to be deleted
-      const itemIndex = cart.CartItems.findIndex((item) => item._id.toString() === cartId);
-      if (itemIndex === -1) {
-        // If the item is not found, send an error response
-        return res.status(404).json({ error: 'Cart item not found.' });
-      }
-      // Get the deleted cart item and its total price
-      const deletedCartItem = cart.CartItems[itemIndex];
-      const deletedItemTotal = deletedCartItem.Total;
-      // Remove the item from the CartItems array
-      cart.CartItems.splice(itemIndex, 1);
-      // Update the TotalAmount by subtracting the deleted item's total
-      cart.TotalAmount -= deletedItemTotal;
-      // Save the updated cart document
-      await cart.save();
-      // Send a success response back to the client
-      res.status(200).json({ message: 'Cart item deleted successfully.' });
-    } catch (error) {
-      // Handle any errors that occur during the deletion process
-      res.status(500).json({ error: 'An error occurred while deleting the cart item.' });
+  }
+
+  // Subtract the discount amount from the FinalTotal
+  cart.FinalTotal = totalAmount - discountAmount;
+} else {
+  // If no coupons are used, set the FinalTotal same as the SubTotal
+  cart.FinalTotal = totalAmount;
+}
+
+            await cart.save(); 
+
+            // Send a success response back to the client
+            res.status(200).json({ message: 'Quantity updated successfully.',updatedPrice: cartItem.Total, quantityId: quantityId,updateSubTotalAmount:cart.SubTotal , updateTotalAmount:cart.FinalTotal });
+          } else {
+            // Send an error response if the cart item is not found
+            res.status(404).json({ error: 'Cart item not found.' });
+          }
+        } catch (error) {
+          // Handle any errors that occur during the update process
+          res.status(500).json({ error: 'An error occurred while updating the quantity.' });
+        }
+          }  ,
+     deleteCartItem: async (req, res) => {
+  const { cartId } = req.body;
+  try {
+    // Find the cart by its _id
+    const userId = req.session.user._id;
+    const cart = await Cart.findOne({ UserId: userId });
+    console.log(cart);
+
+    if (!cart) {
+      // If the cart is not found, send an error response
+      return res.status(404).json({ error: 'Cart not found.' });
+    }
+
+    // Find the index of the cart item to be deleted
+    const itemIndex = cart.CartItems.findIndex((item) => item._id.toString() === cartId);
+    if (itemIndex === -1) {
+      // If the item is not found, send an error response
+      return res.status(404).json({ error: 'Cart item not found.' });
+    }
+
+    // Get the deleted cart item and its total price
+    const deletedCartItem = cart.CartItems[itemIndex];
+    const deletedItemTotal = deletedCartItem.Total;
+
+    // Remove the item from the CartItems array
+    cart.CartItems.splice(itemIndex, 1);
+
+    // Update the TotalAmount by subtracting the deleted item's total
+    cart.SubTotal -= deletedItemTotal;
+
+    // Check if any coupons are used by the user
+    const usedCoupons = await UsedCoupon.findOne({ UserId: userId });
+    if (usedCoupons && usedCoupons.Coupons.length > 0) {
+      // Filter out the deleted coupon from the used coupons
+      usedCoupons.Coupons = usedCoupons.Coupons.filter((coupon) => coupon !== deletedCartItem.CouponCode);
+      await usedCoupons.save();
+    }
+
+    // Update the FinalTotal by subtracting the deleted item's total
+    cart.FinalTotal -= deletedItemTotal;
+
+    // Save the updated cart document
+    await cart.save();
+
+    // Send a success response back to the client
+    res.status(200).json({ message: 'Cart item deleted successfully.' });
+  } catch (error) {
+    // Handle any errors that occur during the deletion process
+    res.status(500).json({ error: 'An error occurred while deleting the cart item.' });
+  }
+}
+,
+    applyCoupon:async(req,res)=>{
+    
+      try{
+        const{coupon} = req.body
+        
+        const DbCoupon= await Coupon.findOne({CouponCode : coupon})
+
+        
+        if(!DbCoupon){
+          res.status(404).json({error:'coupon not found in database'})
+        }else{
+          const userId = req.session.user._id
+
+          couponApplying(userId,DbCoupon).then((resp)=>{
+
+            addingCouponToCart(coupon,userId).then((response)=>{
+             console.log('added',resp);
+            console.log('succes');
+              res.status(200).json({message:'coupon applied succesfully',response,resp})
+            }).catch((err)=>{
+              res.status(400).json({message:err})
+            })
+              
+          }).catch((err)=>{
+            res.status(400).json({message :err})
+          })
+        }
+    }catch(error){
+      res.status(500).json({error:'Some internal Error'})
     }
   }
      

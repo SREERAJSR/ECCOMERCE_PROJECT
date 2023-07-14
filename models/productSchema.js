@@ -2,6 +2,11 @@ const mongoose = require('mongoose')
 
 
 const productSchema = new mongoose.Schema({
+    Slug: {
+        type: String,
+        required: true,
+        unique: true,
+      },
 
     ProductName:{
 
@@ -30,13 +35,17 @@ const productSchema = new mongoose.Schema({
     Category:{
         categoryId:{
         type:mongoose.Schema.Types.ObjectId,
-   
         ref: 'categories', // Reference to the Category model
         },
         categoryName:{
             type:String,
-            
+            ref:'categories'
+        },
+        Slug:{
+            type:String,
+            ref:'categories',
         }
+        
     },
     StockQuantity:{ 
         type:Number,

@@ -1,3 +1,5 @@
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+<script src="/javascripts/sweetalert2.all.js"></script><!-- jQuery Core -->
 <!-- Add this in the <head> section -->
 	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
 
@@ -125,20 +127,32 @@
 								  
 							</table>
 						</div>
-
+						<% var coupons  %>
 						<div class="flex-w flex-sb-m bor15 p-t-18 p-b-15 p-lr-40 p-lr-15-sm">
-							<div class="flex-w flex-m m-r-20 m-tb-5">
-								<input class="stext-104 cl2 plh4 size-117 bor13 p-lr-20 m-r-10 m-tb-5" type="text" name="coupon" placeholder="Coupon Code">
+								<div class="flex-w flex-m m-r-20 m-tb-5">
+								
 									
-								<div class="flex-c-m stext-101 cl2 size-118 bg8 bor13 hov-btn3 p-lr-15 trans-04 pointer m-tb-5">
-									Apply coupon
+									<select id="coupon-select" class="stext-104 cl2 plh4 size-117 bor13 p-lr-20 m-r-10 m-tb-5" name="coupon">
+									<option value="">Select a coupon</option>
+								
+									<% coupons.forEach((coupon)=>{ %>
+									<option value="<%=coupon.CouponCode  %>" ><%= coupon.CouponCode %></option>
+									<%	}) %>
+											<!-- Add more options for each available coupon -->
+								</select>	
+								<div id="apply-coupon" class="flex-c-m stext-101 cl2 size-118 bg8 bor13 hov-btn3 p-lr-15 trans-04 pointer m-tb-5">
+									<button id="apply-coupon" class="stex-101">Apply coupon</button>
 								</div>
-							</div>
-
+								
+								</div>
+					
+				
+						  
 							<div class="flex-c-m stext-101 cl2 size-119 bg8 bor13 hov-btn3 p-lr-15 trans-04 pointer m-tb-10">
-								Update Cart
+							  Update Cart
 							</div>
-						</div>
+						  </div>
+						  
 					</div>
 				</div>
 
@@ -156,55 +170,29 @@
 							</div>
 
 							<div class="size-209">
-								<span class="mtext-110 cl2" id="totalAmount">
-									₹<%=cart.TotalAmount  %>
+								<span class="mtext-110 cl2" id="subtotalAmount">
+									₹<%=cart.SubTotal  %>
 								</span>
 							</div>
 						</div>
-
-						<div class="flex-w flex-t bor12 p-t-15 p-b-30">
-							<div class="size-208 w-full-ssm">
+					
+						<div class="flex-w flex-t bor12 p-b-13">
+							<div class="size-208">
 								<span class="stext-110 cl2">
-									Shipping:
+								Coupon:
 								</span>
 							</div>
 
-							<div class="size-209 p-r-18 p-r-0-sm w-full-ssm">
-								<p class="stext-111 cl6 p-t-2">
-									There are no shipping methods available. Please double check your address, or contact us if you need any help.
-								</p>
-								
-								<div class="p-t-15">
-									<span class="stext-112 cl8">
-										Calculate Shipping
-									</span>
-
-									<div class="rs1-select2 rs2-select2 bor8 bg0 m-b-12 m-t-9">
-										<select class="js-select2" name="time">
-											<option>Select a country...</option>
-											<option>USA</option>
-											<option>UK</option>
-										</select>
-										<div class="dropDownSelect2"></div>
-									</div>
-
-									<div class="bor8 bg0 m-b-12">
-										<input class="stext-111 cl8 plh3 size-111 p-lr-15" type="text" name="state" placeholder="State /  country">
-									</div>
-
-									<div class="bor8 bg0 m-b-22">
-										<input class="stext-111 cl8 plh3 size-111 p-lr-15" type="text" name="postcode" placeholder="Postcode / Zip">
-									</div>
-									
-									<div class="flex-w">
-										<div class="flex-c-m stext-101 cl2 size-115 bg8 bor13 hov-btn3 p-lr-15 trans-04 pointer">
-											Update Totals
-										</div>
-									</div>
-										
-								</div>
+							<div class="size-209">
+								<span id="coupon-status" class="mtext-110 cl2" >
+							
+                        Do you have a coupon? Redeem it now.
+								</span>
 							</div>
 						</div>
+						
+
+
 
 						<div class="flex-w flex-t p-t-27 p-b-33">
 							<div class="size-208">
@@ -214,8 +202,8 @@
 							</div>
 
 							<div class="size-209 p-t-1">
-								<span class="mtext-110 cl2">
-									₹79.65
+								<span class="mtext-110 cl2" id="totalAmount">
+									₹ <%= cart.FinalTotal %>
 								</span>
 							</div>
 						</div>
@@ -236,10 +224,11 @@
 		  $('.btn-num-product-down').on('click', function(){
     var numProduct = Number($(this).next().val());
     const quantityId = $(this).next().data('cartid');
-    if (numProduct > 0) {
+    if (numProduct > 1) {
       $(this).next().val(numProduct - 1);
 	  const status ='-'
-      updateQuantity(numProduct - 1, quantityId,'-',status);
+	  const selectedCoupon = $('#coupon-select').val();
+      updateQuantity(numProduct - 1, quantityId,'-',status,selectedCoupon);
     }
   });
 
@@ -248,27 +237,32 @@
     const quantityId = $(this).prev().data('cartid');
     $(this).prev().val(numProduct + 1);
 	const status ='+'
-    updateQuantity(numProduct + 1, quantityId,status);
+	const selectedCoupon = $('#coupon-select').val();
+    updateQuantity(numProduct + 1, quantityId,status,selectedCoupon);
   });
-  function updateQuantity(quantity, quantityId,status) {
+  function updateQuantity(quantity, quantityId,status,selectedCoupon) {
     $.ajax({
       url: '/updateQuantity',
       type: 'Patch',
       data: {
         quantity: Number(quantity),
         quantityId: quantityId,
-		status:status
+		status:status,
+		selectedCoupon:selectedCoupon
       },
       success: function(response) {
 		  // Assuming the response contains the updated price and quantityId
 		  const updatedPrice = response.updatedPrice;
      const quantityId = response.quantityId;
+	 const updateSubTotalAmount = response.updateSubTotalAmount
 	 const updateTotalAmount = response.updateTotalAmount
-  
   // Update the HTML element with the updated price
   $('.total-price-' + quantityId).text(updatedPrice);
 
+  $('#subtotalAmount').text(updateSubTotalAmount)
   $('#totalAmount').text(updateTotalAmount)
+
+  $('')
 
         
       },
@@ -290,7 +284,7 @@
 			  console.log(cartId);
   
 			  // Make an AJAX request to delete the item
-       $.ajax({
+    $.ajax({
       url: '/deleteCartItem',
       type: 'delete',
       data: { cartId: cartId },
@@ -314,3 +308,57 @@
 				})
 			})
 		</script>
+
+<script>
+	$(document).ready(() => {
+  $('#apply-coupon').on('click', (event) => {
+    event.preventDefault();
+
+    const selectedCoupon = $('#coupon-select').val();
+
+    fetch('/apply-coupon', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ coupon: selectedCoupon })
+    })
+      .then((response) => {
+        if (response.status === 200) {
+          return response.json();
+        } else if (response.status === 400) {
+          throw new Error('Coupon already applied');
+        } else {
+          throw new Error('Unexpected response');
+        }
+      })
+      .then((response) => {
+        console.log(response);
+        const { message } = response;
+		const FinalTotal = response.resp.FinalTotal
+
+		console.log(FinalTotal);
+
+        Swal.fire({
+          position: 'top-end',
+          icon: 'success',
+          title: message,
+          showConfirmButton: false,
+          timer: 1500
+        });
+
+        $('#totalAmount').text(FinalTotal);
+        $('#coupon-status').text('Coupon applied successfully');
+      })
+      .catch((error) => {
+		Swal.fire({
+  icon: 'error',
+  title: error.message,
+  
+})
+      });
+  });
+});
+
+</script>
+		

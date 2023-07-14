@@ -1,9 +1,11 @@
 const category = require("../models/categorySchema");
 const Product = require("../models/productSchema");
+const Coupon = require('../models/couponSchema')
 const Swal = require("sweetalert2");
 const sharp = require('sharp')
 const fs = require("fs");
-const { error } = require("console");
+const slugify = require('slugify');
+const { error, log } = require("console");
 const { getCategory } = require("../helpers/product-helpers");
 const {findCategory}= require('../helpers/product-helpers');
 
@@ -13,11 +15,8 @@ module.exports = {
   getaddProducts: (req, res) => {
     findCategory().then((categories)=>{
       res.render("admin/add-product", { admin: true ,categories});
-    })
-
-    
-  },
-  addingProducts: async (req, res) => {
+    })    
+  },addingProducts: async (req, res) => {
     try {
       console.log(req.files);
       console.log(req.body);
@@ -32,41 +31,62 @@ module.exports = {
         regular_price,
         sale_price,
       } = req.body;
-      const productImagesFileName = req.files.map((file) => file.filename);
-
+  
+      const productImages = req.files;
+  
       //  const{originalname} = req.files
       const Dbcategory = await category.findOne({
         CategoryName: category_name,
       });
       console.log(Dbcategory);
-
-      const newProduct = await new Product({
+  
+      // Generate slugs
+      const slug = slugify(product_name, { lower: true });
+      const categorySlug = slugify(category_name, { lower: true });
+  
+      const newProduct = new Product({
+        Slug: slug,
         ProductName: product_name,
         BrandName: brand_name,
         Description: description,
         ScreenSize: screen_size,
         MemorySize: memory_size,
-
         Category: {
           categoryId: Dbcategory._id,
           categoryName: category_name,
+          Slug: categorySlug,
         },
         StockQuantity: stock_quantity,
         RegularPrice: regular_price,
         SalePrice: sale_price,
-        ProductImages: productImagesFileName,
-        isActive:true
+        isActive: true,
       });
-      await newProduct.save().then(() => {
-        console.log("sucessfull product added");
-        res.redirect("/admin/list-products");
-      }).catch((err)=>{
-        console.log(err);
-      })
+  
+      await Promise.all(
+        productImages.map(async (image) => {
+          console.log(image);
+          const inputImagePath = image.path;
+          const outputImagePath = `public/uploads/product_images/${image.filename}`;
+   
+          await sharp(inputImagePath)
+            .resize(522, 522, { fit: 'inside' })
+            .toFile(outputImagePath);
+          // Unlink the original image file
+          fs.unlinkSync(inputImagePath);
+          // Update the product images array with the new filenames
+          newProduct.ProductImages.push(image.filename);
+        })
+      );
+  
+      await newProduct.save();
+      console.log('Successfully added product');
+      res.redirect('/admin/list-products');
     } catch (err) {
-      res.status(400).json({ error: "product uploaded error" + err });
+      console.error('Error uploading product:', err);
+      res.status(400).json({ error: 'Failed to upload product.' });
     }
-  },
+  }
+ ,
   getListProductPage: async (req, res) => {
     try {
       const allProducts = await Product.aggregate([{$match:{isActive:true}}])
@@ -78,59 +98,64 @@ module.exports = {
   getEditProductPage: async (req, res) => {
     try {
       const userId = req.query.productId;
-      const product = await Product.findOne({ _id: userId });
+      const product = await Product.findOne({ Slug: userId });
       res.render("admin/edit-product", { admin: true, product });
     } catch (err) {
       res.status(400).json({ error: "product uploaded error" + err });
     }
   },
-  editProductAndSave: async (req, res) => {
-    try {
-      const { productId } = req.query;
+    editProductAndSave: async (req, res) => {
+      try {
+        const { productId } = req.query;
 
-      console.log(req.body);
-      console.log(req.query.productId);
-      const productImagesFileName = req.files.map((file) => file.filename);
+        console.log(req.body);
+        console.log(req.query.productId);
+        const productImagesFileName = req.files.map((file) => file.filename);
 
 
-      const {
-        product_name,
-        brand_name,
-        description,
-        screen_size,
-        memory_size,
-        category_name,
-        stock_quantity,
-        regular_price,
-        sale_price,
+        const {
+          product_name,
+          brand_name,
+          description,
+          screen_size,
+          memory_size,
+          category_name,
+          stock_quantity,
+          regular_price,
+          sale_price,
 
-      } = req.body;
+        } = req.body;
 
-      const productSave = await Product.findByIdAndUpdate(
-        productId,
-        {
-          ProductName: product_name,
-          BrandName: brand_name,
-          Description: description,
-          ScreenSize: screen_size,
-          MemorySize: memory_size,
-          "Category.categoryName": category_name,
-          StockQuantity: stock_quantity,
-          RegularPrice: regular_price,
-          SalePrice: sale_price,
-          ProductImages:productImagesFileName
-        },
-        { new: true }
-      );
- 
-      console.log(req.files);
-      if (productSave) {
-        res.redirect("/admin/list-products"); 
+        const slug = slugify(product_name,{lower:true})
+        const categorySlug = slugify(category_name,{lower:true})
+
+        const productSave = await Product.findByIdAndUpdate(
+          productId,
+          {
+            Slug:slug,
+            ProductName: product_name,
+            BrandName: brand_name,
+            Description: description,
+            ScreenSize: screen_size,
+            MemorySize: memory_size,
+            "Category.categoryName": category_name,
+            "Category.Slug":categorySlug,
+            StockQuantity: stock_quantity,
+            RegularPrice: regular_price,
+            SalePrice: sale_price,
+            ProductImages:productImagesFileName
+          },
+          { new: true }
+        );
+  
+        console.log(req.files);
+        if (productSave) {
+          res.redirect("/admin/list-products"); 
+        }
+      } catch (error) {
+        res.status(500).json({ message: "Failed to update the product" });
       }
-    } catch (error) {
-      res.status(500).json({ message: "Failed to update the product" });
-    }
-  },
+    },
   getCategoryPage: async (req, res) => {
     try {
       const categories = await category.aggregate([{$match:{isActive:true}}]);
@@ -153,8 +178,8 @@ module.exports = {
       const outputImagePath = 'public/uploads/Cropped_CategoryImages/'+req.file.filename
 
    await  sharp(inputImagePath)
-  .resize(500, 500) // Resize the image if needed
-  .extract({ left: 0, top: 0, width: 300, height: 300 }) // Crop the image (adjust the values accordingly)
+  .resize(522, 522,{fit:'cover'}) // Resize the image if needed
+  // .extract({ left: 0, top: 0, width: 300, height: 300 }) // Crop the image (adjust the values accordingly)
   .toFile(outputImagePath)
   .then(async() => {
     console.log('Image cropped and saved successfully');
@@ -166,7 +191,9 @@ module.exports = {
     res.redirect('/admin/category')
 
    }else{
+    const slug = slugify(categoryName,{lower:true})
     const newCategory   = await new category({
+      Slug:slug,
       CategoryName :categoryName,
       CategoryImage :req.file.filename,
       isActive:true
@@ -289,7 +316,10 @@ module.exports = {
             if (!category) {
               res.status(500).json({ error: "Category not found" });
             }
+
+            const slug = slugify(category_name,{lower:true})
             //update category name
+            category.Slug=slug
             category.CategoryName = category_name;
             category.CategoryImage = image.filename
             await category.save();   
@@ -363,6 +393,61 @@ module.exports = {
       res.status(500).json({ error: "Internal server error" });
     }
   },
+  getCouponPage:async(req,res)=>{
+
+    try{
+      const coupons  = await Coupon.find()
+      console.log(coupons)
+      res.render('admin/add-coupon',{admin:true,coupons})
+    }catch{
+      const ServerError='server error'
+      res.render('admin/add-coupon',{admin:true,ServerError})
+
+    }
+
+  }
+ , 
+ addingCoupon:async(req,res)=>{
+
+   console.log(req.body);
+   
+   const {couponcode, discount,validFromDate,validTillDate,min_amount} = req.body
+
+try{
+
+  const coupon = await Coupon.findOne({ CouponCode: { $regex: '^' + couponcode + '$', $options: 'i' } });
+
+if(coupon){
+  const existing='is existing'
+  var coupons  = await Coupon.find()
+
+res.render('admin/add-coupon',{admin:true,existing,coupons})
+}else{
+
+  const newCoupon  = await new Coupon({
+    CouponCode: couponcode,
+    Discount:discount,
+    ValidFromDate:validFromDate,
+    ValidTillDate:validTillDate,
+    MinAmount:min_amount
+
+  })
+  await newCoupon.save()
+
+  const success=' added succesfully'
+  var coupons  = await Coupon.find()
+
+
+res.render('admin/add-coupon',{admin:true,success,coupons})
   
+}
+  }catch(error){
+    const ServerError='server error'
+    var coupons  = await Coupon.find()
+    res.render('admin/add-coupon',{admin:true,ServerError,coupons})
+
+
+  }
   
-};
+ }
+}

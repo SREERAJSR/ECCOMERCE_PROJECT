@@ -363,6 +363,7 @@ res.redirect('/login')
         const gaming = filter[0].res;
         const office = filter[1].res;
         const students = filter[2].res;
+  
         if (req.session.user) {
           const userPhone = req.session.user.phone;
           const userDetails = req.session.user;
@@ -422,19 +423,19 @@ res.redirect('/login')
 
   getProductDetailPage: async (req, res, next) => {
     try {
-      const { productId } = req.query;
-      const categoryId = req.query.categoryId.trim();
+      const { productId ,categoryId} = req.query;
+      // const categoryId = req.query.categoryId.trim();
       console.log(categoryId);
 
       const catProd = await Product.aggregate([
         {
           $match: {
-            "Category.categoryId": new mongoose.Types.ObjectId(categoryId),
+            "Category.Slug": categoryId,
           },
         },
       ]);
 
-      await Product.findById(productId)
+      await Product.findOne({Slug:productId})
         .then(async (product) => {
           if (product) {
             if (req.session.user) {

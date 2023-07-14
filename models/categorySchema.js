@@ -13,6 +13,11 @@ const categorySchema = new mongoose.Schema({
     },
     isActive:{
         type:Boolean
+    },
+    Slug:{
+        type:String,
+        required:true,
+        unique:true
     }
    
 })

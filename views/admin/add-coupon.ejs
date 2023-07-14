@@ -1,0 +1,124 @@
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+<script src="/javascripts/sweetalert2.all.js"></script><!-- jQuery Core -->
+
+<section class="content-main">
+    <div class="content-header">
+        <div>
+      <h2 class="content-title card-title">Coupon</h2>
+                 
+        </div>
+       
+        </div>    
+    <div class="card">
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-3">
+                    <form  method="post" action="/admin/add-coupon"  id="coupon-form">
+                        <div class="mb-4">
+                            <label for="coupon_code" class="form-label">Coupon Code</label>
+                            <input type="text" name="couponcode" placeholder="Type here" class="form-control" id="coupon_code"/>
+                        </div>
+                        <div class="mb-4">
+                            <label for="Discount" class="form-label">Discount</label>
+                            <input type="number" name="discount" placeholder="Type here" class="form-control" id="discount"/>
+                        </div>
+                        <div class="mb-4">
+                            <label for="Discount" class="form-label">Minimum amount</label>
+                            <input type="number" name="min_amount" placeholder="Type here" class="form-control" id="min_amount"/>
+                        </div>
+                   
+                        <div class="mb-4">
+                            <label for="validFromDate" class="form-label">ValidFromDate</label>
+                            <input type="date" name="validFromDate" placeholder="Type here" class="form-control" id="valid_From"/>
+                        </div>
+                        <div class="mb-4">
+                            <label for="validTillDate" class="form-label">ValidTillDate</label>
+                            <input type="date" name="validTillDate" placeholder="Type here" class="form-control" id="valid_Till"/>
+                        </div>
+                         <div>                           
+                        </div>
+                        <div class="d-grid">
+                            <button  type="submit" id="submit-button" class="btn btn-primary">SAVE</button>
+                        </div>
+                       
+                    </form>
+                </div>
+                <div class="col-md-9">
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th><b>No</b></th>
+                                    <th><b>Coupon code</b></th>
+                                    <th><b>Discount</b></th>
+                                    <th><b>Min amount</b></th>
+                                    <th><b>ValidFromDate</b></th>
+                                    <th><b>ValidTillDate</b></th>
+                                    <th class="text-end"><b>Action</b></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                               <% var coupons  ,index%>
+                                <% coupons.forEach((coupon,index)=>{ %>
+                                <tr>
+                                    <td><%= index+1 %></td>
+                                    <td><b><%= coupon.CouponCode %></b></td>
+                                    <td> <%= coupon.Discount %></td>
+                                    <td> <%= coupon.MinAmount %></td>
+                                    <td><%= coupon.ValidFromDate %></td>
+                                     <td><%= coupon.ValidTillDate%></td>
+
+                                    <td class="text-end">
+                                        <div class="dropdown">
+                                            <a href="#" data-bs-toggle="dropdown" class="btn btn-light rounded btn-sm font-sm"> <i class="material-icons md-more_horiz"></i> </a>
+                                            <div class="dropdown-menu">
+                                                <a class="dropdown-item"  href="">Edit info</a>
+                                                <a class="dropdown-item text-danger" href="">Delete</a>
+                                            </div>
+                                        </div> <!-- dropdown //end -->
+                                    </td>
+                                </tr>
+                      <% }) %>
+                            
+                            </tbody>
+                        </table>
+                    </div>
+                </div> <!-- .col// -->
+            </div> <!-- .row // -->
+        </div>
+       
+    </div> 
+
+    <% var existing , success ,serverError %>
+    <% if (existing) {%><!-- card .// -->
+    <script>
+    
+    Swal.fire({
+  icon: 'error',
+  title: 'Coupon already exist',
+  text: '',
+  footer: '<a href="">Why do I have this issue?</a>'
+})
+    </script>
+
+<% }else if(success){ %>
+    <script>
+    Swal.fire({
+        position: 'top-end',
+        icon: 'success',
+        title: 'Coupon is saved',
+        showConfirmButton: false,
+        timer: 1500
+      })
+    </script>
+
+    <% }else if(serverError) {%>
+        <script>
+        Swal.fire(
+            'Internal Server error',
+            'That thing is still around?',
+            'question'
+          )
+
+        </script>
+        <% } %>

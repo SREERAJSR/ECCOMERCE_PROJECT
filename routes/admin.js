@@ -24,7 +24,9 @@ const {
   getUnlistedPage,
   changeCategoryStatus,
   getUnlistProductPage,
-  changeProductStatus
+  changeProductStatus,
+  getCouponPage,
+  addingCoupon
 } = require("../controllers/product-controller");
 
 // const upload = require("../middlewares/multer-config")
@@ -74,5 +76,9 @@ router.patch("/delete-product",authenticateAdmin, deleteProduct);
 router.get("/unlist-product",authenticateAdmin,getUnlistProductPage)
 
 router.patch('/unlistproduct',authenticateAdmin,changeProductStatus)
+
+router.get('/add-coupon',getCouponPage)
+
+router.post('/add-coupon',addingCoupon)
 
 module.exports = router;

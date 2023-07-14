@@ -42,12 +42,8 @@ authenticateForUser:async(req,res,next)=>{
     }else{
         res.render('user/login',{u:false})
     }
-}
+},
 
-   
-     
-      
-      
 
     
 }
