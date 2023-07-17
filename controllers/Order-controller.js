@@ -11,7 +11,8 @@ const { error } = require("jquery");
 const { default: mongoose } = require("mongoose");
 const Cart = require('../models/cartSchema')
 const Coupon = require('../models/couponSchema')
-const {couponApplying,addingCouponToCart} = require('../helpers/order-helpers')
+const {couponApplying,addingCouponToCart,
+  placingOrderInDb, generateRazorPay} = require('../helpers/order-helpers')
 const usedCoupon = require('../models/usedCoupons')
 
 module.exports={
@@ -159,10 +160,10 @@ if (UsedCoupons && UsedCoupons.Coupons.length > 0) {
   }
 
   // Subtract the discount amount from the FinalTotal
-  cart.FinalTotal = totalAmount - discountAmount;
+  cart.FinalTotal = (totalAmount - discountAmount)+50;
 } else {
   // If no coupons are used, set the FinalTotal same as the SubTotal
-  cart.FinalTotal = totalAmount;
+  cart.FinalTotal = totalAmount+50;
 }
 
             await cart.save(); 
@@ -230,36 +231,61 @@ if (UsedCoupons && UsedCoupons.Coupons.length > 0) {
   }
 }
 ,
+
     applyCoupon:async(req,res)=>{
     
       try{
         const{coupon} = req.body
-        
-        const DbCoupon= await Coupon.findOne({CouponCode : coupon})
 
         
+        const DbCoupon= await Coupon.findOne({CouponCode : coupon})      
         if(!DbCoupon){
           res.status(404).json({error:'coupon not found in database'})
         }else{
           const userId = req.session.user._id
-
           couponApplying(userId,DbCoupon).then((resp)=>{
-
             addingCouponToCart(coupon,userId).then((response)=>{
-             console.log('added',resp);
-            console.log('succes');
+         
+        
               res.status(200).json({message:'coupon applied succesfully',response,resp})
             }).catch((err)=>{
-              res.status(400).json({message:err})
-            })
-              
+              res.status(409).json({message:err})
+            })         
           }).catch((err)=>{
+            console.log(err);
             res.status(400).json({message :err})
           })
         }
     }catch(error){
       res.status(500).json({error:'Some internal Error'})
     }
+  },
+  placingOrder:async(req,res)=>{
+
+try{
+  const {addressId,paymentMethod,TotalPrice} = req.body
+  const userId = req.session.user._id
+  placingOrderInDb(addressId,paymentMethod,TotalPrice,userId).then((dbOrder)=>{
+
+    if(paymentMethod ==="Cash on Delivery"){
+      res.status(200).json({message:'Order Sucess'})   
+    }else{
+      generateRazorPay(dbOrder.OrderId,dbOrder.TotalAmount).then((razorPayOrder)=>{
+        res.status(201).json({message:'order created',razorPayOrder})
+      })
+
+    }
+
+
+  }) 
+}catch(err){
+  console.log(err);
+
+}
+  
+  },
+  verifyPayment:(req,res)=>{
+    console.log(req.body);
   }
      
   };

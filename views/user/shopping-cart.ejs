@@ -1,364 +1,323 @@
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-<script src="/javascripts/sweetalert2.all.js"></script><!-- jQuery Core -->
-<!-- Add this in the <head> section -->
-	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+	<script src="/javascripts/sweetalert2.all.js"></script><!-- jQuery Core -->
+	<!-- Add this in the <head> section -->
+		<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
 
-	<!-- Cart -->
-	<div class="wrap-header-cart js-panel-cart">
-		<div class="s-full js-hide-cart"></div>
+		<!-- Cart -->
+		<div class="wrap-header-cart js-panel-cart">
+			<div class="s-full js-hide-cart"></div>
 
-		<div class="header-cart flex-col-l p-l-65 p-r-25">
-			<div class="header-cart-title flex-w flex-sb-m p-b-8">
-				<span class="mtext-103 cl2">
-					Your Cart
-					
-				</span>
+			<div class="header-cart flex-col-l p-l-65 p-r-25">
+				<div class="header-cart-title flex-w flex-sb-m p-b-8">
+					<span class="mtext-103 cl2">
+						Your Cart
+						
+					</span>
 
-				<div class="fs-35 lh-10 cl2 p-lr-5 pointer hov-cl1 trans-04 js-hide-cart">
-					<i class="zmdi zmdi-close"></i>
+					<div class="fs-35 lh-10 cl2 p-lr-5 pointer hov-cl1 trans-04 js-hide-cart">
+						<i class="zmdi zmdi-close"></i>
+					</div>
 				</div>
-			</div>
-			
-			<div class="header-cart-content flex-w js-pscroll">
-				<ul class="header-cart-wrapitem w-full">
+				
+				<div class="header-cart-content flex-w js-pscroll">
+					<ul class="header-cart-wrapitem w-full">
+						
+						
+						
+						<li class="header-cart-item flex-w flex-t m-b-12">
+							<div class="header-cart-item-img">
+								<img src="images/item-cart-01.jpg" alt="IMG">
+							</div>
+
+							<div class="header-cart-item-txt p-t-8">
+								<a href="#" class="header-cart-item-name m-b-18 hov-cl1 trans-04">
+									White Shirt Pleat
+								</a>
+
+								<span class="header-cart-item-info">
+									1 x $19.00
+								</span>
+							</div>
+						</li>
+
+				
+					</ul>
 					
-					
-					
-					<li class="header-cart-item flex-w flex-t m-b-12">
-						<div class="header-cart-item-img">
-							<img src="images/item-cart-01.jpg" alt="IMG">
+					<div class="w-full">
+						<div class="header-cart-total w-full p-tb-40">
+							Total: ₹75.00
 						</div>
 
-						<div class="header-cart-item-txt p-t-8">
-							<a href="#" class="header-cart-item-name m-b-18 hov-cl1 trans-04">
-								White Shirt Pleat
+						<div class="header-cart-buttons flex-w w-full">
+							<a href="shoping-cart.html" class="flex-c-m stext-101 cl0 size-107 bg3 bor2 hov-btn3 p-lr-15 trans-04 m-r-8 m-b-10">
+								View Cart
 							</a>
 
-							<span class="header-cart-item-info">
-								1 x $19.00
-							</span>
+							<a href="shoping-cart.html" class="flex-c-m stext-101 cl0 size-107 bg3 bor2 hov-btn3 p-lr-15 trans-04 m-b-10">
+								Check Out
+							</a>
 						</div>
-					</li>
-
-			
-				</ul>
-				
-				<div class="w-full">
-					<div class="header-cart-total w-full p-tb-40">
-						Total: ₹75.00
-					</div>
-
-					<div class="header-cart-buttons flex-w w-full">
-						<a href="shoping-cart.html" class="flex-c-m stext-101 cl0 size-107 bg3 bor2 hov-btn3 p-lr-15 trans-04 m-r-8 m-b-10">
-							View Cart
-						</a>
-
-						<a href="shoping-cart.html" class="flex-c-m stext-101 cl0 size-107 bg3 bor2 hov-btn3 p-lr-15 trans-04 m-b-10">
-							Check Out
-						</a>
 					</div>
 				</div>
 			</div>
 		</div>
-	</div>
 
 
-	<!-- breadcrumb -->
-	<div class="container">
-		<div class="bread-crumb flex-w p-l-25 p-r-15 p-t-30 p-lr-0-lg">
-			<a href="index.html" class="stext-109 cl8 hov-cl1 trans-04">
-				Home
-				<i class="fa fa-angle-right m-l-9 m-r-10" aria-hidden="true"></i>
-			</a>
-
-			<span class="stext-109 cl4">
-				Shoping Cart
-			</span>
-		</div>
-	</div>
-		
-
-
-	<!-- Shoping Cart -->
-	<form class="bg0 p-t-75 p-b-85">
+		<!-- breadcrumb -->
 		<div class="container">
-			<div class="row">
-				<div class="col-lg-10 col-xl-7 m-lr-auto m-b-50">
-					<div class="m-l-25 m-r--38 m-lr-0-xl">
-						<div class="wrap-table-shopping-cart">
-							<table class="table-shopping-cart">
-								<tr class="table_head">
-									<th class="column-1">Product</th>
-									<th class="column-2"></th>
-									<th class="column-3">Price</th>
-									<th class="column-4">Quantity</th>
-									<th class="column-5">Delete</th>
-									<th class="column-6">Total </th>
-								
-								</tr>			
-					 
-								<% cart.CartItems.forEach((item) => { %>
-									<tr class="table_row">
-									  <td class="column-1">
-										<div class="how-itemcart1">
-										  <img src="/uploads/product_images/<%= item.ProductId.ProductImages[0] %>" alt="IMG">
-										</div>
-									  </td>
-									  <td class="column-2"><%= item.ProductId.ProductName %></td>
-									  <td class="column-3">₹<%= item.ProductId.SalePrice %></td>
-									  <td class="column-4">
-										<div class="wrap-num-product flex-w m-l-auto m-r-0">
-										  <div class="btn-num-product-down cl8 hov-btn3 trans-04 flex-c-m">
-											<i class="fs-16 zmdi zmdi-minus"></i>
-										  </div>
-								  
-										  <input class="mtext-104 cl3 txt-center num-product" id="qty-<%= item._id %>" data-cartId="<%= item._id %>" type="number" name="num-product1" value="<%= item.Quantity %>">
-								  
-										  <div class="btn-num-product-up cl8 hov-btn3 trans-04 flex-c-m">
-											<i class="fs-16 zmdi zmdi-plus"></i>
-										  </div>
-										</div>
-									  </td>
-                                 <!-- Update the "trash" icon code -->
-                                <td  class="column-5"><i class="fas fa-trash"  data-cartid="<%= item._id %>"></i></td>
-									  <td class="column-6  total-price-<%= item._id %>">₹<%= item.Total %></td>
-									</tr>
-								  <% }) %>
-								  
-							</table>
-						</div>
-						<% var coupons  %>
-						<div class="flex-w flex-sb-m bor15 p-t-18 p-b-15 p-lr-40 p-lr-15-sm">
-								<div class="flex-w flex-m m-r-20 m-tb-5">
-								
+			<div class="bread-crumb flex-w p-l-25 p-r-15 p-t-30 p-lr-0-lg">
+				<a href="index.html" class="stext-109 cl8 hov-cl1 trans-04">
+					Home
+					<i class="fa fa-angle-right m-l-9 m-r-10" aria-hidden="true"></i>
+				</a>
+
+				<span class="stext-109 cl4">
+					Shoping Cart
+				</span>
+			</div>
+		</div>
+			
+
+
+		<!-- Shoping Cart -->
+		<form class="bg0 p-t-75 p-b-85">
+			<div class="container">
+				<div class="row">
+					<div class="col-lg-10 col-xl-7 m-lr-auto m-b-50">
+						<div class="m-l-25 m-r--38 m-lr-0-xl">
+							<div class="wrap-table-shopping-cart">
+								<table class="table-shopping-cart">
+									<tr class="table_head">
+										<th class="column-1">Product</th>
+										<th class="column-2"></th>
+										<th class="column-3">Price</th>
+										<th class="column-4">Quantity</th>
+										<th class="column-5">Delete</th>
+										<th class="column-6">Total </th>
 									
-									<select id="coupon-select" class="stext-104 cl2 plh4 size-117 bor13 p-lr-20 m-r-10 m-tb-5" name="coupon">
-									<option value="">Select a coupon</option>
-								
-									<% coupons.forEach((coupon)=>{ %>
-									<option value="<%=coupon.CouponCode  %>" ><%= coupon.CouponCode %></option>
-									<%	}) %>
-											<!-- Add more options for each available coupon -->
-								</select>	
-								<div id="apply-coupon" class="flex-c-m stext-101 cl2 size-118 bg8 bor13 hov-btn3 p-lr-15 trans-04 pointer m-tb-5">
-									<button id="apply-coupon" class="stex-101">Apply coupon</button>
-								</div>
-								
-								</div>
-					
-				
-						  
-							<div class="flex-c-m stext-101 cl2 size-119 bg8 bor13 hov-btn3 p-lr-15 trans-04 pointer m-tb-10">
-							  Update Cart
-							</div>
-						  </div>
-						  
-					</div>
-				</div>
-
-				<div class="col-sm-10 col-lg-7 col-xl-5 m-lr-auto m-b-50">
-					<div class="bor10 p-lr-40 p-t-30 p-b-40 m-l-63 m-r-40 m-lr-0-xl p-lr-15-sm">
-						<h4 class="mtext-109 cl2 p-b-30">
-							Cart Totals
-						</h4>
-
-						<div class="flex-w flex-t bor12 p-b-13">
-							<div class="size-208">
-								<span class="stext-110 cl2">
-									Subtotal:
-								</span>
-							</div>
-
-							<div class="size-209">
-								<span class="mtext-110 cl2" id="subtotalAmount">
-									₹<%=cart.SubTotal  %>
-								</span>
-							</div>
-						</div>
-					
-						<div class="flex-w flex-t bor12 p-b-13">
-							<div class="size-208">
-								<span class="stext-110 cl2">
-								Coupon:
-								</span>
-							</div>
-
-							<div class="size-209">
-								<span id="coupon-status" class="mtext-110 cl2" >
-							
-                        Do you have a coupon? Redeem it now.
-								</span>
-							</div>
-						</div>
+									</tr>			
 						
-
-
-
-						<div class="flex-w flex-t p-t-27 p-b-33">
-							<div class="size-208">
-								<span class="mtext-101 cl2">
-									Total:
-								</span>
+									<% cart.CartItems.forEach((item) => { %>
+										<tr class="table_row">
+										<td class="column-1">
+											<div class="how-itemcart1">
+											<img src="/uploads/product_images/<%= item.ProductId.ProductImages[0] %>" alt="IMG">
+											</div>
+										</td>
+										<td class="column-2"><%= item.ProductId.ProductName %></td>
+										<td class="column-3">₹<%= item.ProductId.SalePrice %></td>
+										<td class="column-4">
+											<div class="wrap-num-product flex-w m-l-auto m-r-0">
+											<div class="btn-num-product-down cl8 hov-btn3 trans-04 flex-c-m">
+												<i class="fs-16 zmdi zmdi-minus"></i>
+											</div>
+									
+											<input class="mtext-104 cl3 txt-center num-product" id="qty-<%= item._id %>" data-cartId="<%= item._id %>" type="number" name="num-product1" value="<%= item.Quantity %>">
+									
+											<div class="btn-num-product-up cl8 hov-btn3 trans-04 flex-c-m">
+												<i class="fs-16 zmdi zmdi-plus"></i>
+											</div>
+											</div>
+										</td>
+									<!-- Update the "trash" icon code -->
+									<td  class="column-5"><i class="fas fa-trash"  data-cartid="<%= item._id %>"></i></td>
+										<td class="column-6  total-price-<%= item._id %>">₹<%= item.Total %></td>
+										</tr>
+									<% }) %>
+									
+								</table>
 							</div>
-
-							<div class="size-209 p-t-1">
-								<span class="mtext-110 cl2" id="totalAmount">
-									₹ <%= cart.FinalTotal %>
-								</span>
-							</div>
+							<% var coupons  %>
+							<!-- <div class="flex-w flex-sb-m bor15 p-t-18 p-b-15 p-lr-40 p-lr-15-sm"> -->
+									<!-- <div class="flex-w flex-m m-r-20 m-tb-5"> -->
+									
+										
+										<!-- <select id="coupon-select" class="stext-104 cl2 plh4 size-117 bor13 p-lr-20 m-r-10 m-tb-5" name="coupon">
+										<option value="">Select a coupon</option> -->
+									
+										<!-- <% coupons.forEach((coupon)=>{ %>
+										<option value="<%=coupon.CouponCode  %>" ><%= coupon.CouponCode %></option>
+										<%	}) %> -->
+												<!-- Add more options for each available coupon -->
+									<!-- </select>	
+									<div id="apply-coupon" class="flex-c-m stext-101 cl2 size-118 bg8 bor13 hov-btn3 p-lr-15 trans-04 pointer m-tb-5">
+										<button id="apply-coupon" class="stex-101">Apply coupon</button>
+									</div> -->
+									
+									<!-- </div> -->
+						
+					
+							
+								<!-- <div class="flex-c-m stext-101 cl2 size-119 bg8 bor13 hov-btn3 p-lr-15 trans-04 pointer m-tb-10">
+								Update Cart
+								</div> -->
+							<!-- </div> -->
+							
 						</div>
+					</div>
 
-						<button class="flex-c-m stext-101 cl0 size-116 bg3 bor14 hov-btn3 p-lr-15 trans-04 pointer">
-							Proceed to Checkout
-						</button>
+					<div class="col-sm-10 col-lg-7 col-xl-5 m-lr-auto m-b-50">
+						<div class="bor10 p-lr-40 p-t-30 p-b-40 m-l-63 m-r-40 m-lr-0-xl p-lr-15-sm">
+							<h4 class="mtext-109 cl2 p-b-30">
+								Cart Totals
+							</h4>
+
+							<div class="flex-w flex-t bor12 p-b-13">
+								<div class="size-208">
+									<span class="stext-110 cl2">
+										Subtotal:
+									</span>
+								</div>
+
+								<div class="size-209">
+									<span class="mtext-110 cl2" id="subtotalAmount">
+										₹<%=cart.SubTotal  %>
+									</span>
+								</div>
+							</div>
+						
+							<!-- <div class="flex-w flex-t bor12 p-b-13">
+								<div class="size-208">
+									<span class="stext-110 cl2">
+									Coupon:
+									</span>
+								</div>
+
+								<div class="size-209">
+									<span id="coupon-status" class="mtext-110 cl2" >
+								
+							Do you have a coupon? Redeem it now.
+									</span>
+								</div>
+							</div> -->
+							
+
+
+
+							<!-- <div class="flex-w flex-t p-t-27 p-b-33">
+								<div class="size-208">
+									<span class="mtext-101 cl2">
+										Total:
+									</span>
+								</div>
+
+								<div class="size-209 p-t-1">
+									<span class="mtext-110 cl2" id="totalAmount">
+										₹ <%= cart.FinalTotal %>
+									</span>
+								</div>
+							</div> -->
+
+								<button id="checkout-btn" class="flex-c-m stext-101 cl0 size-116 bg3 bor14 hov-btn3 p-lr-15 trans-04 pointer ">Proceed to Checkout</button>
+							
+						</div>
 					</div>
 				</div>
 			</div>
-		</div>
-	</form>
-		
-	
-	<script>
-		$(document).ready(function() {
-
-		  $('.btn-num-product-down').on('click', function(){
-    var numProduct = Number($(this).next().val());
-    const quantityId = $(this).next().data('cartid');
-    if (numProduct > 1) {
-      $(this).next().val(numProduct - 1);
-	  const status ='-'
-	  const selectedCoupon = $('#coupon-select').val();
-      updateQuantity(numProduct - 1, quantityId,'-',status,selectedCoupon);
-    }
-  });
-
-  $('.btn-num-product-up').on('click', function(){
-    var numProduct = Number($(this).prev().val());
-    const quantityId = $(this).prev().data('cartid');
-    $(this).prev().val(numProduct + 1);
-	const status ='+'
-	const selectedCoupon = $('#coupon-select').val();
-    updateQuantity(numProduct + 1, quantityId,status,selectedCoupon);
-  });
-  function updateQuantity(quantity, quantityId,status,selectedCoupon) {
-    $.ajax({
-      url: '/updateQuantity',
-      type: 'Patch',
-      data: {
-        quantity: Number(quantity),
-        quantityId: quantityId,
-		status:status,
-		selectedCoupon:selectedCoupon
-      },
-      success: function(response) {
-		  // Assuming the response contains the updated price and quantityId
-		  const updatedPrice = response.updatedPrice;
-     const quantityId = response.quantityId;
-	 const updateSubTotalAmount = response.updateSubTotalAmount
-	 const updateTotalAmount = response.updateTotalAmount
-  // Update the HTML element with the updated price
-  $('.total-price-' + quantityId).text(updatedPrice);
-
-  $('#subtotalAmount').text(updateSubTotalAmount)
-  $('#totalAmount').text(updateTotalAmount)
-
-  $('')
-
-        
-      },
-      error: function(error) {
-        console.log(error);
-        // Handle the error response here
-      }
-    });
-  }
-    // Your jQuery code here
-});
-		
-		</script>
+		</form>
+			
 		
 		<script>
-			$(document).ready(()=>{
-				$('.fa-trash').on('click', function() {
-              var cartId = $(this).data('cartid');
-			  console.log(cartId);
-  
-			  // Make an AJAX request to delete the item
-    $.ajax({
-      url: '/deleteCartItem',
-      type: 'delete',
-      data: { cartId: cartId },
-      success: function(response) {
-        // Handle the success response
-        
-        // Remove the deleted item from the DOM
-        $(this).closest('.table_row').remove();
+			$(document).ready(function() {
 
-        // Update the total price or any other relevant information
-        // Example:
-        const updatedTotalAmount = response.updatedTotalAmount;
-        $('.total-amount').text(updatedTotalAmount);
-		location.reload()
-      },
-      error: function(error) {
-        // Handle the error response
-        console.log(error);
-      }
-    });
+			$('.btn-num-product-down').on('click', function(){
+		var numProduct = Number($(this).next().val());
+		const quantityId = $(this).next().data('cartid');
+		if (numProduct > 1) {
+		$(this).next().val(numProduct - 1);
+		const status ='-'
+		const selectedCoupon = $('#coupon-select').val();
+		updateQuantity(numProduct - 1, quantityId,'-',status,selectedCoupon);
+		}
+	});
+
+	$('.btn-num-product-up').on('click', function(){
+		var numProduct = Number($(this).prev().val());
+		const quantityId = $(this).prev().data('cartid');
+		$(this).prev().val(numProduct + 1);
+		const status ='+'
+		const selectedCoupon = $('#coupon-select').val();
+		updateQuantity(numProduct + 1, quantityId,status,selectedCoupon);
+	});
+	function updateQuantity(quantity, quantityId,status,selectedCoupon) {
+		$.ajax({
+		url: '/updateQuantity',
+		type: 'Patch',
+		data: {
+			quantity: Number(quantity),
+			quantityId: quantityId,
+			status:status,
+			selectedCoupon:selectedCoupon
+		},
+		success: function(response) {
+			// Assuming the response contains the updated price and quantityId
+			const updatedPrice = response.updatedPrice;
+		const quantityId = response.quantityId;
+		const updateSubTotalAmount = response.updateSubTotalAmount
+		const updateTotalAmount = response.updateTotalAmount
+	// Update the HTML element with the updated price
+	$('.total-price-' + quantityId).text(updatedPrice);
+
+	$('#subtotalAmount').text(updateSubTotalAmount)
+	$('#totalAmount').text(updateTotalAmount)
+
+	$('')
+
+			
+		},
+		error: function(error) {
+			console.log(error);
+			// Handle the error response here
+		}
+		});
+	}
+		// Your jQuery code here
+	});
+			
+			</script>
+			
+			<script>
+				$(document).ready(()=>{
+					$('.fa-trash').on('click', function() {
+				var cartId = $(this).data('cartid');
+				console.log(cartId);
+	
+				// Make an AJAX request to delete the item
+		$.ajax({
+		url: '/deleteCartItem',
+		type: 'delete',
+		data: { cartId: cartId },
+		success: function(response) {
+			// Handle the success response
+			
+			// Remove the deleted item from the DOM
+			$(this).closest('.table_row').remove();
+
+			// Update the total price or any other relevant information
+			// Example:
+			const updatedTotalAmount = response.updatedTotalAmount;
+			$('.total-amount').text(updatedTotalAmount);
+			location.reload()
+		},
+		error: function(error) {
+			// Handle the error response
+			console.log(error);
+		}
+		});
+					})
 				})
+			</script>
+
+	
+		<script>
+			$(document).ready((event)=>{
+
+
+			$('#checkout-btn').on('click',(event)=>{
+				event.preventDefault(	)
+				
+				location.href='/checkout'	
+			})
 			})
 		</script>
-
-<script>
-	$(document).ready(() => {
-  $('#apply-coupon').on('click', (event) => {
-    event.preventDefault();
-
-    const selectedCoupon = $('#coupon-select').val();
-
-    fetch('/apply-coupon', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({ coupon: selectedCoupon })
-    })
-      .then((response) => {
-        if (response.status === 200) {
-          return response.json();
-        } else if (response.status === 400) {
-          throw new Error('Coupon already applied');
-        } else {
-          throw new Error('Unexpected response');
-        }
-      })
-      .then((response) => {
-        console.log(response);
-        const { message } = response;
-		const FinalTotal = response.resp.FinalTotal
-
-		console.log(FinalTotal);
-
-        Swal.fire({
-          position: 'top-end',
-          icon: 'success',
-          title: message,
-          showConfirmButton: false,
-          timer: 1500
-        });
-
-        $('#totalAmount').text(FinalTotal);
-        $('#coupon-status').text('Coupon applied successfully');
-      })
-      .catch((error) => {
-		Swal.fire({
-  icon: 'error',
-  title: error.message,
-  
-})
-      });
-  });
-});
-
-</script>
-		
+				

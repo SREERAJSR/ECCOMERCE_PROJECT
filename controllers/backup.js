@@ -6,7 +6,7 @@ const { clearCache } = require("ejs");
 
 module.exports = {
   getSignup: (req, res) => {
-    // console.log(req.session.user.username);
+    // console.  log(req.session.user.username);
     res.render("user/signup", { u: false });
   },
 

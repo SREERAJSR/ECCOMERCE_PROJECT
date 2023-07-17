@@ -411,7 +411,7 @@ module.exports = {
 
    console.log(req.body);
    
-   const {couponcode, discount,validFromDate,validTillDate,min_amount} = req.body
+   const {couponcode, discount,validFromDate,validTillDate,min_amount,max_amount} = req.body
 
 try{
 
@@ -423,14 +423,13 @@ if(coupon){
 
 res.render('admin/add-coupon',{admin:true,existing,coupons})
 }else{
-
   const newCoupon  = await new Coupon({
     CouponCode: couponcode,
     Discount:discount,
     ValidFromDate:validFromDate,
     ValidTillDate:validTillDate,
-    MinAmount:min_amount
-
+    MinAmount:min_amount,
+    MaxAmount:max_amount
   })
   await newCoupon.save()
 

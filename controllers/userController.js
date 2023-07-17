@@ -11,6 +11,8 @@ const twilio = require("twilio");
 const { clearCache } = require("ejs");
 const { error } = require("jquery");
 const { default: mongoose } = require("mongoose");
+const Address = require('../models/addressSchema')
+const Coupon = require("../models/couponSchema")
 
 module.exports = {
   getSignup: (req, res) => {
@@ -568,7 +570,157 @@ console.log(userWishlist);
     res.status(500).json({ error: 'An error occurred while removing the product from the wishlist.' });
   }
 
-   }
+   },getCheckoutPage:async(req,res)=>{
+    try{
+      const userId = req.session.user._id
+      const addresses = await Address.find({UserId:req.session.user._id})
+      const coupons =  await Coupon.find()
+      console.log(coupons);
+
+      var cart = await Cart.findOne({UserId:userId}).populate({
+        path:'CartItems.ProductId',
+        select:'ProductName ProductImages SalePrice'
+      })
+      const user = await User.findById(userId)
+      cart.populate
+      if(user.DefaultAddress && cart){
+        const addressId =user.DefaultAddress.toString()
+        var defaultAddress = await Address.findById(addressId)
+        if(addresses.length===0){ 
+
+          console.log(addresses);
+          res.render('user/checkout2',{u:true,cart,coupons})
+        }else{
+          console.log('sreee');
+          res.render('user/checkout2',{u:true,addresses,defaultAddress,cart,coupons})
+  
+        }
+      }else{
+        if(addresses.length===0){ 
+
+          console.log(addresses);
+          res.render('user/checkout2',{u:true,cart,coupons})
+        }else{
+          console.log('sreee');
+          res.render('user/checkout2',{u:true,addresses,cart,coupons})
+   
+        }
+
+
+      }
+
+
+      if(addresses.length===0){ 
+
+        console.log(addresses);
+        res.render('user/checkout2',{u:true})
+      }else{
+        console.log('sreee');
+        res.render('user/checkout2',{u:true,addresses,defaultAddress})
+
+      }
+
+
+    }catch(error){
+      console.log(error);
+
+    }
+
+    
+   },
+   addingAddress: async(req,res)=>{
+
+    console.log(req.body);
+    const {Full_Name,Email,Mobile,Flat,Area,Landmark,Pincode,Town }= req.body
+ 
+    try{
+      if(req.session.user){
+      const userId = req.session.user._id
+      console.log(userId);
+const address = await Address.findOne({UserId:userId})
+if(!address){
+  
+  const newAddress = await new Address({
+    UserId:userId,
+    FullName:Full_Name,
+    Email:Email,
+    Phone:Mobile,
+    Flat:Flat,
+    Area:Area,
+    Landmark:Landmark,
+    Pincode:Pincode,
+    Town:Town
+  })
+  await newAddress.save();
+  res.status(200).json({message:'Address added succesfully'})
+}else{
+
+  const newAddress = await new Address({
+    UserId:userId,
+    FullName:Full_Name,
+    Email:Email,
+    Phone:Mobile,
+    Flat:Flat,
+    Area:Area,
+    Landmark:Landmark,
+    Pincode:Pincode,
+    Town:Town
+  }) 
+
+  await  newAddress.save()
+res.status(200).json({message:'Address added succesfully'})
+} }else{
+  res.status(401).json({message:'Please login'})
+}
+
+    }catch(error){
+
+  res.status(500).json({error:error})
+
+    }
+
+
+   }, 
+   selectDefaultAddress:async(req,res)=>{
+    
+     try{ 
+  const{addressId} = req.body
+  if(req.session.user){
+  const userId = req.session.user._id
+
+const user = await  User.findById(userId)
+console.log(user);
+
+if (user){
+  const selectedAddress = await Address.findById(addressId)
+  console.log(selectedAddress);
+    if(!user.DefaultAddress){  
+      console.log('not coming'); 
+    
+    user.DefaultAddress = selectedAddress
+   await user.save()
+   res.status(200).json({message:'selected address Successfully'})
+  
+   
+  }else{
+    user.DefaultAddress =selectedAddress
+    await user.save()
+    res.status(200).json({message:"selected address Successfully"})
+  }
+}else{  
+ return res.status(404).json({error:error})
+
+}}else{
+  return res.status(404).json({error:error})
+  
+}
+
+}catch(error){
+res.status(500).json({error:error})
+
+
+}
+   } 
 
   
 }

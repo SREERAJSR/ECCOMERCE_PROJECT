@@ -6,7 +6,9 @@ const { addToCart,
   getShoppingCart,
   updateQuantity,
   deleteCartItem,
-  applyCoupon}= require('../controllers/Order-controller')
+  applyCoupon,
+  placingOrder,
+  verifyPayment}= require('../controllers/Order-controller')
 
 var router = express.Router();
 const {
@@ -32,7 +34,10 @@ const {
   getWishlistPage,
   checkWishlist,
   addToWishlist,
-  removeFromWishlist
+  removeFromWishlist,
+  addingAddress,
+  getCheckoutPage,
+  selectDefaultAddress
 
 } = require("../controllers/userController");
 //SHA256:CXoHORZsVoQiTlBkcwyCuTYWR29M0IyeXdcy8GYOnfY sreerajsr03@gmail.com
@@ -112,4 +117,17 @@ router.delete('/deleteCartItem',authenticateSession,deleteCartItem)
 
 router.post('/apply-coupon',authenticateSession ,applyCoupon)
 
+router.get("/checkout",authenticateSession,getCheckoutPage)
+
+router.post('/add_address',addingAddress)
+
+router.post('/select_Default_address',selectDefaultAddress)
+
+
+router.post('/place_order',placingOrder)
+
+router.get('/order_success',(req,res)=>{
+  res.render('user/order-sucess',{u:true})
+})
+router.post('/verify_payment',verifyPayment)
 module.exports = router;

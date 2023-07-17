@@ -36,7 +36,10 @@
             } ,
             CouponUsed:[
                { type:String}
-            ]
+            ],
+            SelecedCoupon:{
+                type:String
+            }
            
     }
     );
