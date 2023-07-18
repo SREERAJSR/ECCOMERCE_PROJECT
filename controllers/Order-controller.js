@@ -12,7 +12,9 @@ const { default: mongoose } = require("mongoose");
 const Cart = require('../models/cartSchema')
 const Coupon = require('../models/couponSchema')
 const {couponApplying,addingCouponToCart,
-  placingOrderInDb, generateRazorPay} = require('../helpers/order-helpers')
+  placingOrderInDb, generateRazorPay,
+  verifiyingPayment,
+  changeOrderStatus} = require('../helpers/order-helpers')
 const usedCoupon = require('../models/usedCoupons')
 
 module.exports={
@@ -285,7 +287,16 @@ try{
   
   },
   verifyPayment:(req,res)=>{
-    console.log(req.body);
+    
+    verifiyingPayment(req.body).then(()=>{
+      changeOrderStatus(req.body['order[receipt]'],req.session.user._id).then(()=>{
+        console.log('payment success');
+        res.json({status:true})
+      }).catch((err)=>{
+        console.log(err);
+        res.json({status:false,errorMessage:'Paymemt failed'})
+      })
+    })
   }
      
   };

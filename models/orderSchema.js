@@ -36,6 +36,11 @@ const  orderSchema = mongoose.Schema({
         Price:{
             type:Number,
           
+        },
+        Status:{
+            type:String,
+            enum:['Pending','Placed','Shipped','Delivered'],
+            default:'Pending'
         }
     }],
 
@@ -46,17 +51,15 @@ const  orderSchema = mongoose.Schema({
     PaymentMethod:{
         type:String,
         enum:['Cash on Delivery','Razor pay','Paypal'],
-      
-
     },
-    Status:{
-        type:String,
-        enum:['Pending','Processing','Shipped','Delivered'],
-        default:'Pending'
-    },
+  
     createdAt:{
         type:Date,
         default:Date
+    },
+    ShippingAddress:{
+        type:mongoose.Schema.Types.ObjectId,
+        ref:'User'
     }
 
 })

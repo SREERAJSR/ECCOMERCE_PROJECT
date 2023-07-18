@@ -10,7 +10,7 @@ module.exports = {
     res.render("user/signup", { u: false });
   },
 
-  userSignup: async (req, res) => {
+  userSignup: async (req, res) => { 
     try {
       const { username, phone, email, password } = req.body;
 

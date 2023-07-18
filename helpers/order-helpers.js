@@ -10,6 +10,7 @@ const Coupon = require('../models/couponSchema')
 const usedCoupon = require('../models/usedCoupons');
 const Order = require('../models/orderSchema')
 const Razorpay = require('razorpay');
+const crypto  = require('crypto')
 
 var instance = new Razorpay({
   key_id: process.env.key_id,
@@ -89,6 +90,7 @@ module.exports={
       placingOrderInDb:(addressId,paymentMethod,TotalPrice,userId)=>{
        
         return new Promise(async(resolve,reject)=>{
+          const user = await User.findById(userId)
           const cart = await Cart.findOne({UserId:userId}).populate()
          
           if(!cart){
@@ -117,7 +119,8 @@ module.exports={
             TotalAmount:TotalPrice,
             PaymentMethod:paymentMethod,
             Products:products,
-
+            ShippingAddress:user.DefaultAddress
+ 
       })
       await newOrder.save().then((savedOrder)=>{
         resolve(savedOrder)
@@ -130,7 +133,7 @@ module.exports={
       generateRazorPay:(orderId,amount)=>{
         return new Promise((resolve,reject)=>{
           instance.orders.create({
-            amount: amount,
+            amount: amount*100,
             currency: "INR",
             receipt: orderId,
             notes: {
@@ -138,12 +141,53 @@ module.exports={
               key2: "value2"
             }
           }).then((order)=>{
-            console.log(order);
+            console.log('evide',order);
             resolve(order)
           }).catch((err)=>{
             reject(err)
           })
 
+        })
+      },
+      verifiyingPayment:(details)=>{
+        console.log(details);
+        return new Promise((resolve,reject)=>{
+          const hmac = crypto.createHmac('sha256', process.env.key_secret)
+          .update(details['payment[razorpay_order_id]']+'|'+details['payment[razorpay_payment_id]'])
+          .digest('hex');
+
+          if(hmac ===details['payment[razorpay_signature]']){
+            resolve()
+          }else{
+            reject()
+          }
+
+        })
+      },
+      changeOrderStatus:(orderId,userId)=>{
+
+        return new Promise(async(resolve, reject)=>{
+
+          try{
+
+          const order = await Order.findOneAndUpdate({
+            OrderId:orderId},{
+              $set:{ 
+              'Products.$[].Status':'Placed'
+            } 
+          },{new:true}
+          )
+
+          if(!order){
+            reject('no order')
+          }
+
+          resolve(order)  
+
+          }catch(error){
+            console.log(error);
+            reject()
+          }
         })
       }
 

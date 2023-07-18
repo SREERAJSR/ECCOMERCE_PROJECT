@@ -1,0 +1,227 @@
+
+<script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+<script src="/javascripts/sweetalert2.all.js"></script><!-- jQuery Core -->
+        <section class="content-main">
+            <div class="content-header">
+                
+                <div class="row gx-3 " style="justify-content: space-evenly;">
+                    <div class="col-lg-4 col-md-6 me-auto">
+                        <button type="button"  id="Daily_report_btn" class="btn btn-outline-dark spaced-btn">Daily Report</button>
+                       
+                    </div>
+                    <div class="col-lg-4 col-md-6 me-auto">
+                        <button type="button" id="Monthly_report_btn" class="btn btn-outline-dark spaced-btn">Weekly Report</button>
+                        
+                    </div>
+                    <div class="col-lg-4 col-md-6 me-auto">
+                        <button type="button" class="btn btn-outline-dark spaced-btn">Yearly Report</button>
+                        
+                    </div>
+                </div>
+
+
+
+
+            </div>
+            <div class="card mb-4">
+                <header class="card-header"  >
+                    <div class="row gx-3" id="daily_report_header" style="display:none;">
+                        <div class="col-lg-4 col-md-6 me-auto">
+                            <label for="">Date</label>
+                            <input id="Sale_Date" type="date" placeholder="" class="form-control">
+                        </div>
+                        <div class="col-lg-4 col-md-6 d-flex align-items-center">
+                            <div class="text-center">
+                              <a href="#" class="btn btn-primary" id="apply_btn"><i class="text-muted material-icons "></i>Apply</a>
+                            </div>
+                        </div>
+                    </div>
+                </header> <!-- card-header end// -->
+                <header class="card-header"  >
+                    <div class="row gx-3" id="weekly_report_header" style="display:none;">
+                        <div class="col-lg-4 col-md-6 me-auto">
+                            <label for="">Month</label>
+                            <input id="Month" type="month" placeholder="" class="form-control">
+                        </div>
+                        <div class="col-lg-4 col-md-6 d-flex align-items-center">
+                            <div class="text-center">
+                              <a href="#" class="btn btn-primary" id="Monthly_apply_btn"><i class="text-muted material-icons "></i>Apply</a>
+                            </div>
+                        </div>
+                    </div>
+                </header> 
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    
+                                    <th scope="col">No</th>
+                                    <th scope="col">ProductName</th>
+                                    <th scope="col">Quantity</th>
+                                    <th scope="col">Payment method</th>
+                                    <th scope="col">Status</th>
+                                    <th scope="col">Date</th>
+                                    <th scope="col">Price</th>
+
+                                </tr>
+                            </thead>
+                            <tbody id="table-body">
+                                  
+                              
+                               
+                                <tr>
+                                    <td>2329</td>
+                                    <td><b>Darlene Robertson</b></td>
+                                    <td><template class="__cf_email__" data-cfemail="244041564d414a4164415c45495448410a474b49">[email&#160;protected]</template></td>
+                                    <td>$948.55</td>
+                                    <td><span class="badge rounded-pill alert-success">Received</span></td>
+                                    <td>03.07.2020</td>
+                                    <td class="text-end">
+                                        <a href="#" class="btn btn-md rounded font-sm">Detail</a>
+                                        <div class="dropdown">
+                                            <a href="#" data-bs-toggle="dropdown" class="btn btn-light rounded btn-sm font-sm"> <i class="material-icons md-more_horiz"></i> </a>
+                                            <div class="dropdown-menu">
+                                                <a class="dropdown-item" href="#">View detail</a>
+                                                <a class="dropdown-item" href="#">Edit info</a>
+                                                <a class="dropdown-item text-danger" href="#">Delete</a>
+                                            </div>
+                                        </div> <!-- dropdown //end -->
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div> <!-- table-responsive //end -->
+                </div> <!-- card-body end// -->
+            </div> <!-- card end// -->
+            <div class="pagination-area mt-15 mb-50">
+                <nav aria-label="Page navigation example">
+                    <ul class="pagination justify-content-start">
+                        <li class="page-item active"><a class="page-link" href="#">01</a></li>
+                        <li class="page-item"><a class="page-link" href="#">02</a></li>
+                        <li class="page-item"><a class="page-link" href="#">03</a></li>
+                        <li class="page-item"><a class="page-link dot" href="#">...</a></li>
+                        <li class="page-item"><a class="page-link" href="#">16</a></li>
+                        <li class="page-item"><a class="page-link" href="#"><i class="material-icons md-chevron_right"></i></a></li>
+                    </ul>
+                </nav>
+            </div>
+        </section> <!-- content-main end// -->
+    
+
+    
+        <script>
+            $(document).ready((event)=>{
+
+                $('#Daily_report_btn').on("click",(event)=>{
+                    event.preventDefault();
+                    if ($('#daily_report_header').is(':hidden')) {
+  $('#daily_report_header').slideDown();
+  $('#weekly_report_header').slideUp();
+} else {
+  $('#daily_report_header').slideUp();
+}
+
+
+                   
+                
+                    $('#apply_btn').on('click',(event)=>{
+                        event.preventDefault()
+                        var date = $('#Sale_Date').val();
+
+                        fetch('/admin/sales_report',{
+                            method:'post',
+                            headers:{
+                                'Content-Type':'application/json'
+                            },
+                            body:JSON.stringify({Date:date,btn:'daily'})
+                        }).then((response)=>{
+                            if(response.status===200){
+                                return response.json()
+                            }
+                        }).then((response)=>{
+                            console.log(response);
+                             // Generate table rows using response data
+    var tableBody = $('#table-body');
+    tableBody.empty(); // Clear existing rows
+    
+    response.dailyReports.forEach((report, index) => {
+      var row = `
+        <tr>
+          <td>${index + 1}</td>
+          <td><b>${report.Products.ProductName}</b></td>
+          <td><b>${report.Products.Quantity}</b></td>
+          <td><b>${report.PaymentMethod}</b></td>
+          <td><span class="badge rounded-pill alert-success">${report.Products.Status}</span></td>
+          <td>${report.createdAt}</td>
+          <td>₹${report.TotalAmount}</td>
+            
+        </tr>
+      `;
+      tableBody.append(row);
+    });
+                            
+
+
+                        })
+                    })
+                })
+
+
+
+
+
+      $('#Monthly_report_btn').on("click",(event)=>{
+        event.preventDefault();
+
+        if ($('#weekly_report_header').is(':hidden')) {
+  $('#weekly_report_header').slideDown();
+  $('#daily_report_header').slideUp();
+} else {
+  $('#weekly_report_header').slideUp();
+}
+$('#Monthly_apply_btn').on('click',(event)=>{
+                        event.preventDefault()
+                        var date = $('#Month').val();
+
+                        fetch('/admin/sales_report',{
+                            method:'post',
+                            headers:{
+                                'Content-Type':'application/json'
+                            },
+                            body:JSON.stringify({Date:date,btn:'weekly'})
+                        }).then((response)=>{
+                            if(response.status===200){
+                                return response.json()
+                            }
+    }).then((response)=>{
+                            console.log(response);
+                             // Generate table rows using response data
+    var tableBody = $('#table-body');
+    tableBody.empty(); // Clear existing rows
+    
+    response.weeklyReports.forEach((report, index) => {
+      var row = `
+        <tr>
+          <td>${index + 1}</td>
+          <td><b>${report.Products.ProductName}</b></td>
+          <td><b>${report.Products.Quantity}</b></td>
+          <td><b>${report.PaymentMethod}</b></td>
+          <td><span class="badge rounded-pill alert-success">${report.Products.Status}</span></td>
+          <td>${report.createdAt}</td>
+          <td>₹${report.TotalAmount}</td>
+            
+        </tr>
+      `;
+      tableBody.append(row);
+    });
+                            
+
+
+            })
+        
+        })
+    })
+})
+        </script>

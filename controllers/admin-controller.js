@@ -2,11 +2,14 @@ const User = require("../models/userSchema");
 const mongoose = require("mongoose");
 const category = require("../models/categorySchema");
 const Product = require("../models/productSchema");
+const Order = require('../models/orderSchema')
 const Admin = require('../models/adminSchema')
 const bcrypt = require('bcrypt')
-
 const sharp = require("sharp");
 const { error } = require("jquery");
+const {fetchDailySaleReport,
+  fetchWeeklySaleReport} = require('../helpers/admin-helpers')
+
 
 
 
@@ -61,7 +64,10 @@ module.exports = {
         }
 
       },
-
+     getDashBoardPage:(req, res) => {
+        res.render("admin/dashboard", { admin: true });
+      } 
+,
   findUser_info: async (req, res) => {
     const users = await User.find({});
     console.log(users);
@@ -93,6 +99,41 @@ module.exports = {
       res.status(500).json({ err: "Internal server error" });
     }
   },
+  getSalesReportPage:(req,res)=>{
+    res.render('admin/sales-report',{admin:true})
+  },
+  fetchingSalesPort:(req,res)=>{
+
+    if(req.body.btn==='daily'){
+
+      const{Date} = req.body 
+      
+      fetchDailySaleReport(Date).then((response)=>{
+        const{dailyReports,TotalAmount} =response
+        console.log(dailyReports);
+        console.log("Total",TotalAmount[0]);
+        const Total =TotalAmount[0]
+        res.status(200).json({message:'success',dailyReports,Total})
+       
+      }).catch((err)=>{
+        res.status(400).json({error:err})
+      })
+    }else if(req.body.btn==='weekly'){
+
+      const{Date} = req.body
+      fetchWeeklySaleReport(Date).then((response)=>{
+        const{weeklyReports,TotalAmount} =response
+        const Total= TotalAmount[0]
+        res.status(200).json({message:'success',weeklyReports,Total})
+
+      }).catch((err)=>{
+        res.status(400).json({error:err})
+
+      })
+
+    }
+
+  }
 
  
 };

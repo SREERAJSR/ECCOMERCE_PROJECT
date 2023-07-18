@@ -593,6 +593,13 @@ const  OrderAddressId =$('#default_address').data('default_addressid')
 const paymentMethod = $('#payment_Method').val();
 const Total = $('#totalAmount').text().trim().replace('₹', '');
 
+if(paymentMethod==='Select a payment method'){
+  sweetAlert("Select a Payment method ", "Otherwise can't be proccessed ", "error");
+  return
+
+  
+}
+
   fetch('/place_order',{
     method:'post',
     headers:{
@@ -641,9 +648,9 @@ const Total = $('#totalAmount').text().trim().replace('₹', '');
     "image": "https://example.com/your_logo",
     "order_id":order.id, //This is a sample Order ID. Pass the `id` obtained in the response of Step 1
     "handler": function (response){
-        alert(response.razorpay_payment_id);
-        alert(response.razorpay_order_id);
-        alert(response.razorpay_signature)
+        // alert(response.razorpay_payment_id);
+        // alert(response.razorpay_order_id);
+        // alert(response.razorpay_signature)
 
         verifyPayment(response,order);
     },
@@ -669,6 +676,18 @@ rzp1.open();
       method:'post',
       data:{
         payment,order
+      },
+      success:(response)=>{
+        if(response.status){
+          window.location.href='/order_success'
+        }else{
+          Swal.fire({
+icon: 'error',
+title: 'Payment Failed',  
+})
+
+
+        }
       }
     })
   }

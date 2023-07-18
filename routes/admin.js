@@ -6,7 +6,10 @@ const {
   loginAdmin,
   findUser_info,
   changeUserStatus,
-  logoutAdmin
+  logoutAdmin,
+  getDashBoardPage,
+  getSalesReportPage,
+  fetchingSalesPort
 } = require("../controllers/admin-controller");
 
 const {
@@ -33,9 +36,7 @@ const {
 const multer = require("multer");
 const  {uploadProduct,uploadCategory} = require("../middlewares/multer-config");
 
-router.get("/",authenticateAdmin,(req, res) => {
-  res.render("admin/dashboard", { admin: true });
-});
+router.get("/",authenticateAdmin,getDashBoardPage)
 
 router.get('/admin-login',authenticateForLogin, getLoginPage)
 
@@ -80,5 +81,9 @@ router.patch('/unlistproduct',authenticateAdmin,changeProductStatus)
 router.get('/add-coupon',getCouponPage)
 
 router.post('/add-coupon',addingCoupon)
+
+router.get('/sales_report',getSalesReportPage)
+
+router.post('/sales_report',fetchingSalesPort)
 
 module.exports = router;
