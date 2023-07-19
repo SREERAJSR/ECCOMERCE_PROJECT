@@ -608,21 +608,22 @@ if(paymentMethod==='Select a payment method'){
     body:JSON.stringify({addressId:OrderAddressId,paymentMethod:paymentMethod,TotalPrice:Total })
   }).then((response)=>{
     if(response.status===200){
+      console.log(response);
 
       return response.json()
     }else if(response.status ===201){
       return response.json()
     }
-  }).then((response)=>{
+  }).then((response)=>{  
 
     if(response && response.message){
-      if(response.message==='Order Sucess'){
+      if(response.message==='Cod Order Sucess'){
         
         window.location.href='/order_success'
       }else if( response.message ==='order created'){
         console.log(response.razorPayOrder);
         razorPayment(response.razorPayOrder)
-
+ 
       }
 
     }

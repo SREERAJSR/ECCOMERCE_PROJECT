@@ -90,7 +90,9 @@ module.exports={
       placingOrderInDb:(addressId,paymentMethod,TotalPrice,userId)=>{
        
         return new Promise(async(resolve,reject)=>{
-          const user = await User.findById(userId)
+
+          try{
+            const user = await User.findById(userId)
           const cart = await Cart.findOne({UserId:userId}).populate()
          
           if(!cart){
@@ -126,7 +128,17 @@ module.exports={
         resolve(savedOrder)
       })
 
-    }
+            
+    } 
+  }
+      catch(err){
+            reject(err)
+
+
+          }
+          
+
+    
         })
 
       },
@@ -151,18 +163,23 @@ module.exports={
       },
       verifiyingPayment:(details)=>{
         console.log(details);
-        return new Promise((resolve,reject)=>{
-          const hmac = crypto.createHmac('sha256', process.env.key_secret)
-          .update(details['payment[razorpay_order_id]']+'|'+details['payment[razorpay_payment_id]'])
-          .digest('hex');
-
-          if(hmac ===details['payment[razorpay_signature]']){
-            resolve()
-          }else{
-            reject()
+        return new Promise(async(resolve,reject)=>{
+          try{
+            const hmac = crypto.createHmac('sha256', process.env.key_secret)
+            .update(details['payment[razorpay_order_id]']+'|'+details['payment[razorpay_payment_id]'])
+            .digest('hex');
+  
+            if(hmac ===details['payment[razorpay_signature]']){
+              resolve()
+            }else{
+              reject()
+            }
+  
+          }catch(err){
+            reject(err)
           }
-
-        })
+          
+        })  
       },
       changeOrderStatus:(orderId,userId)=>{
 
@@ -189,7 +206,27 @@ module.exports={
             reject()
           }
         })
+      },
+      deleteCartProducts: (userId) => {
+        return new Promise(async (resolve, reject) => {
+          try {
+            const cart = await Cart.findOne({ UserId: userId });
+      
+            if (!cart) {
+              reject('No cart found');
+            } else {
+              cart.CartItems = [];
+              cart.SubTotal = 0;
+              cart.FinalTotal = 0;
+              await cart.save();
+              resolve('Cart items deleted successfully');
+            }
+          } catch (error) {
+            reject(error);
+          }
+        });
       }
+      
 
 
 }

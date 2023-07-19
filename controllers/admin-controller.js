@@ -8,7 +8,14 @@ const bcrypt = require('bcrypt')
 const sharp = require("sharp");
 const { error } = require("jquery");
 const {fetchDailySaleReport,
-  fetchWeeklySaleReport} = require('../helpers/admin-helpers')
+  fetchWeeklySaleReport,
+  fetchYearlySaleReport,
+  GetUserCount,GetOrderCount,
+  GetProductsCount,
+  GetTotalRevenue,
+  GetMonthlyTotalOrderCount,
+  GetMonthlyTotalPlacedOrderCount,
+  GetMontlyTotalPendingOrderCount} = require('../helpers/admin-helpers')
 
 
 
@@ -64,9 +71,28 @@ module.exports = {
         }
 
       },
-     getDashBoardPage:(req, res) => {
-        res.render("admin/dashboard", { admin: true });
-      } 
+      getDashBoardPage: async (req, res) => {
+        try {
+          const userCount = await GetUserCount();
+          const orderCount = await GetOrderCount();
+          const productsCount = await GetProductsCount();
+          const totalRevenue = await GetTotalRevenue();
+          const total = totalRevenue[0];
+          const  response = await GetMonthlyTotalOrderCount()
+          const {months,monthlyTotalOrderCount} = response
+           const result = await GetMonthlyTotalPlacedOrderCount()
+     const{monthlyTotalPlacedCount} = result
+     const monthlyTotalPendingCount = await GetMontlyTotalPendingOrderCount()
+
+      
+          res.render("admin/dashboard", { admin: true, userCount, orderCount, productsCount, total ,months,monthlyTotalOrderCount ,monthlyTotalPlacedCount,monthlyTotalPendingCount});
+        } catch (error) {
+          // Handle the error
+          console.log(error);
+          res.status(500).send("Internal Server Error");
+        }
+      }
+      
 ,
   findUser_info: async (req, res) => {
     const users = await User.find({});
@@ -102,7 +128,7 @@ module.exports = {
   getSalesReportPage:(req,res)=>{
     res.render('admin/sales-report',{admin:true})
   },
-  fetchingSalesPort:(req,res)=>{
+  fetchingSalesReport:(req,res)=>{
 
     if(req.body.btn==='daily'){
 
@@ -131,6 +157,18 @@ module.exports = {
 
       })
 
+    }
+    else if(req.body.btn ==='yearly'){
+      const{Year} = req.body
+      fetchYearlySaleReport(Year).then((response)=>{
+        const{yearlyReports,TotalAmount} = response
+        const Total = TotalAmount[0]
+        res.status(200).json({message:'success',yearlyReports,Total})
+
+      }).catch((err)=>{
+        res.status(400).json({error:err})
+
+      })
     }
 
   }

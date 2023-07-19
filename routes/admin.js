@@ -9,7 +9,7 @@ const {
   logoutAdmin,
   getDashBoardPage,
   getSalesReportPage,
-  fetchingSalesPort
+  fetchingSalesReport
 } = require("../controllers/admin-controller");
 
 const {
@@ -84,6 +84,7 @@ router.post('/add-coupon',addingCoupon)
 
 router.get('/sales_report',getSalesReportPage)
 
-router.post('/sales_report',fetchingSalesPort)
+router.post('/sales_report',fetchingSalesReport)
+
 
 module.exports = router;

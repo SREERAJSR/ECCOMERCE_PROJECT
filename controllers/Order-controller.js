@@ -14,7 +14,8 @@ const Coupon = require('../models/couponSchema')
 const {couponApplying,addingCouponToCart,
   placingOrderInDb, generateRazorPay,
   verifiyingPayment,
-  changeOrderStatus} = require('../helpers/order-helpers')
+  changeOrderStatus,
+  deleteCartProducts} = require('../helpers/order-helpers')
 const usedCoupon = require('../models/usedCoupons')
 
 module.exports={
@@ -73,10 +74,10 @@ module.exports={
         }
 
         // Subtract the discount amount from the FinalTotal
-        cart.FinalTotal = totalAmount - discountAmount;
+        cart.FinalTotal = (totalAmount - discountAmount)+50;
       } else {
         // If no coupons are used, set the FinalTotal same as the SubTotal
-        cart.FinalTotal = totalAmount;
+        cart.FinalTotal = totalAmount+50;
       }
 
         
@@ -160,7 +161,6 @@ if (UsedCoupons && UsedCoupons.Coupons.length > 0) {
       discountAmount += couponDiscount;
     }
   }
-
   // Subtract the discount amount from the FinalTotal
   cart.FinalTotal = (totalAmount - discountAmount)+50;
 } else {
@@ -184,6 +184,7 @@ if (UsedCoupons && UsedCoupons.Coupons.length > 0) {
      deleteCartItem: async (req, res) => {
   const { cartId } = req.body;
   try {
+
     // Find the cart by its _id
     const userId = req.session.user._id;
     const cart = await Cart.findOne({ UserId: userId });
@@ -212,7 +213,7 @@ if (UsedCoupons && UsedCoupons.Coupons.length > 0) {
     cart.SubTotal -= deletedItemTotal;
 
     // Check if any coupons are used by the user
-    const usedCoupons = await UsedCoupon.findOne({ UserId: userId });
+    const usedCoupons = await usedCoupon.findOne({ UserId: userId });
     if (usedCoupons && usedCoupons.Coupons.length > 0) {
       // Filter out the deleted coupon from the used coupons
       usedCoupons.Coupons = usedCoupons.Coupons.filter((coupon) => coupon !== deletedCartItem.CouponCode);
@@ -270,9 +271,14 @@ try{
   placingOrderInDb(addressId,paymentMethod,TotalPrice,userId).then((dbOrder)=>{
 
     if(paymentMethod ==="Cash on Delivery"){
-      res.status(200).json({message:'Order Sucess'})   
+      deleteCartProducts(req.session.user._id).then((response)=>{
+console.log(response);
+        res.status(200).json({message:'Cod Order Sucess'})   
+      })
+
     }else{
       generateRazorPay(dbOrder.OrderId,dbOrder.TotalAmount).then((razorPayOrder)=>{
+      
         res.status(201).json({message:'order created',razorPayOrder})
       })
 
@@ -291,7 +297,10 @@ try{
     verifiyingPayment(req.body).then(()=>{
       changeOrderStatus(req.body['order[receipt]'],req.session.user._id).then(()=>{
         console.log('payment success');
-        res.json({status:true})
+        deleteCartProducts(req.session.user._id).then((response)=>{
+          console.log(response);
+          res.json({status:true})
+        })
       }).catch((err)=>{
         console.log(err);
         res.json({status:false,errorMessage:'Paymemt failed'})

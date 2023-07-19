@@ -281,9 +281,20 @@
 					$('.fa-trash').on('click', function() {
 				var cartId = $(this).data('cartid');
 				console.log(cartId);
-	
-				// Make an AJAX request to delete the item
-		$.ajax({
+		
+
+
+Swal.fire({
+  title: 'Are you sure to delete?',
+  text: "You won't be able to revert this!",
+  icon: 'warning',
+  showCancelButton: true,
+  confirmButtonColor: '#3085d6',
+  cancelButtonColor: '#d33',
+  confirmButtonText: 'Yes, delete it!'
+}).then((result) => {
+  if (result.isConfirmed) {
+	$.ajax({
 		url: '/deleteCartItem',
 		type: 'delete',
 		data: { cartId: cartId },
@@ -304,6 +315,19 @@
 			console.log(error);
 		}
 		});
+
+
+	
+    Swal.fire(
+      'Deleted!',
+      'Product has been deleted.',
+      'success'
+    )
+  }
+})
+	
+						
+		
 					})
 				})
 			</script>

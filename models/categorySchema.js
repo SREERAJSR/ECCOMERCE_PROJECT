@@ -20,7 +20,9 @@ const categorySchema = new mongoose.Schema({
         unique:true
     }
    
-})
+},{
+    versionKey: false,
+  })
 
 const category = mongoose.model('category',categorySchema)
 

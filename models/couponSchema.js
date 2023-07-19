@@ -43,6 +43,8 @@ const couponSchema = new mongoose.Schema({
               }
             
         }
+},{
+  versionKey: false,
 })
 // Virtual getter to calculate the discount amount based on percentage
 couponSchema.virtual('DiscountAmount').get(function () {

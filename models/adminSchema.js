@@ -12,7 +12,9 @@
             type:String||Number,
             required:true
         }
-    })
+    },{
+  versionKey: false,
+})
 
     const Admin =  mongoose.model('admin',adminSchema)
 

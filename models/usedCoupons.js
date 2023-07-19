@@ -17,7 +17,9 @@
                 
             }
         ]
-    })
+    },{
+        versionKey: false,
+      })
     const usedCoupon = mongoose.model('UsedCoupon',usedCouponSchema)
 
     module.exports=usedCoupon;

@@ -15,7 +15,7 @@
                         
                     </div>
                     <div class="col-lg-4 col-md-6 me-auto">
-                        <button type="button" class="btn btn-outline-dark spaced-btn">Yearly Report</button>
+                        <button id="Yearly_report_btn" type="button" class="btn btn-outline-dark spaced-btn">Yearly Report</button>
                         
                     </div>
                 </div>
@@ -42,7 +42,7 @@
                     <div class="row gx-3" id="weekly_report_header" style="display:none;">
                         <div class="col-lg-4 col-md-6 me-auto">
                             <label for="">Month</label>
-                            <input id="Month" type="month" placeholder="" class="form-control">
+                            <input id="Month" type="month" placeholder="" class="form-control" min="2020-01">
                         </div>
                         <div class="col-lg-4 col-md-6 d-flex align-items-center">
                             <div class="text-center">
@@ -51,6 +51,23 @@
                         </div>
                     </div>
                 </header> 
+                    <header class="card-header">
+                        <div class="row gx-3" id="yearly_report_header" style="display:none">
+                        <div class="col-lg-4 col-md-6 me-auto">
+                            <label for="yearSelect">Select Year</label>
+                            <select  id="ddlYears" class="form-select">
+                            <option value="">Select a year</option>
+                            
+                            </select>
+                        </div>
+                        <div class="col-lg-4 col-md-6 d-flex align-items-center">
+                            <div class="text-center">
+                            <a href="#" class="btn btn-primary" id="yearly_apply_btn"><i class="text-muted material-icons"></i>Apply</a>
+                            </div>
+                        </div>
+                        </div>
+                    </header>
+                  
                 <div class="card-body">
                     <div class="table-responsive">
                         <table class="table table-hover">
@@ -119,6 +136,7 @@
                     if ($('#daily_report_header').is(':hidden')) {
   $('#daily_report_header').slideDown();
   $('#weekly_report_header').slideUp();
+  $('#yearly_report_header').slideUp();
 } else {
   $('#daily_report_header').slideUp();
 }
@@ -178,6 +196,7 @@
         if ($('#weekly_report_header').is(':hidden')) {
   $('#weekly_report_header').slideDown();
   $('#daily_report_header').slideUp();
+  $('#yearly_report_header').slideUp();
 } else {
   $('#weekly_report_header').slideUp();
 }
@@ -217,11 +236,79 @@ $('#Monthly_apply_btn').on('click',(event)=>{
       tableBody.append(row);
     });
                             
-
-
             })
         
         })
     })
+
+    $(document).ready(function() {
+  // Reference the dropdown list
+  var ddlYears = $("#ddlYears");
+
+  // Determine the current year
+  var currentYear = new Date().getFullYear();
+
+  // Loop and add the year values to the dropdown
+  for (var i = 2020; i <= currentYear; i++) {
+    ddlYears.append($("<option>").val(i).text(i));
+  }
+});
+
+$('#Yearly_report_btn').on("click", function(event) {
+  event.preventDefault();
+  if ($('#yearly_report_header').is(':hidden')) {
+    $('#yearly_report_header').slideDown();
+    $('#weekly_report_header').slideUp();
+    $('#daily_report_header').slideUp();
+  } else {
+    $('#yearly_report_header').slideUp();
+  }
+});
+
+
+$('#yearly_apply_btn').on('click',(event)=>{
+    event.preventDefault()
+    const year = $('#ddlYears').val()
+console.log(year);
+
+                        fetch('/admin/sales_report',{
+                            method:'post',
+                            headers:{
+                                'Content-Type':'application/json'
+                            },
+                            body:JSON.stringify({Year:year,btn:'yearly'})
+                        }).then((response)=>{
+                            if(response.status===200){
+                                return response.json()
+                            }
+    }).then((response)=>{
+        console.log('haiii',response);
+        var tableBody = $('#table-body');
+    tableBody.empty(); // Clear existing rows 
+    response.yearlyReports.forEach((report, index) => {
+      var row = `
+        <tr>
+          <td>${index + 1}</td>
+          <td><b>${report.Products.ProductName}</b></td>
+          <td><b>${report.Products.Quantity}</b></td>
+          <td><b>${report.PaymentMethod}</b></td>
+          <td><span class="badge rounded-pill alert-success">${report.Products.Status}</span></td>
+          <td>${report.createdAt}</td>
+          <td>₹${report.TotalAmount}</td>
+            
+        </tr>
+      `;
+      tableBody.append(row);
+    });
+
+
+    })
+
+})
+
+
+
+
+
 })
         </script>
