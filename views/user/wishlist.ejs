@@ -1,4 +1,4 @@
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+<!-- <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script> -->
 <script src="/javascripts/sweetalert2.all.js"></script>
 </div>
 
@@ -11,9 +11,9 @@
   
         <div class="row isotope-grid">
 
-               
+  
 
-            <% products.forEach((product)=>  { %>
+          <% products.forEach((product)=>  { %>
 
             <div class="col-sm-6 col-md-4 col-lg-3 p-b-35 isotope-item Gaming">
                 <!-- Block2 -->
@@ -21,14 +21,14 @@
                     <div class="block2-pic hov-img0">
                         <img src="/uploads/product_images/<%=product.ProductImages[2]%>" alt="IMG-PRODUCT">
 
-                        <a href="/product-details?productId=<%=product._id%>&categoryId=<%= product.Category.categoryId%>" class="block2-btn flex-c-m stext-103 cl2 size-102 bg0 bor2 hov-btn1 p-lr-15 trans-04 ">
+                        <a href="/product-details?productId=<%=product.Slug%>&categoryId=<%= product.Category.Slug%>" class="block2-btn flex-c-m stext-103 cl2 size-102 bg0 bor2 hov-btn1 p-lr-15 trans-04 quickview " >
                             Quick View
                         </a>
                     </div>
 
                     <div class="block2-txt flex-w flex-t p-t-14">
                         <div class="block2-txt-child1 flex-col-l ">
-                            <a href="product-detail.html" class="stext-104 cl4 hov-cl1 trans-04 js-name-b2 p-b-6">
+                            <a href="/product-details?productId=<%=product.Slug%>" class="stext-104 cl4 hov-cl1 trans-04 js-name-b2 p-b-6">
                                <%=product.ProductName  %>
                             </a>
 
@@ -46,7 +46,8 @@
                     </div>
                 </div>
             </div>
-       <%  })  %>
+           <%  })  %>
+
 
         </div>
 
@@ -270,3 +271,21 @@ Swal.fire(
             $(this).off("click");
           });
         }); -->
+
+        <!-- <script>
+        $('#quick-view').on('click',(event)=>{
+          event.preventDefault()
+        })
+
+      </script> -->
+
+          <!-- <script>
+            $('.quickview').on('click',(event)=>{
+
+  event.preventDefault()
+          // Get the href attribute from the link
+  const href = $(event.target).attr('href');
+    // Navigate to the link
+    window.location.href = href;
+            })
+          </script> -->

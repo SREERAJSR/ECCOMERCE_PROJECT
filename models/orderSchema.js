@@ -55,7 +55,7 @@ const  orderSchema = mongoose.Schema({
   
     createdAt:{
         type:Date,
-        default:Date
+        default:Date.now()
     },
     ShippingAddress:{
         type:mongoose.Schema.Types.ObjectId,

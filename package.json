@@ -20,6 +20,7 @@
     "form-data": "^4.0.0",
     "http-errors": "~1.6.3",
     "jquery": "^3.7.0",
+    "js-image-zoom": "^0.7.0",
     "luxon": "^3.3.0",
     "moment": "^2.29.4",
     "mongoose": "^7.3.4",

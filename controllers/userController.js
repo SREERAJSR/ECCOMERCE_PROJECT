@@ -407,7 +407,7 @@ res.redirect('/login')
     try{
       const products = await Product.aggregate([{$match:{isActive:true}}])
 
-      console.log(products);
+     
 
       if(products){
         res.render('user/shop',{u:true,products})
@@ -422,12 +422,77 @@ res.redirect('/login')
  
 
   },
+      sortSearchFilterPagination: async(req,res)=>{
+    try{
+      const{ selectedSort,selectedPriceRange,selectedBrand,searchQuery, selectedPage} = req.query
+
+     console.log('queryyyyy',req.query);
+
+
+      console.log(selectedBrand,'jithin mandan');
+      
+      const sortOptions = {};
+
+      if (selectedSort === 'price-low-high') {
+        sortOptions['SalePrice'] = 1;
+      } else if (selectedSort === 'price-high-low') {
+        sortOptions['SalePrice'] = -1;
+      }
+
+      let query={}
+
+      if(selectedBrand !== 'All'){
+        query['BrandName'] = selectedBrand;
+      }
+
+
+      if(selectedPriceRange !== 'All'){
+        const [minPrice, maxPrice] = selectedPriceRange.split('-').map(Number);
+        query['SalePrice'] = { $gte: minPrice, $lte: maxPrice };
+
+      }
+
+      if(searchQuery){
+        query['ProductName'] = { $regex: new RegExp(searchQuery, 'i') };
+
+      }
+
+      console.log('queryyyyyyy',query);
+    // Get the total count of matching products for pagination
+    const totalCount = await Product.countDocuments(query);
+
+        // Calculate skip and limit for pagination
+        const skip = (parseInt(selectedPage) - 1) * 10; // Assuming 10 products per page
+        const limit = 10; // Number of products per page
+
+      // Fetch the products based on the query
+      const products = await Product.find(query)
+      .sort(sortOptions)
+      .skip(skip)
+      .limit(limit);
+
+      console.log(products);
+
+       // Send the response as JSON with the fetched products and pagination details
+    res.json({
+      totalProducts: totalCount,
+      currentPage: parseInt(selectedPage),
+      totalPages: Math.ceil(totalCount / limit),
+      products,
+    });
+
+    }catch(err){
+console.log(err);
+res.status(500).json({ error: 'Server Error' });
+    }
+
+  },
 
   getProductDetailPage: async (req, res, next) => {
     try {
-      const { productId ,categoryId} = req.query;
-      // const categoryId = req.query.categoryId.trim();
-      console.log(categoryId);
+      const {productId,categoryId} = req.query;
+
+      console.log(req.query);
 
       const catProd = await Product.aggregate([
         {
@@ -437,8 +502,8 @@ res.redirect('/login')
         },
       ]);
 
-      await Product.findOne({Slug:productId})
-        .then(async (product) => {
+  const product =  await Product.findOne({Slug:productId})
+        console.log('sp'+product);
           if (product) {
             if (req.session.user) {
               const userPhone = req.session.user.phone;
@@ -464,10 +529,8 @@ res.redirect('/login')
           } else {
             res.redirect("/view-products");
           }
-        })
-        .catch((err) => {
-          console.log(err);
-        });
+      
+    
     } catch (err) {
       console.log(err);
       res.status(500).json({ error: err });
@@ -480,7 +543,7 @@ res.redirect('/login')
       const userId =req.session.user._id
       const wishlist = await Wishlist.findOne({UserId:userId}).populate({
         path:'Products',
-        select:'ProductName ProductImages SalePrice Category'
+        select:'ProductName ProductImages SalePrice Category Slug'
       })
         const products =wishlist.Products
         res.render('user/wishlist',{products,u:true })

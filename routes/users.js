@@ -37,7 +37,8 @@ const {
   removeFromWishlist,
   addingAddress,
   getCheckoutPage,
-  selectDefaultAddress
+  selectDefaultAddress,
+  sortSearchFilterPagination
 
 } = require("../controllers/userController");
 //SHA256:CXoHORZsVoQiTlBkcwyCuTYWR29M0IyeXdcy8GYOnfY sreerajsr03@gmail.com
@@ -59,6 +60,8 @@ router.get("/view-products", getProductPage)
 
 
 router.get('/shop',getShopPage)
+
+router.post('/shop',sortSearchFilterPagination) 
 
 router.get("/product-details", getProductDetailPage)
 

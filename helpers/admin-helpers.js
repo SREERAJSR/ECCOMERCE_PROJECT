@@ -5,7 +5,29 @@ const Product = require('../models/productSchema')
 
 
 module.exports={
+    fetchAllPlacedOrder:()=>{
+        return new Promise(async(resolve,reject)=>{
+            try {
+                const sucessOrders = await Order.aggregate([{
+                   $unwind:'$Products'
+                },{
+                    $match:{
+                        'Products.Status':'Placed'
+                    }
+                }])
+                
+                resolve(sucessOrders)
+            } catch (error) {
 
+                reject(error)
+                
+            }
+
+
+        })
+
+
+    },
 
     fetchDailySaleReport:(date)=>{
 

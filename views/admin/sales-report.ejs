@@ -72,6 +72,7 @@
                     <div class="table-responsive">
                         <table class="table table-hover">
                             <thead>
+
                                 <tr>
                                     
                                     <th scope="col">No</th>
@@ -87,26 +88,18 @@
                             <tbody id="table-body">
                                   
                               
-                               
-                                <tr>
-                                    <td>2329</td>
-                                    <td><b>Darlene Robertson</b></td>
-                                    <td><template class="__cf_email__" data-cfemail="244041564d414a4164415c45495448410a474b49">[email&#160;protected]</template></td>
-                                    <td>$948.55</td>
-                                    <td><span class="badge rounded-pill alert-success">Received</span></td>
-                                    <td>03.07.2020</td>
-                                    <td class="text-end">
-                                        <a href="#" class="btn btn-md rounded font-sm">Detail</a>
-                                        <div class="dropdown">
-                                            <a href="#" data-bs-toggle="dropdown" class="btn btn-light rounded btn-sm font-sm"> <i class="material-icons md-more_horiz"></i> </a>
-                                            <div class="dropdown-menu">
-                                                <a class="dropdown-item" href="#">View detail</a>
-                                                <a class="dropdown-item" href="#">Edit info</a>
-                                                <a class="dropdown-item text-danger" href="#">Delete</a>
-                                            </div>
-                                        </div> <!-- dropdown //end -->
-                                    </td>
-                                </tr>
+                        <% allSucessOrders.forEach((order,index)=>{ %> 
+                        <tr>
+          <td> <%= index + 1  %></td>
+          <td><b><%=order.Products.ProductName  %></b></td>
+          <td><b><%=order.Products.Quantity  %></b></td>
+          <td><b><%=order.PaymentMethod  %></b></td>
+          <td><span class="badge rounded-pill alert-success"><%=order.Products.Status  %></span></td>
+          <td><%= order.createdAt %></td>
+          <td><%= order.TotalAmount  %></td>
+            
+        </tr>
+  <%  })  %>
                             </tbody>
                         </table>
                     </div> <!-- table-responsive //end -->

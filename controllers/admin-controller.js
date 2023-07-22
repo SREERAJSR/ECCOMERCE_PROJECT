@@ -7,7 +7,8 @@ const Admin = require('../models/adminSchema')
 const bcrypt = require('bcrypt')
 const sharp = require("sharp");
 const { error } = require("jquery");
-const {fetchDailySaleReport,
+const {fetchAllPlacedOrder,
+  fetchDailySaleReport,
   fetchWeeklySaleReport,
   fetchYearlySaleReport,
   GetUserCount,GetOrderCount,
@@ -16,11 +17,6 @@ const {fetchDailySaleReport,
   GetMonthlyTotalOrderCount,
   GetMonthlyTotalPlacedOrderCount,
   GetMontlyTotalPendingOrderCount} = require('../helpers/admin-helpers')
-
-
-
-
-
 
 module.exports = {
 
@@ -73,6 +69,8 @@ module.exports = {
       },
       getDashBoardPage: async (req, res) => {
         try {
+          const order = await Order.find()   //promise all
+          if(order){
           const userCount = await GetUserCount();
           const orderCount = await GetOrderCount();
           const productsCount = await GetProductsCount();
@@ -84,8 +82,12 @@ module.exports = {
      const{monthlyTotalPlacedCount} = result
      const monthlyTotalPendingCount = await GetMontlyTotalPendingOrderCount()
 
-      
           res.render("admin/dashboard", { admin: true, userCount, orderCount, productsCount, total ,months,monthlyTotalOrderCount ,monthlyTotalPlacedCount,monthlyTotalPendingCount});
+          }else{
+            res.render("admin/dashboard", { admin: true });
+
+
+          }
         } catch (error) {
           // Handle the error
           console.log(error);
@@ -125,8 +127,15 @@ module.exports = {
       res.status(500).json({ err: "Internal server error" });
     }
   },
-  getSalesReportPage:(req,res)=>{
-    res.render('admin/sales-report',{admin:true})
+  getSalesReportPage:async(req,res)=>{
+    try {
+       const allSucessOrders = await fetchAllPlacedOrder()
+      res.render('admin/sales-report',{admin:true,allSucessOrders})
+      
+    } catch (error) {
+      console.log(error);
+      
+    }
   },
   fetchingSalesReport:(req,res)=>{
 

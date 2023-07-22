@@ -110,7 +110,7 @@ module.exports = {
 
         console.log(req.body);
         console.log(req.query.productId);
-        const productImagesFileName = req.files.map((file) => file.filename);
+        const productImages = req.files
 
 
         const {
@@ -142,13 +142,35 @@ module.exports = {
             "Category.Slug":categorySlug,
             StockQuantity: stock_quantity,
             RegularPrice: regular_price,
-            SalePrice: sale_price,
-            ProductImages:productImagesFileName
+            SalePrice: sale_price
           },
+          
           { new: true }
         );
-  
-        console.log(req.files);
+        const updatedProductImages = [];
+
+        await Promise.all(
+          productImages.map(async (image) => {
+            const inputImagePath = image.path;
+            const outputImagePath = `public/uploads/product_images/${image.filename}`;
+        
+            await sharp(inputImagePath)
+              .resize(522, 522, { fit: 'inside' })
+              .toFile(outputImagePath);
+            
+            // Unlink the original image file
+            fs.unlinkSync(inputImagePath);
+        
+            // Add the new filename to the updatedProductImages array
+            updatedProductImages.push(image.filename);
+          })
+        );
+        
+        // Update the product images array with the new filenames
+        productSave.ProductImages = updatedProductImages;
+        
+        await productSave.save();
+        
         if (productSave) {
           res.redirect("/admin/list-products"); 
         }
@@ -174,14 +196,16 @@ module.exports = {
       const { categoryName } = req.body;
       const image = req.file
       console.log(image);
-      const inputImagePath = req.file.path
-      const outputImagePath = 'public/uploads/Cropped_CategoryImages/'+req.file.filename
+      const inputImagePath = image.path
+      const outputImagePath = 'public/uploads/category_images/'+image.filename
 
    await  sharp(inputImagePath)
-  .resize(522, 522,{fit:'cover'}) // Resize the image if needed
+  .resize(522, 522,{fit:'inside'}) // Resize the image if needed
   // .extract({ left: 0, top: 0, width: 300, height: 300 }) // Crop the image (adjust the values accordingly)
   .toFile(outputImagePath)
   .then(async() => {
+    fs.unlinkSync(inputImagePath);
+
     console.log('Image cropped and saved successfully');
     const regex = new RegExp('^' + categoryName + '$',"i");
    const existingCategory =  await category.findOne({CategoryName:{$regex:regex}})
@@ -303,13 +327,14 @@ module.exports = {
         }else{
           const image = req.file
           console.log(image);
-          const inputImagePath = req.file.path
-          const outputImagePath = 'public/uploads/Cropped_CategoryImages/'+req.file.filename
+          const inputImagePath = image.path
+          const outputImagePath = 'public/uploads/category_images/'+image.filename
       await  sharp(inputImagePath)
-      .resize(1000, 1000) // Resize the image if needed
-      .extract({ left: 0, top: 0, width: 300, height: 300 }) // Crop the image (adjust the values accordingly)
+      .resize(522, 522, { fit: 'inside' })
       .toFile(outputImagePath)
+     
       .then(async() => {
+        fs.unlinkSync(inputImagePath);
       console.log('Image cropped and saved successfully');
           getCategory(categoryId).then(async (category) => {
             console.log(category);

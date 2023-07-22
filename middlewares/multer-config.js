@@ -9,9 +9,20 @@ const productStorage= multer.diskStorage({
     cb(null, `${Date.now()}-${file.originalname}`); 
   }
 });
+
+// Set up the Multer middleware with validation
+const imageFilter = (req, file, cb,res) => {
+  // Check if the uploaded file is an image
+  if (file.mimetype.startsWith('image/')) {
+    cb(null, true);
+  } else {
+    res.send(Swal.fire('Any fool can use a computer'))
+    cb(new Error('Only image files are allowed!'), false);
+  }
+};
 const categoryStorage= multer.diskStorage({
   destination: function (req, file, cb) {
-    cb(null, 'public/uploads/category_images');
+    cb(null, 'public/uploads/temp');
   },
   filename: function (req, file, cb) {
     const ext = file.mimetype.split("/")[1];
@@ -19,8 +30,16 @@ const categoryStorage= multer.diskStorage({
   }
 });
 
-const uploadProduct= multer({ storage: productStorage });
-const uploadCategory= multer({ storage: categoryStorage});
+const uploadProduct= multer({ storage: productStorage ,
+fileFilter:imageFilter,
+limits:{
+  fieldSize:5*1024*1024
+}});
+const uploadCategory= multer({ storage: categoryStorage,
+  fileFilter:imageFilter,
+  limits:{
+    fieldSize:5*1024*1024
+  }});
 
 
 module.exports ={
