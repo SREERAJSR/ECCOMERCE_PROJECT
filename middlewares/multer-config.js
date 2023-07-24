@@ -16,8 +16,7 @@ const imageFilter = (req, file, cb,res) => {
   if (file.mimetype.startsWith('image/')) {
     cb(null, true);
   } else {
-    res.send(Swal.fire('Any fool can use a computer'))
-    cb(new Error('Only image files are allowed!'), false);
+      cb(new Error('Only image files are allowed!'), false);
   }
 };
 const categoryStorage= multer.diskStorage({
@@ -25,7 +24,7 @@ const categoryStorage= multer.diskStorage({
     cb(null, 'public/uploads/temp');
   },
   filename: function (req, file, cb) {
-    const ext = file.mimetype.split("/")[1];
+    const ext = file.mimetype.split("/")[1]; 
     cb(null, `${Date.now()}-${file.originalname}`); 
   }
 });

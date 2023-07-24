@@ -422,71 +422,71 @@ res.redirect('/login')
  
 
   },
-      sortSearchFilterPagination: async(req,res)=>{
-    try{
-      const{ selectedSort,selectedPriceRange,selectedBrand,searchQuery, selectedPage} = req.query
+        sortSearchFilterPagination: async(req,res)=>{
+      try{
+        const{ selectedSort,selectedPriceRange,selectedBrand,searchQuery, selectedPage} = req.query
 
-     console.log('queryyyyy',req.query);
+      console.log('queryyyyy11',req.query);
 
 
-      console.log(selectedBrand,'jithin mandan');
-      
-      const sortOptions = {};
+        console.log(selectedBrand,'jithin mandan');
+        
+        const sortOptions = {};
 
-      if (selectedSort === 'price-low-high') {
-        sortOptions['SalePrice'] = 1;
-      } else if (selectedSort === 'price-high-low') {
-        sortOptions['SalePrice'] = -1;
+        if (selectedSort === 'price-low-high') {
+          sortOptions['SalePrice'] = 1;
+        } else if (selectedSort === 'price-high-low') {
+          sortOptions['SalePrice'] = -1;
+        }
+
+        let query={}
+
+        if(selectedBrand !== 'all brands'){
+          query['BrandName'] = selectedBrand;
+        }
+
+
+        if(selectedPriceRange !== 'All'){
+          const [minPrice, maxPrice] = selectedPriceRange.split('-').map(Number);
+          query['SalePrice'] = { $gte: minPrice, $lte: maxPrice };
+
+        }
+
+        if(searchQuery){
+          query['ProductName'] = { $regex: new RegExp(searchQuery, 'i') };
+
+        }
+
+        console.log('queryyyyyyy',query);
+      // Get the total count of matching products for pagination
+      const totalCount = await Product.countDocuments(query);
+
+          // Calculate skip and limit for pagination
+          const skip = (parseInt(selectedPage) - 1) * 3; // Assuming 10 products per page
+          const limit = 3; // Number of products per page
+
+        // Fetch the products based on the query
+        const products = await Product.find(query)
+        .sort(sortOptions)
+        .skip(skip)
+        .limit(limit);
+
+        console.log(products);
+
+        // Send the response as JSON with the fetched products and pagination details
+      res.json({
+        totalProducts: totalCount,
+        currentPage: parseInt(selectedPage),
+        totalPages: Math.ceil(totalCount / limit),
+        products,
+      });
+
+      }catch(err){
+  console.log(err);
+  res.status(500).json({ error: 'Server Error' });
       }
 
-      let query={}
-
-      if(selectedBrand !== 'All'){
-        query['BrandName'] = selectedBrand;
-      }
-
-
-      if(selectedPriceRange !== 'All'){
-        const [minPrice, maxPrice] = selectedPriceRange.split('-').map(Number);
-        query['SalePrice'] = { $gte: minPrice, $lte: maxPrice };
-
-      }
-
-      if(searchQuery){
-        query['ProductName'] = { $regex: new RegExp(searchQuery, 'i') };
-
-      }
-
-      console.log('queryyyyyyy',query);
-    // Get the total count of matching products for pagination
-    const totalCount = await Product.countDocuments(query);
-
-        // Calculate skip and limit for pagination
-        const skip = (parseInt(selectedPage) - 1) * 10; // Assuming 10 products per page
-        const limit = 10; // Number of products per page
-
-      // Fetch the products based on the query
-      const products = await Product.find(query)
-      .sort(sortOptions)
-      .skip(skip)
-      .limit(limit);
-
-      console.log(products);
-
-       // Send the response as JSON with the fetched products and pagination details
-    res.json({
-      totalProducts: totalCount,
-      currentPage: parseInt(selectedPage),
-      totalPages: Math.ceil(totalCount / limit),
-      products,
-    });
-
-    }catch(err){
-console.log(err);
-res.status(500).json({ error: 'Server Error' });
-    }
-
-  },
+    },
 
   getProductDetailPage: async (req, res, next) => {
     try {
