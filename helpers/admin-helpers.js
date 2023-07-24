@@ -2,7 +2,7 @@ const mongoose = require('mongoose')
 const Order = require('../models/orderSchema')
 const User = require('../models/userSchema')
 const Product = require('../models/productSchema')
-
+const moment = require('moment')
 
 module.exports={
     fetchAllPlacedOrder:()=>{
@@ -15,6 +15,10 @@ module.exports={
                         'Products.Status':'Placed'
                     }
                 }])
+
+                sucessOrders.forEach((order) => {
+                    order.createdAt = moment(order.createdAt).format('YYYY-MM-DD');
+                  });
                 
                 resolve(sucessOrders)
             } catch (error) {
@@ -75,6 +79,11 @@ module.exports={
                     }
                 }
             ])
+                // Format the createdAt date using moment
+      dailyReports.forEach((report) => {
+        report.createdAt = moment(report.createdAt).format('YYYY-MM-DD');
+      });
+
             
             resolve({dailyReports,TotalAmount})
         }catch(error){
@@ -138,6 +147,9 @@ module.exports={
                     }
                 }
             ])
+            weeklyReports.forEach((report) => {
+                report.createdAt = moment(report.createdAt).format('YYYY-MM-DD');
+              });
 
             console.log('week',weeklyReports);
             console.log('total',TotalAmount);
@@ -196,6 +208,9 @@ module.exports={
                     }
                 }
             ])
+            yearlyReports.forEach((report) => {
+                report.createdAt = moment(report.createdAt).format('YYYY-MM-DD');
+              });
             
             resolve({yearlyReports,TotalAmount})
         }catch(err){

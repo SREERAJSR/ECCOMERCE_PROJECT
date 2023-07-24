@@ -2,6 +2,7 @@
 <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 <script src="/javascripts/sweetalert2.all.js"></script><!-- jQuery Core -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js"></script>
         <section class="content-main">
             <div class="content-header">
                 
@@ -86,8 +87,10 @@
                                 </tr>
                             </thead>
                             <tbody id="table-body">
+                                
+                             
                                   
-                              
+                           
                         <% allSucessOrders.forEach((order,index)=>{ %> 
                         <tr>
           <td> <%= index + 1  %></td>
@@ -97,7 +100,6 @@
           <td><span class="badge rounded-pill alert-success"><%=order.Products.Status  %></span></td>
           <td><%= order.createdAt %></td>
           <td><%= order.TotalAmount  %></td>
-            
         </tr>
   <%  })  %>
                             </tbody>

@@ -429,7 +429,6 @@ res.redirect('/login')
       console.log('queryyyyy11',req.query);
 
 
-        console.log(selectedBrand,'jithin mandan');
         
         const sortOptions = {};
 
@@ -783,7 +782,31 @@ res.status(500).json({error:error})
 
 
 }
-   } 
+   } ,
+
+   gettingUserProfilePage:async(req,res)=>{
+
+    try{
+      const userId = req.session.user._id
+      const addresses = await Address.find({UserId:req.session.user._id})
+
+      var cart = await Cart.findOne({UserId:userId})
+      const user = await User.findById(userId)
+      
+      if(user.DefaultAddress && cart){
+        const addressId =user.DefaultAddress.toString()
+        var defaultAddress = await Address.findById(addressId)
+
+        console.log(defaultAddress);
+          res.render('user/user-profile',{u:true,cart,defaultAddress,addresses})
+  
+      }
+    }catch(error){
+      console.log(error);
+
+    }
+
+   }
 
   
 }

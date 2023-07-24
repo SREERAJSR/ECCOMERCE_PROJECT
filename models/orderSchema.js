@@ -1,4 +1,5 @@
 const mongoose = require('mongoose')
+const moment = require('moment')
 
 
 const  orderSchema = mongoose.Schema({
@@ -53,10 +54,13 @@ const  orderSchema = mongoose.Schema({
         enum:['Cash on Delivery','Razor pay','Paypal'],
     },
   
-    createdAt:{
-        type:Date,
-        default:Date.now()
-    },
+    createdAt: {
+        type: Date,
+        default: Date.now(),
+        get: function (value) {
+          return moment(value).format('YYYY-MM-DD');
+        }
+      },
     ShippingAddress:{
         type:mongoose.Schema.Types.ObjectId,
         ref:'User'

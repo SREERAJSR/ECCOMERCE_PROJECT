@@ -38,7 +38,8 @@ const {
   addingAddress,
   getCheckoutPage,
   selectDefaultAddress,
-  sortSearchFilterPagination
+  sortSearchFilterPagination,
+  gettingUserProfilePage
 
 } = require("../controllers/userController");
 //SHA256:CXoHORZsVoQiTlBkcwyCuTYWR29M0IyeXdcy8GYOnfY sreerajsr03@gmail.com
@@ -133,4 +134,9 @@ router.get('/order_success',(req,res)=>{
   res.render('user/order-sucess',{u:true})
 })
 router.post('/verify_payment',verifyPayment)
+
+
+////// user profile
+
+router.get('/user_profile', gettingUserProfilePage)
 module.exports = router;

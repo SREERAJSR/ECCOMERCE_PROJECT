@@ -320,7 +320,12 @@ module.exports = {
         const { categoryId } = req.query;
         const regex = new RegExp(`^${category_name}$`, "i"); 
         console.log(req.file); 
-        const existingCategory = await category.findOne({ CategoryName: { $regex: regex } }).exec();
+        const existingCategory = await category.findOne({
+          $and: [
+            { CategoryName: { $regex: regex } }, // Category name matches the regex
+            { _id: { $ne: categoryId } }, // Exclude the current category by its ID
+          ],
+        }).exec();
         if (existingCategory) {
           req.flash('success', '  existing category');
           res.redirect('/admin/category');
