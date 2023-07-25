@@ -8,8 +8,9 @@ module.exports={
             console.log(376);
            next()
         }else{
-            console.log('3');
-           res.render('user/login',{u:false})
+         
+       
+    res.redirect('/login')
         }
     },
 authenticateAdmin:((req,res,next)=>{

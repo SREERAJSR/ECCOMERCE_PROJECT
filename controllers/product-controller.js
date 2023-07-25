@@ -10,7 +10,7 @@ const { getCategory } = require("../helpers/product-helpers");
 const {findCategory}= require('../helpers/product-helpers');
 
 
-
+ 
 module.exports = {
   getaddProducts: (req, res) => {
     findCategory().then((categories)=>{

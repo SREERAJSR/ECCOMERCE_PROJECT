@@ -1,175 +1,581 @@
-const User = require("../models/userSchema");
-const bcrypt = require("bcrypt");
-const twilio = require("twilio");
-const userHelpers = require("../helpers/user-helpers");
-const { clearCache } = require("ejs");
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<style>
+    body{
+    background: #f5f5f5;
+    margin-top:20px;
+}
 
-module.exports = {
-  getSignup: (req, res) => {
-    // console.  log(req.session.user.username);
-    res.render("user/signup", { u: false });
-  },
+.ui-w-80 {
+    width: 80px !important;
+    height: auto;
+}
 
-  userSignup: async (req, res) => { 
-    try {
-      const { username, phone, email, password } = req.body;
+.btn-default {
+    border-color: rgba(24,28,33,0.1);
+    background: rgba(0,0,0,0);
+    color: #4E5155;
+}
 
-      const hashedPassword = await bcrypt.hash(password, 10);
-      console.log(hashedPassword);
-      const newUser = new User({
-        Name: username,
-        phone: phone,
-        Email: email,
-        password: hashedPassword,
-        isActive: true,
-      });
-      await newUser
-        .save()
-        .then(() => {
-          req.session.user = newUser;
-          //req.session.phone=phone
-          console.log(req.session.user);
-          userHelpers.sendingOtp(req.session.user.phone).then(() => {
-            const userPhone = "+91" + req.session.user.phone;
-            res.render("user/user-signUp-otp", { u: false, userPhone });
-          });
-        })
-        .catch((err) => {
-          console.log(err);
-        });
-    } catch {
-      res.status(500).json({ message: "User failed signup" });
-    }
-  },
+label.btn {
+    margin-bottom: 0;
+}
 
-  signupOtp: (req, res) => {
-    res.render("user/otp-signup", { u: false });
-  },
+.btn-outline-primary {
+    border-color: #26B4FF;
+    background: transparent;
+    color: #26B4FF;
+}
+
+.btn {
+    cursor: pointer;
+}
+
+.text-light {
+    color: #babbbc !important;
+}
+
+.btn-facebook {
+    border-color: rgba(0,0,0,0);
+    background: #3B5998;
+    color: #fff;
+}
+
+.btn-instagram {
+    border-color: rgba(0,0,0,0);
+    background: #000;
+    color: #fff;
+}
+
+.card {
+    background-clip: padding-box;
+    box-shadow: 0 1px 4px rgba(24,28,33,0.012);
+}
+
+.row-bordered {
+    overflow: hidden;
+}
+
+.account-settings-fileinput {
+    position: absolute;
+    visibility: hidden;
+    width: 1px;
+    height: 1px;
+    opacity: 0;
+}
+.account-settings-links .list-group-item.active {
+    font-weight: bold !important;
+}
+html:not(.dark-style) .account-settings-links .list-group-item.active {
+    background: transparent !important;
+}
+.account-settings-multiselect ~ .select2-container {
+    width: 100% !important;
+}
+.light-style .account-settings-links .list-group-item {
+    padding: 0.85rem 1.5rem;
+    border-color: rgba(24, 28, 33, 0.03) !important;
+}
+.light-style .account-settings-links .list-group-item.active {
+    color: #4e5155 !important;
+}
+.material-style .account-settings-links .list-group-item {
+    padding: 0.85rem 1.5rem;
+    border-color: rgba(24, 28, 33, 0.03) !important;
+}
+.material-style .account-settings-links .list-group-item.active {
+    color: #4e5155 !important;
+}
+.dark-style .account-settings-links .list-group-item {
+    padding: 0.85rem 1.5rem;
+    border-color: rgba(255, 255, 255, 0.03) !important;
+}
+.dark-style .account-settings-links .list-group-item.active {
+    color: #fff !important;
+}
+.light-style .account-settings-links .list-group-item.active {
+    color: #4E5155 !important;
+}
+.light-style .account-settings-links .list-group-item {
+    padding: 0.85rem 1.5rem;
+    border-color: rgba(24,28,33,0.03) !important;
+}
+</style>
+
+<!-- Add toastr CSS -->
+<link href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css" rel="stylesheet" />
+
+<!-- Add toastr JS -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
+
+<body>
+    <div class="container light-style flex-grow-1 container-p-y">
+
+        <h4 class="font-weight-bold py-3 mb-4">
+          Account settings
+        </h4>
+    
+        <div class="card overflow-hidden">
+          <div class="row no-gutters row-bordered row-border-light">
+            <div class="col-md-3 pt-0">
+              <div class="list-group list-group-flush account-settings-links">
+                <a class="list-group-item list-group-item-action active" data-toggle="list" href="#account-general">General</a>
+                <a class="list-group-item list-group-item-action" data-toggle="list" href="#account-change-password">Change password</a>
+                <a class="list-group-item list-group-item-action" data-toggle="list" href="#account-info">Address</a>
+                <a class="list-group-item list-group-item-action" data-toggle="list" href="#account-social-links">Orders info</a>
+                <a class="list-group-item list-group-item-action" data-toggle="list" href="#account-connections">Logout</a>
+                <!-- <a class="list-group-item list-group-item-action" data-toggle="list" href="#account-notifications">Notifications</a> -->
+              </div>
+            </div>
+            <div class="col-md-9">
+              <div class="tab-content">
+                <div class="tab-pane fade active show" id="account-general">
+    
+                  
+     
+                  <form action="/user_profile_edit_profile" id="profileForm" method="post"  >
+                  <div class="card-body">
+                    <div class="form-group">
+                      <label class="form-label">Full Name</label>
+                      <input type="text" class="form-control mb-1" name="fullName" value="<%=user.Name %>">
+                    </div>
+                    <div class="form-group">
+                      <label class="form-label">Phone</label>
+                      <input type="number" class="form-control" name="phone" value="<%=user.phone  %>"">
+                    </div>
+                    <div class="form-group">
+                      <label class="form-label">E-mail</label>
+                      <input type="email" class="form-control mb-1" name="email" value="<%=user.Email %>">
+                   
+                    </div>
+                    <div class="text-right mt-3">
+                        <button type="submit" class="btn btn-primary">Save changes</button>&nbsp;
+                        <button type="button" class="btn btn-default">Cancel</button>
+                      </div>
+                    </form>
+                   
+                  </div>
+                  
+    
+                </div>
+                <div class="tab-pane fade" id="account-change-password">
+                  <div class="card-body pb-2">
+                    <form  id="passwordForm">
+                    <div class="form-group">
+                      <label class="form-label" >Current password</label>
+                      <input type="password" name="current_password" class="form-control">
+                    </div>
+    
+                    <div class="form-group">
+                      <label class="form-label">New password</label>
+                      <input id="new-password" type="password" name="new_password" class="form-control">
+                    </div>
+    
+                    <div class="form-group">
+                      <label class="form-label">Repeat new password</label>
+                      <input id="same-password" type="password" name="same_password" class="form-control">
+                    </div>
+                    <div class="text-right mt-3">
+                        <button id="pass_Btn" type="submit" class="btn btn-outline-dark">Save changes</button>&nbsp;
+                      </div>
+                    </form>
+    
+                  </div>
+                  
+                </div>
+                <div class="tab-pane fade" id="account-info">
+
+                    <div class="col-sm-12">
+                        <div class="btn btn-outline-dark" data-toggle="modal" data-target="#addAddressModal">Add Address</div>
+                    <% if (defaultAddress){ %>
+                         <div class="card">
+                            <div class="card-body" id="default_address" data-default_addressid="<%=defaultAddress._id %>">
+                            <h5 class="card-title">Default address</h5>
+                            <p class="card-text"><%= defaultAddress.FullName  %></p>
+                                  <p class="card-text"><%= defaultAddress.Email  %></p>
+                                  <p class="card-text"><%= defaultAddress.Phone  %></p>
+                                  <p class="card-text"><%= defaultAddress.Flat  %></p>
+                                  <p class="card-text"><%= defaultAddress.Area  %></p>
+                                  <p class="card-text"><%= defaultAddress.Landmark %></p>
+                                  <p class="card-text"><%= defaultAddress.Pincode  %></p>
+                                  <p class="card-text"><%= defaultAddress.Town  %></p>
+                                 
+                          </div>
+                        </div>
+                        <% }else{ %>
+                            <div class="card-header">
+                                No default address
+                      </div>
+
+                            <% } %>
+                      </div>
+
+                      <% var addresses %>
+                    
+                    <div class="row">
+                        <% addresses.forEach((address,index)=>{ %>
+
+                        <div class="col-sm-4">
+                            <div class="card">
+                              <div class="card-body">
+                                <h5 class="card-title">Address <%= index+1 %></h5>
+                                <p class="card-text"><%=address.FullName  %></p>
+                                <p class="card-text"><%=address.Email  %></p>
+                                <p class="card-text"><%=address.Phone  %></p>
+                                <p class="card-text"><%=address.Flat  %></p>
+                                <p class="card-text"><%=address.Area  %></p>
+                                <p class="card-text"><%=address.Landmark  %></p>
+                                <p class="card-text"><%=address.Pincode  %></p>
+                                <p class="card-text"><%=address.Town  %></p>
+                                <a href="#"  data-addressid="<%= address._id%>" class="btn btn-outline-dark select_address">Select</a>
+                              </div>
+                            </div>
+                          </div>
+                          <%    })  %>
+                          
+                </div>
+            </div>
+                <div class="tab-pane fade" id="account-social-links">
+                  <div class="card-body pb-2">
+    
+                    <div class="form-group">
+                      <label class="form-label">Twitter</label>
+                      <input type="text" class="form-control" value="https://twitter.com/user">
+                    </div>
+                    <div class="form-group">
+                      <label class="form-label">Facebook</label>
+                      <input type="text" class="form-control" value="https://www.facebook.com/user">
+                    </div>
+                    <div class="form-group">
+                      <label class="form-label">Google+</label>
+                      <input type="text" class="form-control" value="">
+                    </div>
+                    <div class="form-group">
+                      <label class="form-label">LinkedIn</label>
+                      <input type="text" class="form-control" value="">
+                    </div>
+                    <div class="form-group">
+                      <label class="form-label">Instagram</label>
+                      <input type="text" class="form-control" value="https://www.instagram.com/user">
+                    </div>
+    
+                  </div>
+                </div>
+                <div class="tab-pane fade" id="account-connections">
+                  <div class="card-body">
+                    <button type="button" class="btn btn-twitter">Connect to <strong>Twitter</strong></button>
+                  </div>
+                  <hr class="border-light m-0">
+                  <div class="card-body">
+                    <h5 class="mb-2">
+                      <a href="javascript:void(0)" class="float-right text-muted text-tiny"><i class="ion ion-md-close"></i> Remove</a>
+                      <i class="ion ion-logo-google text-google"></i>
+                      You are connected to Google:
+                    </h5>
+                    nmaxwell@mail.com
+                  </div>
+                  <hr class="border-light m-0">
+                  <div class="card-body">
+                    <button type="button" class="btn btn-facebook">Connect to <strong>Facebook</strong></button>
+                  </div>
+                  <hr class="border-light m-0">
+                  <div class="card-body">
+                    <button type="button" class="btn btn-instagram">Connect to <strong>Instagram</strong></button>
+                  </div>
+                </div>
+                <div class="tab-pane fade" id="account-notifications">
+                  <div class="card-body pb-2">
+    
+                    <h6 class="mb-4">Activity</h6>
+    
+                    <div class="form-group">
+                      <label class="switcher">
+                        <input type="checkbox" class="switcher-input" checked="">
+                        <span class="switcher-indicator">
+                          <span class="switcher-yes"></span>
+                          <span class="switcher-no"></span>
+                        </span>
+                        <span class="switcher-label">Email me when someone comments on my article</span>
+                      </label>
+                    </div>
+                    <div class="form-group">
+                      <label class="switcher">
+                        <input type="checkbox" class="switcher-input" checked="">
+                        <span class="switcher-indicator">
+                          <span class="switcher-yes"></span>
+                          <span class="switcher-no"></span>
+                        </span>
+                        <span class="switcher-label">Email me when someone answers on my forum thread</span>
+                      </label>
+                    </div>
+                    <div class="form-group">
+                      <label class="switcher">
+                        <input type="checkbox" class="switcher-input">
+                        <span class="switcher-indicator">
+                          <span class="switcher-yes"></span>
+                          <span class="switcher-no"></span>
+                        </span>
+                        <span class="switcher-label">Email me when someone follows me</span>
+                      </label>
+                    </div>
+                  </div>
+                  <hr class="border-light m-0">
+                  <div class="card-body pb-2">
+    
+                    <h6 class="mb-4">Application</h6>
+    
+                    <div class="form-group">
+                      <label class="switcher">
+                        <input type="checkbox" class="switcher-input" checked="">
+                        <span class="switcher-indicator">
+                          <span class="switcher-yes"></span>
+                          <span class="switcher-no"></span>
+                        </span>
+                        <span class="switcher-label">News and announcements</span>
+                      </label>
+                    </div>
+                    <div class="form-group">
+                      <label class="switcher">
+                        <input type="checkbox" class="switcher-input">
+                        <span class="switcher-indicator">
+                          <span class="switcher-yes"></span>
+                          <span class="switcher-no"></span>
+                        </span>
+                        <span class="switcher-label">Weekly product updates</span>
+                      </label>
+                    </div>
+                    <div class="form-group">
+                      <label class="switcher">
+                        <input type="checkbox" class="switcher-input" checked="">
+                        <span class="switcher-indicator">
+                          <span class="switcher-yes"></span>
+                          <span class="switcher-no"></span>
+                        </span>
+                        <span class="switcher-label">Weekly blog digest</span>
+                      </label>
+                    </div>
+    
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+    
+      </div>
+      <!-- Modal -->
+      <div class="modal fade" id="addAddressModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel"
+      aria-hidden="true">
+      <div class="modal-dialog " role="document">
+        <div class="modal-content">
+          <div class="modal-header text-center">
+            <h4 class="modal-title w-100 font-weight-bold">Write to us</h4>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="modal-body mx-3">
+            <b>  <h1>ADD ADDRESS</h1></b>
+
+            <form id="add_address_form">
+            <div class="md-form mb-5">
+              <input type="text" id="form34" name="Full_Name" class="form-control validate">
+              <label data-error="wrong" data-success="right" for="form34">Full Name</label>
+            </div>
+    
+            <div class="md-form mb-5">
+              
+              <input type="email" id="form29" name="Email" class="form-control validate">
+              <label data-error="wrong" data-success="right" for="form29">Email</label>
+            </div>
+            <div class="md-form mb-5">
+              
+              <input type="number" id="form29" name="Mobile" class="form-control validate">
+              <label data-error="wrong" data-success="right" for="form29">Mobile</label>
+            </div>
+    
+            <div class="md-form mb-5">
+           
+              <input type="text" id="form32" name="Flat" class="form-control validate">
+              <label data-error="wrong" data-success="right" for="form32"> Flat, House no., Building, Company, Apartment</label>
+            </div>
+            <div class="md-form mb-5">
+             
+              <input type="text" id="form32" name="Area" class="form-control validate">
+              <label data-error="wrong" data-success="right" for="form32">Area, Street, Sector, Village</label>
+            </div>
+            <div class="md-form mb-5">
+              
+              <input type="text" id="form32" name="Landmark" class="form-control validate">
+              <label data-error="wrong" data-success="right" for="form32">Landmark</label>
+            </div>
+            <div class="md-form mb-5">
+              
+              <input name="Pincode" type="number" id="form32" class="form-control validate">
+              <label data-error="wrong" data-success="right" for="form32"> Pincode</label>
+            </div>
+            <div class="md-form mb-5">
+           
+              <input type="text" id="form32" name="Town" class="form-control validate">
+              <label data-error="wrong" data-success="right" for="form32">Town</label>
+            </div>
+          </div>
+          <div class="modal-footer d-flex justify-content-center">
+            <button id="addres_save_btn" class="btn btn-outline-dark">Save<i class="fas fa-save ml-1"></i></button>
+          </div>
+      </form>
+        </div>
+      </div>
+    </div>
+    
+</body>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/sweetalert/2.1.2/sweetalert.min.js"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+<script src="/javascripts/sweetalert2.all.js"></script><!-- jQuery Core -->
+
+<script>
  
-  getLogin: (req, res) => {
+  $(document).ready((event)=>{
 
-    if (req.session.user) {
+  
+      $("#addres_save_btn").on('click',(event)=>{
+          event.preventDefault();
 
-      console.log("haii");
-      res.setHeader("Cache-Control", "no-cache, no-store, must-revalidate");
-      res.setHeader("Pragma", "no-cache");
-      res.setHeader("Expires", "0");
-      res.redirect("/");
-    } else { 
-      console.log("no hai");
-      res.render("user/login", { u: false });
-    }
-  },
+          const formData =$('#add_address_form').serializeArray()
+          const jsonFormData={}
 
-  postLogin: async (req, res) => {
-    try {
-      const { email, password } = req.body;
+          // convert formdata into json
+          $.each(formData,(index,field)=>{
+              jsonFormData[field.name] =field.value
+          })
+          
 
-      const user = await User.findOne({ Email: email });
+         fetch('/add_address',{
+          method:'post',
+          body:JSON.stringify(jsonFormData),
+          headers:{
+              "Content-Type":'application/json'
+          }
+         }).then((response)=>{
+          if(response.status===200){
+
+            return response.json()
+          }else if(response.status===401){
+            throw new Error('Please login')
+          }else{
+            throw new Error('Address not added')
+
+          }
+         }).then((response)=>{
+          console.log(response);
+          Swal.fire({
+    position: 'top-end',
+    icon: 'success',
+    title: response.message,
+    showConfirmButton: false,
+    timer: 1500
+  });
+  location.reload()
+         }).catch((error)=>{
+          console.log(error);
+          Swal.fire({
+ icon: 'error',
+title: error.message,
+
+   })
+         })
+      })
 
       
-      if (!user) { 
-        return res.status(401).json({ message: "Invalid email or password" });
-      }
-      const passwordMatch = await bcrypt.compare(password, user.password);
+  })
+</script>
 
-      console.log(req.session.user); 
-      if (passwordMatch) {
-        res.redirect("/");
-      } else {
-        res.redirect("/login");
-      }
-    } catch (err) {
-      console.log(err);
-    }
-  },
-  loginOtp: (req, res) => {
-    res.render("user/numberOtp", { u: false });
-  },
-
-  sendOtp: async (req, res) => {
-    try {
-      const { phone } = req.body;
-      // Set up the Twilio client with your Account SID and Auth Token
-      const accountSid = process.env.accountSid;
-      const authToken = process.env.authToken;
-      const client = twilio(accountSid, authToken);
-      await client.verify.v2
-        .services(process.env.verifySid)
-        .verifications.create({ to: "+91" + phone, channel: "sms" });
-      const userPhone = "+91" + phone;
-      req.session.phone = phone;
-      res.render("user/otp-signup", { u: false, userPhone });
-      // res.redirect(`/otp/${phone}`);
-    } catch (err) {
-      console.log(err);
-    }
-  },
-  otpVerification: async (req, res) => {
-    try {
-      const phone = req.params.id;
-      const { otp1, otp2, otp3, otp4, otp5, otp6 } = req.body;
-      const otpcode = `${otp1}${otp2}${otp3}${otp4}${otp5}${otp6}`;
-      const client = twilio(process.env.accountSid, process.env.authToken);
-
-      await client.verify.v2
-        .services(process.env.verifySid)
-        .verificationChecks.create({ to: phone, code: otpcode })
-        .then((verification_check) => {
-          console.log(verification_check.status);
-
-          if (req.session.phone) {
-            res.redirect("/");
-          } else {
-            res.redirect("/login");
-          }
-        })
-        .catch((err) => {
-          res.status(401).json({ message: "Invalid Otp" + err });
-        });
-    } catch (err) {
-      console.log("ERROR IN OTP" + err);
-    }
-  },
-  resendOtp: async (req, res) => {
-    try {
-      const phone = req.params.id;
-      // Set up the Twilio client with your Account SID and Auth Token
-      const accountSid = process.env.accountSid;
-      const authToken = process.env.authToken;
-      const client = twilio(accountSid, authToken);
-      await client.verify.v2
-        .services(process.env.verifySid)
-        .verifications.create({ to: phone, channel: "sms" });
-      const userPhone = phone;
-      res.render("user/otp-signup", { u: false, userPhone });
-      // res.redirect(`/otp/${phone}`);
-    } catch (err) {
-      console.log(err);
-    }
-  },
-  validateSignUp: async (req, res) => {
-    try {
-      const { otp1, otp2, otp3, otp4, otp5, otp6 } = req.body;
-      const otpcode = `${otp1}${otp2}${otp3}${otp4}${otp5}${otp6}`;
-      console.log(otpcode);
-      console.log("SSSSSSSŠ" + req.session.user.phone);
-      // const phone = req.session.phone;
-
-      userHelpers
-        .validating(req.session.user.phone, otpcode)
-        .then(() => {
-          if (req.session.user) {
-            res.redirect("/");
-          } else {
-            res.redirect("/login");
-          }
-        })
-        .catch((err) => {
-          res.status(401).json({ message: "Invalid Otp" + err });
-        });
-    } catch (err) {
-      console.log("ERROR IN OTP" + err);
-    }
-  },
+<script>
+   // Initialize toastr
+toastr.options = {
+  closeButton: true,
+  debug: false,
+  newestOnTop: false,
+  progressBar: true,
+  positionClass: 'toast-top-right',
+  preventDuplicates: false,
+  onclick: null,
+  showDuration: '300',
+  hideDuration: '1000',
+  timeOut: '5000',
+  extendedTimeOut: '1000',
+  showEasing: 'swing',
+  hideEasing: 'linear',
+  showMethod: 'fadeIn',
+  hideMethod: 'fadeOut'
 };
+
+  $(document).ready(()=>{
+
+    $('#passwordForm').on('submit',(event)=>{
+      event.preventDefault()
+      const newPass=$('#new-password').val()
+    const renteredPass = $(('#same-password')).val()
+
+    console.log(newPass,renteredPass);
+  
+    if(newPass!==renteredPass){
+     return Swal.fire({
+  icon: 'error',
+  title: 'New password and Repeat password are not match',
+  text: 'Please correct it',
+  footer: '<a href="">Why do I have this issue?</a>'
+})
+
+    }else{
+
+      const formData =$('#passwordForm').serializeArray()
+
+      const jsonFormData={}
+
+// convert formdata into json
+$.each(formData,(index,field)=>{
+    jsonFormData[field.name] = field.value 
+  })
+    console.log(jsonFormData);
+    fetch('/user_edit_password',{
+      method:'post',
+      body:JSON.stringify(jsonFormData),
+      headers:{
+        'Content-Type':'application/json'
+      }
+    }).then((response)=>{
+     if(response.status===200){
+      return response.json()
+     }else if ( response.status===403){
+      console.log(response);
+      throw new Error(response)
+
+     }
+    }).then((response)=>{
+      console.log(response);
+        // Display success notification
+  toastr.success('Password updated successfully!');
+
+
+    }).catch((response)=>{
+console.log(response);
+      // Display error notification
+  toastr.error('Password updated failed');
+    })
+
+  }
+    })
+  
+  })
+</script>
+
+
+
+
+</html>

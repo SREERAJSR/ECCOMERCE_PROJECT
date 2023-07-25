@@ -39,7 +39,9 @@ const {
   getCheckoutPage,
   selectDefaultAddress,
   sortSearchFilterPagination,
-  gettingUserProfilePage
+  gettingUserProfilePage,
+  updateUserProfileItems,
+  update_new_password
 
 } = require("../controllers/userController");
 //SHA256:CXoHORZsVoQiTlBkcwyCuTYWR29M0IyeXdcy8GYOnfY sreerajsr03@gmail.com
@@ -51,7 +53,7 @@ const limiter = rateLimiter({
 });
 /* GET users listing. */
 
-router.get("/login",authenticateSession, getLogin);
+router.get("/login", getLogin);
 
 router.post("/login", postLogin);
 
@@ -139,4 +141,9 @@ router.post('/verify_payment',verifyPayment)
 ////// user profile
 
 router.get('/user_profile', gettingUserProfilePage)
+
+router.post('/user_profile_edit_profile',updateUserProfileItems)
+
+router.post('/user_edit_password',update_new_password)
 module.exports = router;
+ 
