@@ -9,7 +9,9 @@ const {
   logoutAdmin,
   getDashBoardPage,
   getSalesReportPage,
-  fetchingSalesReport
+  fetchingSalesReport,
+  getAdminOrderListPage,
+  getAdminOrderDetailPage
 } = require("../controllers/admin-controller");
 
 const {
@@ -36,11 +38,12 @@ const {
 const multer = require("multer");
 const  {uploadProduct,uploadCategory} = require("../middlewares/multer-config");
 
-router.get("/",authenticateAdmin,getDashBoardPage)
 
 router.get('/admin-login',authenticateForLogin, getLoginPage)
 
+router.get("/",getDashBoardPage)
 router.post('/admin-login',loginAdmin)
+
 
 router.get('/admin-logout',authenticateAdmin, logoutAdmin)
 
@@ -85,6 +88,10 @@ router.post('/add-coupon',addingCoupon)
 router.get('/sales_report',getSalesReportPage)
 
 router.post('/sales_report',fetchingSalesReport)
+
+router.get('/order_list',getAdminOrderListPage)
+
+router.get('/order_details',getAdminOrderDetailPage)
 
 
 module.exports = router;

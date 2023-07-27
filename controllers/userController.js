@@ -7,7 +7,11 @@ const {
   validating,
   sendingOtp,
   updateUserProfileItems,
-  editPassword
+  editPassword,
+  gettingOrderDetails,
+  fetchOrderDetails,
+  orderCancelChangeStatus,
+  orderReturnChangeStatus
 } = require("../helpers/user-helpers");
 const { findCategory } = require("../helpers/product-helpers");
 const { categoryWiseFiltering } = require("../helpers/product-helpers");
@@ -769,21 +773,27 @@ module.exports = {
         var cart = await Cart.findOne({ UserId: userId });
         const user = await User.findById(userId);
 
+     const orders  = await gettingOrderDetails(req.session.user._id)
+        
+
         if (user.DefaultAddress && cart) {
           const addressId = user.DefaultAddress.toString();
           var defaultAddress = await Address.findById(addressId);
 
-          console.log(defaultAddress);
+
+
           res.render("user/user-profile", {
             u: true,
             cart,
             defaultAddress,
             addresses,
             user,
+            orders
           });
         }
+        
       } else {
-        res.redirect("login");
+        res.render('error_login',{u:true})
       }
     } catch (error) {
       console.log(error);
@@ -802,7 +812,7 @@ module.exports = {
         );
       } else {
         // res.render("error", { u: true, message: "PLEASE LOGIN BUDDY" });
-        res.redirect('/login')
+        res.render('error_login',{u:true})
       }
     } catch (err) {
       res
@@ -825,4 +835,72 @@ module.exports = {
     res.render('error',{u:true,message:err,code:500})
     }
   },
+  getOrderDetaiPage:async(req,res)=>{
+    try{
+      if(req.session.user){
+      const {orderId} = req.query
+      const userId = req.session.user._id
+
+     const orders = await fetchOrderDetails(orderId,userId)
+
+     res.render('user/order-details',{u:true,orders})
+      }else{
+        res.render('error_login',{u:true})
+      }
+    }catch(err){
+
+    }
+  },
+  cancelOrder:async(req,res)=>{
+    try {
+      
+      if(req.session.user){
+
+        console.log('hai');
+        const{productId,reasonText,OrderId} = req.body
+        console.log(req.body);
+
+        orderCancelChangeStatus(productId,reasonText,req.session.user._id,OrderId).then((success)=>{
+        
+          res.status(200).json({success:true,message:success})
+          
+        }).catch((err)=>{
+          console.log(err);
+      res.status(500).json({success:false,message:err})
+        })
+      }else{
+        res.render('error_login',{u:true})
+
+      }
+      
+    } catch (error) {
+      console.log(error);
+
+      res.status(500).json({success:false,message:error})
+      
+    }
+  },
+  returnOrder:async(req,res)=>{
+    try {
+
+      console.log(req.body);
+      const{productId,reasonText,OrderId} =req.body
+
+
+      orderReturnChangeStatus(productId,reasonText,OrderId,req.session.user._id).then((success)=>{
+        res.status(200).json({success:true,message:success})
+
+      }).catch((err)=>{
+        console.log(err);
+        res.status(500).json({success:false,message:err})
+
+      })
+      
+    } catch (error) {
+      res.status(500).json({success:false,message:error})
+
+    }
+  }
+
+  
 };

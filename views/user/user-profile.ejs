@@ -105,11 +105,77 @@ html:not(.dark-style) .account-settings-links .list-group-item.active {
     padding: 0.85rem 1.5rem;
     border-color: rgba(24,28,33,0.03) !important;
 }
+
+
+  a {
+    color: black;
+  }
+
+
+.modal-body {
+    background-color: #fff;
+    border-color: #fff;
+
+}
+
+
+.close {
+    color: #000;
+    cursor: pointer;
+}
+
+.close:hover {
+    color: #000;
+}
+
+
+.theme-color{
+
+    color: #004cb9;
+}
+hr.new1 {
+    border-top: 2px dashed #fff;
+    margin: 0.4rem 0;
+}
+
+
+.btn-primary {
+    color: #fff;
+    background-color: #004cb9;
+    border-color: #004cb9;
+    padding: 12px;
+    padding-right: 30px;
+    padding-left: 30px;
+    border-radius: 1px;
+    font-size: 17px;
+}
+
+
+.btn-primary:hover {
+    color: #fff;
+    background-color: #004cb9;
+    border-color: #004cb9;
+    padding: 12px;
+    padding-right: 30px;
+    padding-left: 30px;
+    border-radius: 1px;
+    font-size: 17px;
+}
+
+
+
+  
+
+
+
 </style>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 
 <!-- Add toastr CSS -->
 <link href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css" rel="stylesheet" />
-
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.5.0/font/bootstrap-icons.css">
 <!-- Add toastr JS -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
 
@@ -240,32 +306,53 @@ html:not(.dark-style) .account-settings-links .list-group-item.active {
                           
                 </div>
             </div>
-                <div class="tab-pane fade" id="account-social-links">
-                  <div class="card-body pb-2">
-    
-                    <div class="form-group">
-                      <label class="form-label">Twitter</label>
-                      <input type="text" class="form-control" value="https://twitter.com/user">
-                    </div>
-                    <div class="form-group">
-                      <label class="form-label">Facebook</label>
-                      <input type="text" class="form-control" value="https://www.facebook.com/user">
-                    </div>
-                    <div class="form-group">
-                      <label class="form-label">Google+</label>
-                      <input type="text" class="form-control" value="">
-                    </div>
-                    <div class="form-group">
-                      <label class="form-label">LinkedIn</label>
-                      <input type="text" class="form-control" value="">
-                    </div>
-                    <div class="form-group">
-                      <label class="form-label">Instagram</label>
-                      <input type="text" class="form-control" value="https://www.instagram.com/user">
-                    </div>
-    
-                  </div>
-                </div>
+            <div class="tab-pane fade" id="account-social-links">
+              <div class="card-body pb-2">
+                <table class="table">
+                  <thead>
+                    <tr>
+                      <th scope="col">No</th>
+                      <th scope="col">Order Items and Quantity</th>
+                      <th scope="col">OrderId</th>
+                      <th scope="col">Payment method</th>
+                      <th scope="col">Date</th>
+                      <th scope="col">Total</th>
+                      
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <% orders.forEach((order,index)=>{ %>
+                    <tr>
+                      <th scope="row"><%=index+1  %></th>
+                      <td>
+                  
+                          <ul class="list-group">
+                            <% for (let i = 0; i < order.ProductName.length; i++) { %>
+                              <li class="list-group-item d-flex justify-content-between align-items-center">
+                                <%= order.ProductName[i] %>
+                               
+
+                                <span class="badge bg-dark rounded-pill"> <%= order.Quantity[i] %></span>
+                              </li>
+                            <% } %>
+                          </ul>
+                      </td>
+                      <td><a href="/order_details?orderId=<%=order.OrderId %>"><%=order.OrderId %></a></td>
+                      <td><%=order.PaymentMethod  %></td>
+                      <td><%=order.Date  %></td>
+                      <td>₹<%=order.Price  %></td>
+                      
+                     
+                    </tr>
+            <%    }) %>
+                    
+                  </tbody>
+                </table>
+                
+            </div>
+          </div>
+            
+          
                 <div class="tab-pane fade" id="account-connections">
                   <div class="card-body">
                     <button type="button" class="btn btn-twitter">Connect to <strong>Twitter</strong></button>
@@ -433,6 +520,7 @@ html:not(.dark-style) .account-settings-links .list-group-item.active {
       </div>
     </div>
     
+   
 </body>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/sweetalert/2.1.2/sweetalert.min.js"></script>
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>

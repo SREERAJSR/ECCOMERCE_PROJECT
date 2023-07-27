@@ -1,0 +1,396 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        .gradient-custom-2 {
+/* fallback for old browsers */
+background:  #000000;
+
+/* Chrome 10-25, Safari 5.1-6 */
+/* background: -webkit-linear-gradient(to right, rgba(161, 196, 253, 1), rgba(194, 233, 251, 1)); */
+
+/* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
+/* background: linear-gradient(to right, rgba(161, 196, 253, 1), rgba(194, 233, 251, 1)) */
+}
+.modal {
+  z-index: 1050; /* Adjust the value as needed */
+}
+
+#progressbar-1 {
+color: #455A64;
+}
+
+#progressbar-1 li {
+list-style-type: none;
+font-size: 13px;
+width: 33.33%;
+float: left;
+position: relative;
+}
+
+#progressbar-1 #step1:before {
+content: "1";
+color: #fff;
+width: 29px;
+margin-left: 22px;
+padding-left: 11px;
+}
+
+#progressbar-1 #step2:before {
+content: "2";
+color: #fff;
+width: 29px;
+}
+
+#progressbar-1 #step3:before {
+content: "3";
+color: #fff;
+width: 29px;
+margin-right: 22px;
+text-align: center;
+}
+
+#progressbar-1 li:before {
+line-height: 29px;
+display: block;
+font-size: 12px;
+background: #455A64;
+border-radius: 50%;
+margin: auto;
+}
+
+#progressbar-1 li:after {
+content: '';
+width: 121%;
+height: 2px;
+background: #455A64;
+position: absolute;
+left: 0%;
+right: 0%;
+top: 15px;
+z-index: -1;
+}
+
+#progressbar-1 li:nth-child(2):after {
+left: 50%
+}
+
+#progressbar-1 li:nth-child(1):after {
+left: 25%;
+width: 121%
+}
+
+#progressbar-1 li:nth-child(3):after {
+left: 25%;
+width: 50%;
+}
+
+#progressbar-1 li.active:before,
+#progressbar-1 li.active:after {
+background: #000000;
+}
+
+.card-stepper {
+z-index: 2
+}
+    </style>
+    <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
+
+</head>
+<body>
+    <section class="vh-10 gradient-custom-2">
+        <div class="container py-5 h-100">
+          <div class="row d-flex justify-content-center align-items-center h-100">
+            <div class="col-md-10 col-lg-8 col-xl-6">
+              <div class="card card-stepper" style="border-radius: 16px;">
+                <div class="card-header p-4">
+                  <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                      <p class="text-muted mb-2"> Order ID <span class="fw-bold text-body"><%=orders[0].OrderId %></span></p>
+                      <p class="text-muted mb-0"> Placed On <span class="fw-bold text-body"><%=orders[0].Date %></span> </p>
+                    </div>
+                    <!-- <div>
+                      <h6 class="mb-0"> <a href="#">View Details</a> </h6>
+                    </div> -->
+                  </div>
+                </div>
+                <div class="card-body p-4">
+                    <% orders.forEach((order,index) => { %>
+                      <div class="d-flex flex-row mb-4 pb-2">
+                        <div class="flex-fill">
+                          <h5 class="bold"><%= order.ProductName  %></h5> 
+                          <p class="text-muted"> Qt: <%= order.Quantity %> Item</p>
+                          <h4 class="mb-3">₹ <%= order.Price  %><span class="small text-muted"> via (<%= order.PaymentMethod %>)</span></h4>
+                          <p class="badge rounded-pill alert-success"><%= order.Status  %></p>
+                          <div class="d-flex justify-content-start mt-3">
+                            <% if (order.Status==='Pending' ||  order.Status === 'Placed' || order.Status==='Shipped' ){ %>
+                              <button data-backdrop="false" class="btn btn-outline-danger"data-toggle="modal" data-target="#cancelModal<%= index %>" onclick="cancelOrder('<%=order.ProductId %>')"  >Cancel</button>
+                              <button class="btn btn-outline-primary"data-toggle="modal" data-target="#returnModal" data-productid="<%= order.ProductId %>" disabled  >Return</button>
+                            <% }else if(order.Status==='Returned' || order.Status==='Cancelled'){ %>
+                                <button data-backdrop="false" class="btn btn-outline-danger"data-toggle="modal" data-target="#cancelModal<%= index %>" onclick="cancelOrder('<%=order.ProductId %>')" disabled >Cancel</button>
+                            <button data-backdrop="false"  class="btn btn-outline-primary"data-toggle="modal" data-target="#returnModal<%= index %>" data-productid="<%= order.ProductId %>"  onclick="returnProduct('<%= order.ProductId %>')" disabled >Return</button>
+                                <% }else if(order.Status==='Delivered'){ %>
+                                  <button data-backdrop="false" class="btn btn-outline-danger"data-toggle="modal" data-target="#cancelModal<%= index %>" onclick="cancelOrder('<%=order.ProductId %>')" disabled >Cancel</button>
+                                  <button data-backdrop="false"  class="btn btn-outline-primary"data-toggle="modal" data-target="#returnModal<%= index %>" data-productid="<%= order.ProductId %>"  onclick="returnProduct('<%= order.ProductId %>')" >Return</button>
+                                  <% } %>
+                          </div>
+                        </div>
+                        <div>
+                          <img class="align-self-center img-fluid" src="/uploads/product_images/<%= order.ProductImages[0] %>" width="150">
+                        </div>
+                      </div>
+<!--cancellation modal-->
+                      <div class="modal fade" id="cancelModal<%= index %>" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                        <div class="modal-dialog" role="document">
+                          <div class="modal-content">
+                            <div class="modal-header">
+                             
+                            </div>
+                            <div class="modal-body">
+                          
+                                <div class="form-group">
+                                <b> <h3 for="recipient-name" class="col-form-label">Reason For cancelling </h3></b>  
+                                  <hr>
+                                  
+                                </div>
+                                
+                                <div class="form-group">
+                                  <label for="message-text" class="col-form-label">Reason:</label>
+                                  <textarea class="form-control reason-text" ></textarea>
+                                </div>
+                            
+                            </div>
+                            <div class="modal-footer">
+                              <button type="button" class="btn btn-outline-primary" data-dismiss="modal">Close</button>
+                              <button type="button" data-orderid="<%=order.OrderId%>" class="btn btn-outline-success submit-cancel" class="btn btn-primary">Submit</button>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+
+
+                       <!-- REturn modal-->
+      <div class="modal fade" id="returnModal<%= index %>" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+          <div class="modal-content">
+            <div class="modal-header">
+             
+            </div>
+            <div class="modal-body">
+          
+                <div class="form-group">
+                <b> <h3 for="recipient-name" class="col-form-label">Reason For return product </h3></b>  
+                  <hr>
+                  
+                </div>
+              
+                <div class="form-group">
+                  <label for="message-text" class="col-form-label">Reason:</label>
+                  <textarea class="form-control return_reason_text" ></textarea>
+                </div>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-outline-primary" data-dismiss="modal">Close</button>
+              <button type="button" data-orderid="<%=order.OrderId  %>" class="btn btn-primary submit-return">Submit</button>
+            </div>
+          </div>
+        </div>
+      </div>
+      <% if (order.Status==='Cancelled'){ %>
+      <ul id="progressbar-1" class="mx-0 mt-0 mb-5 px-0 pt-0 pb-4">
+        <li class="step0 active" id="step1"><span style="margin-left: 22px; margin-top: 12px;">PLACED</span></li>
+        <li class="step0 active text-center" id="step2"><span>Cancelled</span></li>
+        <li class="step0 text-muted text-end" id="step3"><span style="margin-right: 22px;">DELIVERED</span></li>
+
+      </ul>
+      <% }else if(order.Status==='Pending'){%>
+        <ul id="progressbar-1" class="mx-0 mt-0 mb-5 px-0 pt-0 pb-4">
+          <li class="step0 active" id="step1"><span style="margin-left: 22px; margin-top: 12px;">PLACED</span></li>
+          <li class="step0 text-center" id="step2"><span>SHIPPED</span></li>
+          <li class="step0 text-muted text-end" id="step3"><span style="margin-right: 22px;">DELIVERED</span></li>
+
+        </ul>
+
+
+        <%}else if(order.Status ==='Delivered') {  %>
+          <ul id="progressbar-1" class="mx-0 mt-0 mb-5 px-0 pt-0 pb-4">
+            <li class="step0 active" id="step1"><span style="margin-left: 22px; margin-top: 12px;">PLACED</span></li>
+            <li class="step0 active text-center" id="step2"><span>SHIPPED</span></li>
+            <li class="step0 active text-muted text-end" id="step3"><span style="margin-right: 22px;">DELIVERED</span></li>
+          </ul>
+
+
+          <% }else if(order.Status ==='Returned') {%>
+            <ul id="progressbar-1" class="mx-0 mt-0 mb-5 px-0 pt-0 pb-4">
+              <li class="step0 active" id="step1"><span style="margin-left: 22px; margin-top: 12px;">PLACED</span></li>
+              <li class="step0 active text-center" id="step2"><span>DELIVERED</span></li>
+              <li class="step0 active text-muted text-end" id="step3"><span style="margin-right: 22px;">RETURNED</span></li>
+
+            </ul>
+
+            <% }else{ %>
+              <ul id="progressbar-1" class="mx-0 mt-0 mb-5 px-0 pt-0 pb-4">
+                <li class="step0 active" id="step1"><span style="margin-left: 22px; margin-top: 12px;">PLACED</span></li>
+                <li class="step0 active text-center" id="step2"><span>Cancelled</span></li>
+                <li class="step0 text-muted text-end" id="step3"><span style="margin-right: 22px;">DELIVERED</span></li>
+              </ul>
+              <% } %>
+                    <% }) %>
+                  
+                   
+                  </div>
+                  
+                <!-- <div class="card-footer p-4">
+                  <div class="d-flex justify-content-between">
+                    <h5 class="fw-normal mb-0"><a href="#!">Track</a></h5>
+                    <div class="border-start h-100"></div>
+                    <h5 class="fw-normal mb-0"><a href="#!">Cancel</a></h5>
+                    <div class="border-start h-100"></div>
+                    <h5 class="fw-normal mb-0"><a href="#!">Pre-pay</a></h5>
+                    <div class="border-start h-100"></div>
+                    <h5 class="fw-normal mb-0"><a href="#!" class="text-muted"><i class="fas fa-ellipsis-v"></i></a>
+                    </h5>
+                  </div>
+                </div> -->
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+      <!-- cancelation modal-->
+      
+      
+    
+    
+</body>
+</html>
+
+<script>
+
+
+
+    function  cancelOrder(productId){
+  
+      console.log('haiiiii');
+        $(document).ready(()=>{
+                  console.log(productId);
+      $('.submit-cancel').on('click',function(){
+  
+      const  orderId= $(event.currentTarget).data('orderid')
+      console.log(orderId);
+      const reasonText =$('.reason-text').val()
+
+      console.log(reasonText);
+
+      swal({
+  title: "Are you sure to cancel this order?",
+  text: "",
+  icon: "warning",
+  buttons: true,
+  dangerMode: true,
+})
+.then((willDelete) => {
+  if (willDelete) {
+
+    $.ajax({
+
+        url:'/cancel_order',
+        method:'patch',
+        data:{
+            productId:productId,
+            reasonText:reasonText,
+            OrderId:orderId
+        },
+        success:(response)=>{
+
+            console.log(response);
+            swal("Poof! Your order is successfully cancelled", {
+      icon: "success",
+    });
+    location.reload()
+
+        },
+        error:(response)=>{
+            sweetAlert("Oops...", response.message, "error");
+        }
+    })
+
+   
+  } else {
+    swal("Your imaginary file is safe!");
+  }
+});
+
+
+  
+      })
+    })
+
+      }
+
+</script>
+
+<script>
+
+
+    function returnProduct(productId){
+
+        $(document).ready(()=>{
+
+      
+
+
+$('.submit-return').on('click',()=>{
+
+
+    const  orderId= $(event.currentTarget).data('orderid')
+      const reasonText =$('.return_reason_text').val()
+
+      swal({
+  title: "Are you sure to return this order?",
+  text: "",
+  icon: "warning",
+  buttons: true,
+  dangerMode: true,
+}).then((willDelete) => {
+  if (willDelete) {
+
+    $.ajax({
+
+        url:'/return_order',
+        method:'patch',
+        data:{
+            productId:productId,
+            reasonText:reasonText,
+            OrderId:orderId
+        },
+        success:(response)=>{
+
+            console.log(response);
+            swal("Poof! Your order is successfully returned", {
+      icon: "success",
+    });
+    location.reload()
+
+        },
+        error:(response)=>{
+            sweetAlert("Oops...", response.message, "error");
+        }
+    })
+
+   
+  } else {
+    swal("Your imaginary file is safe!");
+  }
+});
+
+     
+})
+        })
+
+    }
+</script>

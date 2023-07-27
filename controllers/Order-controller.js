@@ -148,25 +148,25 @@ module.exports={
             // Update the TotalAmount field by summing up the individual totals
             const totalAmount = cart.CartItems.reduce((sum, item) => sum + item.Total, 0);
             cart.SubTotal= totalAmount;
-// Check if any coupons are used by the user
-const UsedCoupons = await usedCoupon.findOne({ UserId: req.session.user._id });
+//   // Check if any coupons are used by the user
+// const UsedCoupons = await usedCoupon.findOne({ UserId: req.session.user._id });
 
-if (UsedCoupons && UsedCoupons.Coupons.length > 0) {
-  // Iterate over the used coupons and calculate the discount amount
-  let discountAmount = 0;
-  for (const couponCode of UsedCoupons.Coupons) {
-    const coupon = await Coupon.findOne({ CouponCode: couponCode });
-    if (coupon) {
-      const couponDiscount = (coupon.Discount / 100) * totalAmount;
-      discountAmount += couponDiscount;
-    }
-  }
-  // Subtract the discount amount from the FinalTotal
-  cart.FinalTotal = (totalAmount - discountAmount)+50;
-} else {
+// if (UsedCoupons && UsedCoupons.Coupons.length > 0) {
+//   // Iterate over the used coupons and calculate the discount amount
+//   let discountAmount = 0;
+//   for (const couponCode of UsedCoupons.Coupons) {
+//     const coupon = await Coupon.findOne({ CouponCode: couponCode });
+//     if (coupon) {
+//       const couponDiscount = (coupon.Discount / 100) * totalAmount;
+//       discountAmount += couponDiscount;
+//     }
+//   }
+//   // Subtract the discount amount from the FinalTotal
+//   cart.FinalTotal = (totalAmount - discountAmount)
+// } else {
   // If no coupons are used, set the FinalTotal same as the SubTotal
-  cart.FinalTotal = totalAmount+50;
-}
+  cart.FinalTotal = totalAmount +50 
+
 
             await cart.save(); 
 
@@ -221,7 +221,8 @@ if (UsedCoupons && UsedCoupons.Coupons.length > 0) {
     }
 
     // Update the FinalTotal by subtracting the deleted item's total
-    cart.FinalTotal -= deletedItemTotal;
+    cart.FinalTotal -= (deletedItemTotal);
+    cart.FinalTotal -=50
 
     // Save the updated cart document
     await cart.save();

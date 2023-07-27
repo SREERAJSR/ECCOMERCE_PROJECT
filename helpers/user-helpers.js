@@ -8,9 +8,11 @@ const { findCategory } = require("../helpers/product-helpers");
 const { categoryWiseFiltering } = require("../helpers/product-helpers");
 const bcrypt = require("bcrypt");;
 const Address = require('../models/addressSchema')
+const Wallet = require('../models/walletSchema')
 const Coupon = require("../models/couponSchema")
-
-
+const Order = require('../models/orderSchema')
+const mongoose = require('mongoose')
+const moment = require('moment')
 
 module.exports = {
 
@@ -27,8 +29,8 @@ module.exports = {
           .verifications.create({ to: "+91" + phone, channel: "sms" });
         //resolve();
       } catch (err) {
-      //   reject(err);
-       }
+      //   reject(err) ;
+       } 
      //});
   },
    validating:  (phone, otpcode) => {
@@ -123,6 +125,214 @@ module.exports = {
         reject(err)
       }
     })
+ 
+  },
+          gettingOrderDetails:(userId)=>{
+            return new Promise(async(resolve,reject)=>{
+              try{
+                
+                console.log(userId);
+                const orders = await Order.aggregate([{
+                  $match:{CustomerId:mongoose.Types.ObjectId.createFromHexString(userId)}
+              },{
+                $project: {
+                  _id: 0, // Exclude the default _id field from the result
+                  ProductName: '$Products.ProductName', // Get the product name
+                Quantity: '$Products.Quantity',
+                Price:'$TotalAmount',
+                Status:'$Products.Status',
+                Date:'$createdAt',
+                OrderId:'$OrderId',
+                PaymentMethod:'$PaymentMethod',
+                SalePrice:'$Products.Price'
 
+                } // Get the quantity
+              }])
+              orders.forEach((order) => {
+                order.Date = moment(order.Date).format('YYYY-MM-DD');
+              });
+        
+
+
+     if(!orders){
+      reject('no orders')
+     }
+      resolve(orders)
+     
+      }catch(err){
+        console.log(err);
+
+        reject(err)
+
+      }
+    })
+      
+  },
+  fetchOrderDetails:(orderId,userId)=>{
+
+    return new Promise(async(resolve,reject)=>{
+      try {
+
+        const orders =await Order.aggregate([{
+          $match:{
+            CustomerId:mongoose.Types.ObjectId.createFromHexString(userId),
+            OrderId:orderId
+          }
+        },{
+          $unwind:'$Products'
+        },{
+          $lookup:{
+            from:'products',
+            localField:'Products.ProductId',
+            foreignField:'_id',
+            as:'ProductInfo'
+          }
+        },{
+          $unwind:'$ProductInfo'
+
+        },{
+          $project:{
+            _id:null,
+            ProductName:'$Products.ProductName',
+            Quantity:'$Products.Quantity',
+            Price:{$multiply:['$Products.Quantity','$Products.Price']},
+            Status:'$Products.Status',
+            ProductImages:'$ProductInfo.ProductImages',
+            PaymentMethod:'$PaymentMethod',
+            Date:'$createdAt',
+            OrderId:'$OrderId',
+            TotalAmount:'$TotalAmount',
+            ProductId:'$ProductInfo._id'         
+          }
+        }
+     ])
+     orders.forEach((order) => {
+      order.Date = moment(order.Date).format('YYYY-MM-DD');
+    });
+   
+    console.log(orders);
+    if(!orders){
+      reject('no orders')
+
+    }
+    resolve(orders)
+        
+
+        
+      } catch (error) {
+
+        console.log(error);
+        reject(error)
+        
+      }
+    })
+  },
+  orderCancelChangeStatus:(productId,reasonText,userId,OrderId)=>{
+    return new Promise(async(resolve, reject) => {
+      
+      try {
+
+        const user = await User.findById(userId)
+
+        
+      const order = await Order.findOne({CustomerId:userId,
+      OrderId:OrderId})
+        
+      if(!order){
+        reject('No orders found for the user.');
+        return;
+      }
+     
+      let found = false;
+      const targetProductId = mongoose.Types.ObjectId.createFromHexString(productId);
+let Price;
+      order.Products.forEach((item) => {
+        if (item.ProductId.equals(targetProductId)) {
+          item.Status = 'Cancelled';
+          item.reasonForCancellation=reasonText;
+          found = true;
+           Price= item.Price
+        }
+      });
+      if(!found){
+        reject('Product not found in the order.');
+        return;
+      }
+
+      if(order.PaymentMethod==='Razor pay'){
+        const wallet = await Wallet.findOne({ User: userId });
+
+        if(!wallet){
+
+       const  newWallet = new Wallet({
+            User:userId,
+            Balance:Number(Price),
+          })
+          user.Wallet =Number(Price)
+
+         await  newWallet.save()
+        }else{
+          console.log('order.Price:', Price);
+          wallet.Balance += Number(Price);
+          console.log('wallet.Balance:', wallet.Balance);
+          await wallet.save()
+          user.Wallet = wallet.Balance
+        }
+      }
+      await user.save()
+      await order.save();
+      resolve('Order status updated successfully.');
+      } 
+      catch (error) {
+console.log(error);
+        reject(error)
+        
+      }
+    })
+  },
+  orderReturnChangeStatus:(productId,reasonText,OrderId,userId)=>{
+
+    return new Promise(async(resolve, reject) => {
+      
+      try {
+
+        const order = await Order.findOne({CustomerId:userId,
+        OrderId:OrderId})
+          
+        if(!order){
+          reject('No orders found for the user.');
+          return;
+        }
+       
+        let found = false;
+        const targetProductId = mongoose.Types.ObjectId.createFromHexString(productId);
+  
+        order.Products.forEach((item) => {
+          if (item.ProductId.equals(targetProductId)) {
+            if(item.Status==='Delivered'){
+              item.Status = 'Returned';
+              item.reasonForReturn=reasonText;
+              found = true;
+
+            }else{
+              reject('product is not delivered')
+            }
+          }
+        });
+        if(!found){
+          reject('Product not found in the order.');
+          return;
+        }
+  
+        await order.save();
+        resolve('Order status updated successfully.');
+        } 
+        catch (error) {
+  console.log(error);
+          reject(error)
+          
+        }
+    })
   }
+
 };

@@ -13,10 +13,9 @@ module.exports={
     res.redirect('/login')
         }
     },
-authenticateAdmin:((req,res,next)=>{
+authenticateAdmin:((req,res,next)=>{ 
 
     if(req.session.admin){
-       
         next()
     }else{
 

@@ -16,7 +16,9 @@ const {fetchAllPlacedOrder,
   GetTotalRevenue,
   GetMonthlyTotalOrderCount,
   GetMonthlyTotalPlacedOrderCount,
-  GetMontlyTotalPendingOrderCount} = require('../helpers/admin-helpers')
+  GetMontlyTotalPendingOrderCount,
+  fetchOrdersList,
+  fetchOrderDetailsFromAdmin} = require('../helpers/admin-helpers')
 
 module.exports = {
 
@@ -26,7 +28,6 @@ module.exports = {
   },
 
         loginAdmin:async(req,res)=>{
-
           try{
             const{UserName,password}= req.body
 
@@ -75,12 +76,14 @@ module.exports = {
           const orderCount = await GetOrderCount();
           const productsCount = await GetProductsCount();
           const totalRevenue = await GetTotalRevenue();
-          const total = totalRevenue[0];
           const  response = await GetMonthlyTotalOrderCount()
           const {months,monthlyTotalOrderCount} = response
-           const result = await GetMonthlyTotalPlacedOrderCount()
-     const{monthlyTotalPlacedCount} = result
-     const monthlyTotalPendingCount = await GetMontlyTotalPendingOrderCount()
+          const result = await GetMonthlyTotalPlacedOrderCount()
+          const{monthlyTotalPlacedCount} = result
+          const monthlyTotalPendingCount = await GetMontlyTotalPendingOrderCount()
+          const total = totalRevenue;
+
+          console.log('dd', total);
 
           res.render("admin/dashboard", { admin: true, userCount, orderCount, productsCount, total ,months,monthlyTotalOrderCount ,monthlyTotalPlacedCount,monthlyTotalPendingCount});
           }else{
@@ -178,6 +181,57 @@ module.exports = {
         res.status(400).json({error:err})
 
       })
+    }
+
+  },
+  getAdminOrderListPage:(req,res)=>{
+
+    try{
+
+      if(req.session.admin){ 
+        fetchOrdersList().then((ordersList)=>{
+    
+          res.render('admin/admin-order-list',{admin:true,ordersList})
+        }).catch((err)=>{
+          res.render('error',{message:err})
+        })
+      }else{
+        res.redirect('/admin/admin-login')
+      }
+    }catch(err){
+      console.log(err);
+      res.render('error',{message:err})
+    }
+  }
+
+  ,
+  getAdminOrderDetailPage:async(req,res)=>{
+
+    try {
+      if(req.session.admin){
+
+        const{orderId}= req.query
+
+        fetchOrderDetailsFromAdmin(orderId).then((orders)=>{
+
+          
+          res.render('admin/admin-order-detail',{admin:true,orders})
+
+        }).catch((err)=>{
+          console.log(err);
+
+          res.render('error',{message:err})
+
+          
+        })
+      }else{
+        res.redirect('/admin/admin-login')
+      }
+      
+    } catch (error) {
+console.log(error);
+      res.render('error',{message:error})
+      
     }
 
   }

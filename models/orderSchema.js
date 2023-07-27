@@ -38,11 +38,17 @@ const  orderSchema = mongoose.Schema({
             type:Number,
           
         },
-        Status:{
+        Status:{    
             type:String,
-            enum:['Pending','Placed','Shipped','Delivered'],
+            enum:['Pending','Placed','Shipped','Delivered','Cancelled', 'Returned'],
             default:'Pending'
-        }
+        },
+        reasonForCancellation: {
+            type: String,
+          },
+          reasonForReturn:{
+            type:String
+          }
     }],
 
     TotalAmount:{
@@ -65,6 +71,7 @@ const  orderSchema = mongoose.Schema({
         type:mongoose.Schema.Types.ObjectId,
         ref:'User'
     }
+   
 
 })
 

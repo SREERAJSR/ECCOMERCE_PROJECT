@@ -217,7 +217,7 @@ module.exports={
             } else {
               cart.CartItems = [];
               cart.SubTotal = 0;
-              cart.FinalTotal = 0;
+              cart.FinalTotal = 0
               await cart.save();
               resolve('Cart items deleted successfully');
             }
@@ -225,7 +225,7 @@ module.exports={
             reject(error);
           }
         });
-      }
+      },
       
 
 

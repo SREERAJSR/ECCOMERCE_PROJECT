@@ -33,6 +33,11 @@ const userSchema = new mongoose.Schema({
   DefaultAddress:{
     type:mongoose.Schema.Types.ObjectId,
     ref:'Address'
+  },
+  Wallet:{
+    type:Number,
+    ref:'Wallet',
+    default:0
   }
 }, {
   versionKey: false,

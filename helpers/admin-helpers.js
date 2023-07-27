@@ -305,7 +305,7 @@ module.exports={
                         $group:{
 
                             _id:null,
-                            TotalRevnue:{
+                            TotalRevenue:{
                                 $sum:'$TotalAmount'
                             }
                         }
@@ -313,7 +313,12 @@ module.exports={
   
                 ])
 
-                resolve(TotalRevenue)
+                if(TotalRevenue.length===0){
+                    resolve({TotalRevenue:0})
+                }else{
+
+                    resolve(TotalRevenue[0])
+                }
 
              
                 
@@ -479,7 +484,117 @@ const months = [
             }
 
         })
-    }
+    },
+    fetchOrdersList:()=>{
+        return new Promise(async(resolve, reject) => {
+
+            try {
+                const ordersList = await Order.find().sort({ createdAt: -1 });
+
+                ordersList.forEach((order) => {
+                    order.createdAt = moment(order.createdAt).format('YYYY-MM-DD');
+                  });
+
+            if(!ordersList){
+                reject(ordersList)
+            }
+            resolve(ordersList)
+                
+            } catch (error) {
+                console.log(error);
+
+                reject(error)
+                
+            }
+            
+
+        })
+    },
+
+    fetchOrderDetailsFromAdmin:(orderId)=>{
+
+        return new Promise(async(resolve,reject)=>{
+          try {
+    
+            const orders =await Order.aggregate([{
+              $match:{
+                OrderId:orderId
+              }
+            },{
+              $unwind:'$Products'
+            },{
+              $lookup:{
+                from:'products',
+                localField:'Products.ProductId',
+                foreignField:'_id',
+                as:'ProductInfo'
+              }
+            },
+            {
+            $lookup:{
+                from:'addresses',
+                localField:'ShippingAddress',
+                foreignField:'_id',
+                as:'AddressInfo'
+            }
+            },{
+                $lookup:{
+                    from:'users',
+                    localField:'CustomerId',
+                    foreignField:'_id',
+                    as:'UserInfo'
+                }
+
+            },
+            {
+                $unwind:'$ProductInfo'   
+            },
+            {
+                $unwind:'$AddressInfo'
+            },
+            {
+                $unwind:'$UserInfo'
+
+            },
+            {
+                $project:{
+                  _id:null,
+                  ProductName:'$Products.ProductName',
+                  Quantity:'$Products.Quantity',
+                  UnitPrice:'$Products.Price',
+                  Price:{$multiply:['$Products.Quantity','$Products.Price']},
+                  Status:'$Products.Status',
+                  ProductImages:'$ProductInfo.ProductImages',
+                  PaymentMethod:'$PaymentMethod',
+                  Date:'$createdAt',
+                  OrderId:'$OrderId',
+                  TotalAmount:'$TotalAmount',
+                  ProductId:'$ProductInfo._id',
+                  Adress:'$AddressInfo',
+                  CustomerName:'$UserInfo.Name',
+                  CustomerInfo:'$UserInfo'
+                }
+              }
+  
+         ])
+         orders.forEach((order) => {
+          order.Date = moment(order.Date).format('YYYY-MM-DD');
+        });
+       
+        console.log(orders);
+        if(!orders){
+          reject('no orders')
+    
+        }
+        resolve(orders)
+          } catch (error) {
+    
+            console.log(error);
+            reject(error)
+            
+          }
+        })
+      }
 
 
 }

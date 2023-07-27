@@ -3,7 +3,9 @@
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 <script src="/javascripts/sweetalert2.all.js"></script><!-- jQuery Core -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js"></script>
-        <section class="content-main">
+
+<!-- Include required JavaScript libraries -->
+      <section class="content-main">
             <div class="content-header">
                 
                 <div class="row gx-3 " style="justify-content: space-evenly;">
@@ -32,9 +34,19 @@
                             <label for="">Date</label>
                             <input id="Sale_Date" type="date" placeholder="" class="form-control">
                         </div>
-                        <div class="col-lg-4 col-md-6 d-flex align-items-center">
+                        <div class="col-lg-4 col-md-4 d-flex align-items-center">
                             <div class="text-center">
                               <a href="#" class="btn btn-primary" id="apply_btn"><i class="text-muted material-icons "></i>Apply</a>
+                            </div>
+                        </div>
+                        <div class="col-lg-4 col-md-6 d-flex align-items-center">
+                            <div class="text-center">
+                                <a href="#" class="btn btn-primary" id="download-csv-btn1" >
+                                    DOWNLOAD  CSV
+                                   </a>
+                                   <a href="#" class="btn btn-primary" id="download-pdf-btn1" >
+                                       DOWNLOAD   PDF
+                                   </a>
                             </div>
                         </div>
                     </div>
@@ -48,8 +60,20 @@
                         <div class="col-lg-4 col-md-6 d-flex align-items-center">
                             <div class="text-center">
                               <a href="#" class="btn btn-primary" id="Monthly_apply_btn"><i class="text-muted material-icons "></i>Apply</a>
+                               
                             </div>
                         </div>
+                        <div class="col-lg-4 col-md-6 d-flex align-items-center">
+                            <div class="text-center">
+                                <a href="#" class="btn btn-primary" id="download-csv-btn2" >
+                                    DOWNLOAD  CSV
+                                   </a>
+                                   <a href="#" class="btn btn-primary" id="download-pdf-btn2" >
+                                    DOWNLOAD   PDF
+                                   </a>                               
+                            </div>
+                        </div>
+            
                     </div>
                 </header> 
                     <header class="card-header">
@@ -64,14 +88,27 @@
                         <div class="col-lg-4 col-md-6 d-flex align-items-center">
                             <div class="text-center">
                             <a href="#" class="btn btn-primary" id="yearly_apply_btn"><i class="text-muted material-icons"></i>Apply</a>
+                          
                             </div>
                         </div>
+                        <div class="col-lg-4 col-md-6 d-flex align-items-center">
+                            <div class="text-center">
+                                <a href="#" class="btn btn-primary" id="download-csv-btn3" >
+                                  DOWNLOAD  CSV
+                                   </a>
+                                   <a href="#" class="btn btn-primary" id="download-pdf-btn3"   >
+                                    DOWNLOAD   PDF
+                                   </a>                          
+                            </div>
+                        </div>
+
+                       
                         </div>
                     </header>
                   
                 <div class="card-body">
                     <div class="table-responsive">
-                        <table class="table table-hover">
+                        <table class="table table-hover" id="table-data">
                             <thead>
 
                                 <tr>
@@ -119,8 +156,120 @@
                     </ul>
                 </nav>
             </div>
-        </section> <!-- content-main end// -->
-    
+        </section> 
+        <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.5.0/papaparse.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.66/pdfmake.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.66/vfs_fonts.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+<script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
+  
+<script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.66/pdfmake.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.66/vfs_fonts.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+
+        
+        <!-- content-main end// -->
+        <script>
+            // Function to convert table data to CSV format
+            function convertToCSV() {
+              const tableBody = document.getElementById("table-body");
+              const rows = Array.from(tableBody.getElementsByTagName("tr"));
+              const csvRows = [];
+          
+              rows.forEach((row) => {
+                const cells = Array.from(row.getElementsByTagName("td"));
+                const csvValues = cells.map((cell) => cell.innerText);
+                const csvRow = csvValues.join(",");
+                csvRows.push(csvRow);
+              });
+          
+              return csvRows.join("\n");
+            }
+          
+            // Function to download table data as CSV
+            function downloadCSV() {
+              const csvContent = "data:text/csv;charset=utf-8," + encodeURIComponent(convertToCSV());
+              const a = document.createElement("a");
+              a.href = csvContent;
+              a.download = "table_data.csv";
+              a.click();
+            }
+          
+            // Function to download table data as PDF
+            function downloadPDF() {
+              const element = document.getElementById("table-data"); // Update the id to "table-data"
+          
+              html2pdf()
+                .from(element)
+                .set({ filename: "table_data.pdf", margin: 10 })
+                .save();
+            }
+          
+            // Event listeners for the download buttons
+            document.getElementById("download-csv-btn1").addEventListener("click", function () {
+              swal({
+                title: "Downloading CSV...",
+                icon: "success",
+                buttons: false,
+                timer: 1500,
+              });
+              downloadCSV();
+            });
+          
+            document.getElementById("download-pdf-btn1").addEventListener("click", function () {
+              swal({
+                title: "Downloading PDF...",
+                icon: "success",
+                buttons: false,
+                timer: 1500,
+              });
+              downloadPDF();
+            });
+             // Event listeners for the download buttons
+             document.getElementById("download-csv-btn2").addEventListener("click", function () {
+              swal({
+                title: "Downloading CSV...",
+                icon: "success",
+                buttons: false,
+                timer: 1500,
+              });
+              downloadCSV();
+            });
+          
+            document.getElementById("download-pdf-btn2").addEventListener("click", function () {
+              swal({
+                title: "Downloading PDF...",
+                icon: "success",
+                buttons: false,
+                timer: 1500,
+              });
+              downloadPDF();
+            });
+             // Event listeners for the download buttons
+             document.getElementById("download-csv-btn3").addEventListener("click", function () {
+              swal({
+                title: "Downloading CSV...",
+                icon: "success",
+                buttons: false,
+                timer: 1500,
+              });
+              downloadCSV();
+            });
+          
+            document.getElementById("download-pdf-btn3").addEventListener("click", function () {
+              swal({
+                title: "Downloading PDF...",
+                icon: "success",
+                buttons: false,
+                timer: 1500,
+              });
+              downloadPDF();
+            });
+          </script>
+               
+
 
     
         <script>
@@ -307,3 +456,5 @@ console.log(year);
 
 })
         </script>
+
+ 
