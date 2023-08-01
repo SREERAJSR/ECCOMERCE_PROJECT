@@ -18,7 +18,8 @@ const {fetchAllPlacedOrder,
   GetMonthlyTotalPlacedOrderCount,
   GetMontlyTotalPendingOrderCount,
   fetchOrdersList,
-  fetchOrderDetailsFromAdmin} = require('../helpers/admin-helpers')
+  fetchOrderDetailsFromAdmin,
+  changeOrderItemStatusFromAdmin} = require('../helpers/admin-helpers')
 
 module.exports = {
 
@@ -27,37 +28,48 @@ module.exports = {
     res.render("admin/admin-login", { admin_login: true ,loggedErr:false});
   },
 
-        loginAdmin:async(req,res)=>{
-          try{
-            const{UserName,password}= req.body
-
-            const admin =await Admin.findOne({Username:UserName})
-
-              if(!admin){
-                const  passwordErr='invalid password'
-                const  userNameErr='invalid username'
-              res.render('admin/admin-login',{userNameErr,admin_login:true,loggedErr:true})
-              }
-              else{
-                const passwordMatch =await  bcrypt.compare(password,admin.Password)
-
-                if(passwordMatch){
-                  req.session.admin=true
-                return res.redirect('/admin')
-                }else{
-                  const  passwordErr='invalid password'
-                  const  userNameErr='invalid username'
-                res.render('admin/admin-login',{passwordErr,admin_login:true,loggedErr:true})
-                
-                }
-              }
-      
-          }catch(err){
-            console.error('Error finding admin:', err);
-          res.status(500).json({ error: 'Internal server error' +err});
-
-          }   
-      },
+  loginAdmin: async (req, res) => {
+    try {
+      const { UserName, password } = req.body;
+  
+      const admin = await Admin.findOne({ Username: UserName });
+      if (!admin) {
+        const saltRounds = 10;
+        const hashedPassword = await bcrypt.hash(password, saltRounds);
+  
+        const newAdmin = new Admin({
+          Username: UserName,
+          Password: hashedPassword
+        });
+  
+        await newAdmin.save();
+  
+        // Successfully created a new admin
+        req.session.admin = true;
+        res.render('admin/admin-login', { admin_login: true, admin: true });
+      } else {
+        const passwordMatch = await bcrypt.compare(password, admin.Password);
+        if (passwordMatch) {
+          // Password matches, log in the admin
+          req.session.admin = true;
+          res.render('admin/dashboard', { admin_login: true,admin:true});
+        } else {
+          // Password doesn't match
+          const passwordErr = 'Invalid password';
+          const userNameErr = 'Invalid username';   
+          res.render('admin/admin-login', {
+            passwordErr,
+            admin_login: true,
+            loggedErr: true
+          });
+        }
+      }
+    } catch (error) {
+      console.log(error);
+      res.status(500).json({ message: 'An error occurred while logging in.' });
+    }
+  },
+  
       logoutAdmin:(req,res)=>{
  
         if(req.session.admin){
@@ -234,6 +246,26 @@ console.log(error);
       
     }
 
+  },
+  changeOrderItemStatus:async(req,res)=>{
+    try {
+const{ProductId,OrderId,newStatus,customerId,paymentStatus} = req.body
+
+changeOrderItemStatusFromAdmin(ProductId,OrderId,newStatus,customerId,paymentStatus).then((response)=>{
+
+  console.log(response);
+
+  res.status(200).json({status:true,message:response})
+}).catch((err)=>{
+  console.log(err);
+  res.status(500).json({ status: false, message: err }); // Sending an error response in case of rejection
+
+})
+    } catch (error) {
+      console.log(error);
+      res.status(500).json({ status: false, message: 'An unexpected error occurred.' });
+
+    }
   }
 
  

@@ -614,6 +614,8 @@
       qty:quantity},
 
       success:(response)=>{
+
+console.log(response)
         Swal.fire({
           position: "top-end",
           icon: "success",
@@ -625,6 +627,12 @@
 
       },
       error:(xhr, status, error)=>{
+
+       if(xhr.status ===400){
+
+        sweetAlert("Out of stock", "", "error");
+
+       }
         if (xhr.status === 500) {
       // User is not authenticated, redirect to the login page
       window.location.href = '/login';

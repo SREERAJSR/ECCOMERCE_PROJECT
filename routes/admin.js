@@ -11,7 +11,8 @@ const {
   getSalesReportPage,
   fetchingSalesReport,
   getAdminOrderListPage,
-  getAdminOrderDetailPage
+  getAdminOrderDetailPage,
+  changeOrderItemStatus
 } = require("../controllers/admin-controller");
 
 const {
@@ -31,7 +32,9 @@ const {
   getUnlistProductPage,
   changeProductStatus,
   getCouponPage,
-  addingCoupon
+  addingCoupon,
+  getInventoryManagementPage,
+  changeInventoryStatus
 } = require("../controllers/product-controller");
 
 // const upload = require("../middlewares/multer-config")
@@ -41,7 +44,7 @@ const  {uploadProduct,uploadCategory} = require("../middlewares/multer-config");
 
 router.get('/admin-login',authenticateForLogin, getLoginPage)
 
-router.get("/",getDashBoardPage)
+router.get("/", authenticateAdmin,getDashBoardPage)
 router.post('/admin-login',loginAdmin)
 
 
@@ -51,7 +54,7 @@ router.get("/user-manage",authenticateAdmin, findUser_info);
 
 router.patch("/userManage",authenticateAdmin, changeUserStatus);
 
-router.get("/add-product", getaddProducts); 
+router.get("/add-product", authenticateAdmin, getaddProducts); 
 
 router.post("/add-product",authenticateAdmin, uploadProduct.array("images", 4), addingProducts);
 
@@ -71,6 +74,10 @@ router.get("/category",authenticateAdmin, getCategoryPage);
 
 router.get("/list-products",authenticateAdmin, getListProductPage);
 
+router.get('/inventory_manage', authenticateAdmin,getInventoryManagementPage)
+
+router.patch('/inventory_manage', authenticateAdmin,changeInventoryStatus)
+
 router.get("/edit-product",authenticateAdmin, getEditProductPage);
 
 router.post("/edit-product", authenticateAdmin,uploadProduct.array("images", 4), editProductAndSave);
@@ -81,17 +88,21 @@ router.get("/unlist-product",authenticateAdmin,getUnlistProductPage)
 
 router.patch('/unlistproduct',authenticateAdmin,changeProductStatus)
 
-router.get('/add-coupon',getCouponPage)
+router.get('/add-coupon',authenticateAdmin,getCouponPage)
 
-router.post('/add-coupon',addingCoupon)
+router.post('/add-coupon',authenticateAdmin,addingCoupon)
 
-router.get('/sales_report',getSalesReportPage)
+router.get('/sales_report',authenticateAdmin,getSalesReportPage)
 
-router.post('/sales_report',fetchingSalesReport)
+router.post('/sales_report',authenticateAdmin,fetchingSalesReport)
 
-router.get('/order_list',getAdminOrderListPage)
+router.get('/order_list',authenticateAdmin,getAdminOrderListPage)
 
-router.get('/order_details',getAdminOrderDetailPage)
+router.get('/order_details',authenticateAdmin,getAdminOrderDetailPage)
+
+
+router.patch('/change_Order_Status',authenticateAdmin,changeOrderItemStatus)
+
 
 
 module.exports = router;

@@ -151,8 +151,9 @@ module.exports = {
               orders.forEach((order) => {
                 order.Date = moment(order.Date).format('YYYY-MM-DD');
               });
-        
-
+              // Sort the orders array in descending order based on the Date field
+      orders.sort((a, b) => new Date(b.Date) - new Date(a.Date));
+              
 
      if(!orders){
       reject('no orders')
@@ -248,7 +249,7 @@ module.exports = {
 let Price;
       order.Products.forEach((item) => {
         if (item.ProductId.equals(targetProductId)) {
-          item.Status = 'Cancelled';
+          item.Status = 'Cancel request';
           item.reasonForCancellation=reasonText;
           found = true;
            Price= item.Price
@@ -259,27 +260,27 @@ let Price;
         return;
       }
 
-      if(order.PaymentMethod==='Razor pay'){
-        const wallet = await Wallet.findOne({ User: userId });
+      // if(order.PaymentMethod==='Razor pay'){
+      //   const wallet = await Wallet.findOne({ User: userId });
 
-        if(!wallet){
+      //   if(!wallet){
 
-       const  newWallet = new Wallet({
-            User:userId,
-            Balance:Number(Price),
-          })
-          user.Wallet =Number(Price)
+      //  const  newWallet = new Wallet({
+      //       User:userId,
+      //       Balance:Number(Price),
+      //     })
+      //     user.Wallet =Number(Price)
 
-         await  newWallet.save()
-        }else{
-          console.log('order.Price:', Price);
-          wallet.Balance += Number(Price);
-          console.log('wallet.Balance:', wallet.Balance);
-          await wallet.save()
-          user.Wallet = wallet.Balance
-        }
-      }
-      await user.save()
+      //    await  newWallet.save()
+      //   }else{
+      //     console.log('order.Price:', Price);
+      //     wallet.Balance += Number(Price);
+      //     console.log('wallet.Balance:', wallet.Balance);
+      //     await wallet.save()
+      //     user.Wallet = wallet.Balance
+      //   }
+      // }
+      // await user.save()
       await order.save();
       resolve('Order status updated successfully.');
       } 
@@ -310,7 +311,7 @@ console.log(error);
         order.Products.forEach((item) => {
           if (item.ProductId.equals(targetProductId)) {
             if(item.Status==='Delivered'){
-              item.Status = 'Returned';
+              item.Status = 'Return request';
               item.reasonForReturn=reasonText;
               found = true;
 

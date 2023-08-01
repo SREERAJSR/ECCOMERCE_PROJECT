@@ -3,6 +3,7 @@ const Order = require('../models/orderSchema')
 const User = require('../models/userSchema')
 const Product = require('../models/productSchema')
 const moment = require('moment')
+const Wallet = require('../models/walletSchema')
 
 module.exports={
     fetchAllPlacedOrder:()=>{
@@ -12,7 +13,7 @@ module.exports={
                    $unwind:'$Products'
                 },{
                     $match:{
-                        'Products.Status':'Placed'
+                        'Products.Status':'Delivered'
                     }
                 }])
 
@@ -56,7 +57,7 @@ module.exports={
             },
             {
                 $match:{
-                    'Products.Status':'Placed'
+                    'Products.Status':'Delivered'
                 }
             }
            
@@ -67,7 +68,7 @@ module.exports={
                         createdAt:{
                             $gte: new Date(date),
                             $lt : new Date(date+ 'T23:59:59Z')
-                        },'Products.Status':'Placed'
+                        },'Products.Status':'Delivered'
                     }
                 },
                 {
@@ -116,14 +117,14 @@ module.exports={
 
                     $gte: startDate,
                     $lt : endDate
-                },'Products.Status':'Placed'
+                },'Products.Status':'Delivered'
             }
         }, {
                 $unwind:'$Products'
             },
             {
                 $match:{
-                    'Products.Status':'Placed'
+                    'Products.Status':'Delivered'
                 }
             }
         
@@ -135,7 +136,7 @@ module.exports={
                         createdAt:{
                             $gte: startDate,
                             $lt :endDate
-                        },'Products.Status':'Placed'
+                        },'Products.Status':'Delivered'
                     }
                 },
                 {
@@ -177,7 +178,7 @@ module.exports={
                             $gte: new Date(`${year}-01-01`),
                             $lt: new Date(`${Number(year) + 1}-01-01`)
                         },
-                        'Products.Status':'Placed'
+                        'Products.Status':'Delivered'
                     }
                 },
                 {
@@ -185,7 +186,7 @@ module.exports={
                 },
                 {
                     $match:{
-                        'Products.Status' :'Placed'
+                        'Products.Status' :'Delivered'
                     }
                 }
 
@@ -196,7 +197,7 @@ module.exports={
                         createdAt:{
                             $gte: new Date(`${year}-01-01`),
                             $lt : new Date(`${Number(year + 1)}-01-01`)
-                        },'Products.Status':'Placed'
+                        },'Products.Status':'Delivered'
                     }
                 },
                 {
@@ -572,7 +573,10 @@ const months = [
                   ProductId:'$ProductInfo._id',
                   Adress:'$AddressInfo',
                   CustomerName:'$UserInfo.Name',
-                  CustomerInfo:'$UserInfo'
+                  CustomerInfo:'$UserInfo',
+                  Reason:'$Products.reasonForCancellation',
+                  ProductId:'$Products.ProductId'
+
                 }
               }
   
@@ -593,6 +597,66 @@ const months = [
             reject(error)
             
           }
+        })
+      },
+      changeOrderItemStatusFromAdmin:(ProductId,OrderId,newStatus,customerId,paymentStatus)=>{
+        return new Promise(async(resolve, reject) => {
+
+            try {
+                const userOrder = await Order.findOne({CustomerId:customerId,
+                OrderId:OrderId})
+                const user = await User.findById(customerId)
+
+                
+            if(!userOrder){
+                reject('no order for this user')
+            }
+
+            console.log(ProductId)
+            
+            console.log(userOrder,'aaaaa');;
+
+            const productToUpdate = userOrder.Products.find(item => item.ProductId.equals(ProductId));
+            let Price  = productToUpdate.Price * productToUpdate.Quantity
+           
+            if (!productToUpdate) {
+                return reject('Product not found in the order');
+              }          
+              if(newStatus==='Returned' || (newStatus==='Cancelled' && paymentStatus==='Razor pay') ){
+
+                const product = await Product.findById(ProductId)
+                product.StockQuantity += productToUpdate.Quantity
+                  const wallet = await Wallet.findOne({ User: customerId });
+                  if(!wallet){
+                const  newWallet = new Wallet({
+                    User:customerId,
+                    Balance:Number(Price),
+                  })
+                  user.Wallet =Number(Price)
+
+                 await  newWallet.save()
+                }else{
+                  console.log('order.Price:', Price);
+                  wallet.Balance += Number(Price);
+                  console.log('wallet.Balance:', wallet.Balance);
+                  await wallet.save()
+                  user.Wallet = wallet.Balance
+                
+              }
+              await product.save();
+            }
+              await user.save()
+              productToUpdate.Status = newStatus;
+              await userOrder.save();
+              resolve('Order item status updated successfully');
+                
+            } catch (error) {
+                console.log(error);
+                reject(error)
+                
+            }
+            
+            
         })
       }
 

@@ -45,7 +45,7 @@
                         <tr>
                             <td><%= index+1 %></td>
                             <td><b><%=order.OrderId  %></b></td>
-                            <td><%=order.TotalAmount  %></td>
+                            <td>₹<%=order.TotalAmount  %></td>
                             <td><%=order.createdAt  %></td>
                             <td class="text-end">
                                 <a href="/admin/order_details?orderId=<%=order.OrderId  %>" class="btn btn-md rounded font-sm">Detail</a>

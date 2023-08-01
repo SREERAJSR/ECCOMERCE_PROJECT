@@ -112,7 +112,7 @@
 												<i class="fs-16 zmdi zmdi-minus"></i>
 											</div>
 									
-											<input class="mtext-104 cl3 txt-center num-product" id="qty-<%= item._id %>" data-cartId="<%= item._id %>" type="number" name="num-product1" value="<%= item.Quantity %>">
+											<input class="mtext-104 cl3 txt-center num-product" id="qty-<%= item._id %>" data-cartId="<%= item._id %>" data-productid="<%=item.ProductId._id  %>" type="number" name="num-product1" value="<%= item.Quantity %>">
 									
 											<div class="btn-num-product-up cl8 hov-btn3 trans-04 flex-c-m">
 												<i class="fs-16 zmdi zmdi-plus"></i>
@@ -120,14 +120,14 @@
 											</div>
 										</td>
 									<!-- Update the "trash" icon code -->
-									<td  class="column-5"><i class="fas fa-trash"  data-cartid="<%= item._id %>"></i></td>
+									<td  class="column-5"><i class="fas fa-trash" data-productid="<%=item.ProductId._id   %>"  data-cartid="<%= item._id %>"></i></td>
 										<td class="column-6  total-price-<%= item._id %>">₹<%= item.Total %></td>
 										</tr>
 									<% }) %>
 									
 								</table>
 							</div>
-							<% var coupons  %>
+							
 							<!-- <div class="flex-w flex-sb-m bor15 p-t-18 p-b-15 p-lr-40 p-lr-15-sm"> -->
 									<!-- <div class="flex-w flex-m m-r-20 m-tb-5"> -->
 									
@@ -135,9 +135,7 @@
 										<!-- <select id="coupon-select" class="stext-104 cl2 plh4 size-117 bor13 p-lr-20 m-r-10 m-tb-5" name="coupon">
 										<option value="">Select a coupon</option> -->
 									
-										<!-- <% coupons.forEach((coupon)=>{ %>
-										<option value="<%=coupon.CouponCode  %>" ><%= coupon.CouponCode %></option>
-										<%	}) %> -->
+										
 												<!-- Add more options for each available coupon -->
 									<!-- </select>	
 									<div id="apply-coupon" class="flex-c-m stext-101 cl2 size-118 bg8 bor13 hov-btn3 p-lr-15 trans-04 pointer m-tb-5">
@@ -220,26 +218,32 @@
 		<script>
 			$(document).ready(function() {
 
-			$('.btn-num-product-down').on('click', function(){
+		$('.btn-num-product-down').on('click', function(){
 		var numProduct = Number($(this).next().val());
 		const quantityId = $(this).next().data('cartid');
+		const productId = $(this).next().data('productid');
+		console.log(productId);
 		if (numProduct > 1) {
 		$(this).next().val(numProduct - 1);
 		const status ='-'
 		const selectedCoupon = $('#coupon-select').val();
-		updateQuantity(numProduct - 1, quantityId,'-',status,selectedCoupon);
+		console.log(productId);
+		updateQuantity(numProduct - 1, quantityId,status,selectedCoupon,productId);
 		}
 	});
 
 	$('.btn-num-product-up').on('click', function(){
 		var numProduct = Number($(this).prev().val());
 		const quantityId = $(this).prev().data('cartid');
+		const productId = $(this).prev().data('productid');
+		
 		$(this).prev().val(numProduct + 1);
 		const status ='+'
 		const selectedCoupon = $('#coupon-select').val();
-		updateQuantity(numProduct + 1, quantityId,status,selectedCoupon);
+		updateQuantity(numProduct + 1, quantityId,status,selectedCoupon,productId);
 	});
-	function updateQuantity(quantity, quantityId,status,selectedCoupon) {
+	function updateQuantity(quantity, quantityId,status,selectedCoupon,prodId) {
+		console.log(prodId);
 		$.ajax({
 		url: '/updateQuantity',
 		type: 'Patch',
@@ -247,9 +251,11 @@
 			quantity: Number(quantity),
 			quantityId: quantityId,
 			status:status,
-			selectedCoupon:selectedCoupon
+			selectedCoupon:selectedCoupon,
+			ProductId:prodId
 		},
 		success: function(response) {
+			console.log(response);
 			// Assuming the response contains the updated price and quantityId
 			const updatedPrice = response.updatedPrice;
 		const quantityId = response.quantityId;
@@ -259,15 +265,16 @@
 	$('.total-price-' + quantityId).text(updatedPrice);
 
 	$('#subtotalAmount').text('₹'+updateSubTotalAmount)
-	$('#totalAmount').text(updateTotalAmount)
-
-	$('')
-
-			
+	$('#totalAmount').text(updateTotalAmount)			
 		},
-		error: function(error) {
-			console.log(error);
-			// Handle the error response here
+		error: function(xhr,status,error) {
+			if(xhr.status ===400){
+
+sweetAlert("Out of stock", "", "error").then(()=>{
+	location.reload()
+})
+
+}			
 		}
 		});
 	}
@@ -280,10 +287,9 @@
 				$(document).ready(()=>{
 					$('.fa-trash').on('click', function() {
 				var cartId = $(this).data('cartid');
+				var productId = $(this).data('productid')
 				console.log(cartId);
-		
-
-
+				console.log(productId);
 Swal.fire({
   title: 'Are you sure to delete?',
   text: "You won't be able to revert this!",
@@ -297,7 +303,8 @@ Swal.fire({
 	$.ajax({
 		url: '/deleteCartItem',
 		type: 'delete',
-		data: { cartId: cartId },
+		data: { cartId: cartId,
+		ProductId:productId },
 		success: function(response) {
 			// Handle the success response
 			

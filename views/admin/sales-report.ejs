@@ -136,7 +136,7 @@
           <td><b><%=order.PaymentMethod  %></b></td>
           <td><span class="badge rounded-pill alert-success"><%=order.Products.Status  %></span></td>
           <td><%= order.createdAt %></td>
-          <td><%= order.TotalAmount  %></td>
+          <td>₹<%= order.TotalAmount  %></td>
         </tr>
   <%  })  %>
                             </tbody>

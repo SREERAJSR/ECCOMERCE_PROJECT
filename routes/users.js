@@ -106,52 +106,52 @@ router.get('/resend-otp/:id',resendOtp)
 router.post('/user-signUp-otp',validateSignUp)
 
 
-router.get('/wishlist', authenticateSession ,getWishlistPage)
-router.get('/check_wishlist',checkWishlist)
-router.post('/add_to_wishlist',addToWishlist)
+router.get('/wishlist', authenticateSession,getWishlistPage)
+router.get('/check_wishlist',authenticateSession ,checkWishlist)
+router.post('/add_to_wishlist',authenticateSession ,addToWishlist)
 
-router.delete('/remove_from_wishlist',removeFromWishlist)
+router.delete('/remove_from_wishlist',authenticateSession ,removeFromWishlist)
 
 
 //////cart-- start//////
 
-router.post('/add-to-cart',addToCart)
+router.post('/add-to-cart',authenticateSession ,addToCart)
 
-router.get('/shopping-cart',authenticateSession,  getShoppingCart)
+router.get('/shopping-cart',authenticateSession ,authenticateSession,  getShoppingCart)
 
-router.patch('/updateQuantity',authenticateSession ,updateQuantity)
+router.patch('/updateQuantity',authenticateSession ,authenticateSession ,updateQuantity)
 
-router.delete('/deleteCartItem',authenticateSession,deleteCartItem)
+router.delete('/deleteCartItem',authenticateSession ,authenticateSession,deleteCartItem)
 
-router.post('/apply-coupon',authenticateSession ,applyCoupon)
+router.post('/apply-coupon',authenticateSession ,authenticateSession ,applyCoupon)
 
 router.get("/checkout",authenticateSession,getCheckoutPage)
 
 router.post('/add_address',addingAddress)
 
-router.post('/select_Default_address',selectDefaultAddress)
+router.post('/select_Default_address',authenticateSession ,selectDefaultAddress)
 
 
-router.post('/place_order',placingOrder)
+router.post('/place_order',authenticateSession ,placingOrder)
 
-router.get('/order_success',(req,res)=>{
+router.get('/order_success',authenticateSession ,(req,res)=>{
   res.render('user/order-sucess',{u:true})
 })
-router.post('/verify_payment',verifyPayment)
+router.post('/verify_payment',authenticateSession ,verifyPayment)
 
 
 ////// user profile
 
-router.get('/user_profile', gettingUserProfilePage)
+router.get('/user_profile',authenticateSession , gettingUserProfilePage)
 
-router.post('/user_profile_edit_profile',updateUserProfileItems)
+router.post('/user_profile_edit_profile',authenticateSession ,updateUserProfileItems)
 
-router.post('/user_edit_password',update_new_password)
+router.post('/user_edit_password',authenticateSession ,update_new_password)
 
-router.get('/order_details',getOrderDetaiPage)
+router.get('/order_details',authenticateSession ,getOrderDetaiPage)
 
-router.patch('/cancel_order',cancelOrder)
-router.patch('/return_order',returnOrder)
+router.patch('/cancel_order',authenticateSession ,cancelOrder)
+router.patch('/return_order',authenticateSession ,returnOrder)
 
 module.exports = router;
  

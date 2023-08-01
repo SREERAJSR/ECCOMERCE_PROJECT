@@ -64,7 +64,7 @@
                     </span> <br>
                     <small class="text-muted">Order ID: <%= orders[0].OrderId  %></small>
                 </div>
-                <div class="col-lg-6 col-md-6 ms-auto text-md-end">
+                <!-- <div class="col-lg-6 col-md-6 ms-auto text-md-end">
                     <select class="form-select d-inline-block mb-lg-0 mb-15 mw-200">
                         <option>Change status</option>
                         <option>Awaiting payment</option>
@@ -74,7 +74,7 @@
                     </select>
                     <a class="btn btn-primary" href="#">Save</a>
                     <a class="btn btn-secondary print ms-2" href="#"><i class="icon material-icons md-print"></i></a>
-                </div>
+                </div> -->
             </div>
         </header> <!-- card-header end// -->
         <div class="card-body">
@@ -131,6 +131,7 @@
                                         <th width="40%">Product</th>
                                         <th width="20%">Unit Price</th>
                                         <th width="20%">Quantity</th>
+                                        <th width="20%">Reason</th>
                                         <th width="10" >Status</th>
                                         <th width="20%" class="text-end">Total</th>
                                         
@@ -147,15 +148,19 @@
                                                 <div class="info"> <%=order.ProductName  %> </div>
                                             </a>
                                         </td>
-                                        <td> ₹ <%=order.UnitPrice  %> </td>
+                                        <td> ₹ <%=order.UnitPrice%> </td>
                                         <td> <%=order.Quantity  %> </td>
+                                        <td> <%=order.Reason  %></td>
                                             <td>
-                                                <select class="pill alert-success form-select d-inline-block mb-lg-0 mb-15 mw-200">
-                                                <option>Change status</option>
-                                                <option>Awaiting payment</option>
-                                                <option>Confirmed</option>
-                                                <option>Shipped</option>
+                                                <select data-productid="<%=order.ProductId %>" data-paymentstatus="<%=orders[0].PaymentMethod %>"  data-orderid="<%=order.OrderId %>" data-customerid="<%=order.CustomerInfo._id %>"  class="pill alert-success form-select d-inline-block mb-lg-0 mb-15 mw-200 status-dropdown">
+                                                   
+                                                <option> <%= order.Status  %></option>
+                                                <option>Cancelled</option>
+                                                <option> Shipped</option>
+                                                <option>Returned</option>
                                                 <option>Delivered</option>
+
+                                              
                                                 </select>
 
                                             </td>
@@ -166,7 +171,7 @@
                             <%  }) %>
                                 
                                     <tr>
-                                        <td colspan="4">
+                                        <td colspan="6">
                                             <article class="float-end">
                                                 <dl class="dlist">
                                                     <dt></dt>
@@ -210,3 +215,70 @@
         </div> <!-- card-body end// -->
     </div> <!-- card end// -->
 </section> <!-- content-main end// -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
+
+<script>
+
+$(document).ready(() => {
+  $('.status-dropdown').on('change', function (event) {
+    event.preventDefault();
+
+    const ProductId = $(this).data('productid');
+    const OrderId = $(this).data('orderid');
+    const newStatus = $(this).val();
+    const customerId = $(this).data('customerid');
+    const paymentStatus = $(this).data('paymentstatus')
+
+    console.log(ProductId); 
+    console.log(OrderId);
+    console.log(newStatus);
+    console.log(paymentStatus);
+
+    // Show the SweetAlert before making the AJAX request
+    swal({
+      title: "Are you sure?",
+      text: "Once the status is changed, it cannot be undone!",
+      icon: "warning",
+      buttons: true,
+      dangerMode: true,
+    })
+    .then((willChange) => {
+      if (willChange) {
+        // Make the AJAX request if the user confirms
+        $.ajax({
+          url: '/admin/change_Order_Status',
+          method: 'patch',
+          data: {
+            ProductId: ProductId,
+            OrderId: OrderId,
+            newStatus: newStatus,
+            customerId: customerId,
+            paymentStatus:paymentStatus
+          },
+          success: (response) => {
+            console.log(response);
+            // Show success message after successful status change
+            swal("Status changed successfully!", {
+              icon: "success",
+            });
+            location.reload()
+          },
+          error: (err) => {
+            // Show error message if there's an issue with the AJAX request
+            swal("Error changing status!", {
+              icon: "error",
+            });
+          }
+        });
+      } else {
+        // Show a message if the user cancels the status change
+        swal("Status change cancelled!");
+      }
+    });
+  });
+});
+
+
+
+</script>

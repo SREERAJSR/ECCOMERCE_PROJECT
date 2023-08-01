@@ -7,7 +7,8 @@ const fs = require("fs");
 const slugify = require('slugify');
 const { error, log } = require("console");
 const { getCategory } = require("../helpers/product-helpers");
-const {findCategory}= require('../helpers/product-helpers');
+const {findCategory,
+  changeStockCount}= require('../helpers/product-helpers');
 
 
  
@@ -107,12 +108,8 @@ module.exports = {
     editProductAndSave: async (req, res) => {
       try {
         const { productId } = req.query;
-
-        console.log(req.body);
-        console.log(req.query.productId);
-        const productImages = req.files
-
-
+        const productImages = req.files;
+    
         const {
           product_name,
           brand_name,
@@ -123,59 +120,65 @@ module.exports = {
           stock_quantity,
           regular_price,
           sale_price,
-
         } = req.body;
-
-        const slug = slugify(product_name,{lower:true})
-        const categorySlug = slugify(category_name,{lower:true})
-
+    
+        const slug = slugify(product_name, { lower: true });
+        const categorySlug = slugify(category_name, { lower: true });
+    
         const productSave = await Product.findByIdAndUpdate(
           productId,
           {
-            Slug:slug,
+            Slug: slug,
             ProductName: product_name,
             BrandName: brand_name,
             Description: description,
             ScreenSize: screen_size,
             MemorySize: memory_size,
-            "Category.categoryName": category_name,
-            "Category.Slug":categorySlug,
+            'Category.categoryName': category_name,
+            'Category.Slug': categorySlug,
             StockQuantity: stock_quantity,
             RegularPrice: regular_price,
-            SalePrice: sale_price
+            SalePrice: sale_price,
           },
-          
           { new: true }
         );
-        const updatedProductImages = [];
-
-        await Promise.all(
-          productImages.map(async (image) => {
-            const inputImagePath = image.path;
-            const outputImagePath = `public/uploads/product_images/${image.filename}`;
         
-            await sharp(inputImagePath)
-              .resize(522, 522, { fit: 'inside' })
-              .toFile(outputImagePath);
-            
-            // Unlink the original image file
-            fs.unlinkSync(inputImagePath);
-        
-            // Add the new filename to the updatedProductImages array
-            updatedProductImages.push(image.filename);
-          })
-        );
-        
-        // Update the product images array with the new filenames
-        productSave.ProductImages = updatedProductImages;
-        
-        await productSave.save();
-        
-        if (productSave) {
-          res.redirect("/admin/list-products"); 
+        // If product with the given ID doesn't exist, handle the error
+        if (!productSave) {
+          return res.status(404).json({ message: 'Product not found.' });
         }
+    
+        // Check if new product images were uploaded
+        if (productImages && productImages.length > 0) {
+          const updatedProductImages = [];
+    
+          await Promise.all(
+            productImages.map(async (image) => {
+              const inputImagePath = image.path;
+              const outputImagePath = `public/uploads/product_images/${image.filename}`;
+    
+              await sharp(inputImagePath)
+                .resize(522, 522, { fit: 'inside' })
+                .toFile(outputImagePath);
+    
+              // Unlink the original image file
+              fs.unlinkSync(inputImagePath);
+    
+              // Add the new filename to the updatedProductImages array
+              updatedProductImages.push(image.filename);
+            })
+          );
+    
+          // Update the product images array with the new filenames
+          productSave.ProductImages = updatedProductImages;
+        }
+    
+        await productSave.save();
+    
+        // Redirect back to the product list page after successful update
+        res.redirect('/admin/list-products');
       } catch (error) {
-        res.status(500).json({ message: "Failed to update the product" });
+        res.status(500).json({ message: 'Failed to update the product.' });
       }
     },
   getCategoryPage: async (req, res) => {
@@ -437,7 +440,7 @@ module.exports = {
 
   }
  , 
- addingCoupon:async(req,res)=>{
+   addingCoupon:async(req,res)=>{
 
    console.log(req.body);
    
@@ -478,5 +481,48 @@ res.render('admin/add-coupon',{admin:true,success,coupons})
 
   }
   
+ },
+ getInventoryManagementPage:async(req,res)=>{
+
+  try {
+    
+    const products = await Product.find()
+console.log(products);
+    if(!products){
+      res.render('error',{message:'No products'})
+    }
+
+    res.render('admin/products-stock-change',{admin:true,products})
+  } catch (error) {
+    console.log(error);
+    res.render('error',{message:error})
+
+  }
+
+ },
+
+ changeInventoryStatus:(req,res)=>{
+  
+  try {
+
+   const {productId,stockQuantity} = req.body
+
+   changeStockCount(productId,stockQuantity).then((response)=>{
+
+    console.log(response);
+    res.status(200).json({ success: true, message: "Stock count updated successfully." });
+
+   }).catch((err)=>{
+    console.log(err);
+    res.status(500).json({ success: false, message: "Error updating stock count." });
+
+   })
+     
+  } catch (error) {
+    
+    console.log(error);
+    res.status(400).json({ success: false, message: "Bad request." });
+
+  }
  }
 }

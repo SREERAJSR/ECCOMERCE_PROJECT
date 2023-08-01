@@ -3,16 +3,14 @@
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
 
-<% var usercount,orderCount,productsCount,total %>
+<% var userCount,orderCount,productsCount,total %>
 <section class="content-main">
     <div class="content-header">
         <div>
             <h2 class="content-title card-title">Dashboard </h2>
             <p>Whole data about your business here</p>
         </div>
-        <div>
-            <a href="#" class="btn btn-primary"><i class="text-muted material-icons md-post_add"></i>Download sales report</a>
-        </div>
+       
     </div>
     <div class="row">
         <div class="col-lg-3">
@@ -61,7 +59,7 @@
                     <span class="icon icon-sm rounded-circle bg-info-light"><i class="text-info material-icons md-shopping_basket"></i></span>
                     <div class="text">
                        
-                            <h6 class="mb-1 card-title">Earnings</h6> <span><%=total.TotalRevenue  %></span>
+                            <h6 class="mb-1 card-title">Earnings</h6> <span>₹<%=total.TotalRevenue  %></span>
                            
                                 
                         <span class="text-sm">
@@ -76,7 +74,7 @@
         <div class="col-xl-8 col-lg-12">
             <div class="card mb-4">
                 <article class="card-body">
-                    <h5 class="card-title">Sale statistics</h5>
+                    <h5 class="card-title">Order statistics</h5>
                     <canvas id="myChart" height="120px"></canvas>
                 </article>
             </div>

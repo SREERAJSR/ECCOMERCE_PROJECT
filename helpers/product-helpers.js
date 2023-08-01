@@ -1,4 +1,5 @@
 const category = require("../models/categorySchema");
+const Product = require("../models/productSchema");
 module.exports = {
   getCategory: (categoryId) => {
     return new Promise(async (resolve, reject) => {
@@ -24,7 +25,28 @@ module.exports = {
   },
 
 
-  categoryWiseFiltering:()=>{
-    
+  changeStockCount:(productId,stockQuantity)=>{
+
+    return new Promise(async(resolve, reject) => {
+      try {
+
+
+        const product = await  Product.findById(productId)
+
+        if(!product){
+          reject('no product')
+        }
+
+        product.StockQuantity =stockQuantity
+
+        await product.save()
+        resolve('stock update successfully')
+
+      } catch (error) {
+console.log(error);
+        reject(error)
+        
+      }
+    })
   }
 };

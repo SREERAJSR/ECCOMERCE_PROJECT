@@ -1,0 +1,172 @@
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+
+       
+        <!-- Include DataTables CSS and JS -->
+<link rel="stylesheet" href="https://cdn.datatables.net/1.11.5/css/jquery.dataTables.min.css">
+<script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
+</head>
+<style>
+    .stock-input-small {
+        width: 60px; /* Adjust the width to your preference */
+    }
+</style>
+
+<body>
+
+
+<section class="content-main">
+    <div class="content-header">
+        <div>
+            <h2 class="content-title card-title">Products List</h2>
+            <p>Lorem ipsum dolor sit amet.</p>
+        </div>
+        <div>
+            <a href="#" class="btn btn-light rounded font-md">Export</a>
+            <a href="#" class="btn btn-light rounded  font-md">Import</a>
+            <a href="#" class="btn btn-primary btn-sm rounded">Create new</a>
+        </div>
+    </div>
+    <div class="card mb-4">
+        <header class="card-header">
+            <!-- <div class="row align-items-center">
+                <div class="col col-check flex-grow-0">
+                    <div class="form-check ms-2">
+                        <input class="form-check-input" type="checkbox" value="">
+                    </div>
+                </div>
+                <div class="col-md-3 col-12 me-auto mb-md-0 mb-3">
+                    <select class="form-select">
+                        <option selected>All category</option>
+                        <option>Electronics</option>
+                        <option>Clothes</option>
+                        <option>Automobile</option>
+                    </select>
+                </div>
+                <div class="col-md-2 col-6">
+                    <input type="date" value="02.05.2021" class="form-control">
+                </div>
+                <div class="col-md-2 col-6">
+                    <select class="form-select">
+                        <option selected>Status</option>
+                        <option>Active</option>
+                        <option>Disabled</option>
+                        <option>Show all</option>
+                    </select>
+                </div>
+            </div> -->
+        </header> <!-- card-header end// -->
+     <div class="card-body">
+    <div class="table-responsive">
+        <table id="myTable" class="table table-hover productList">
+            <thead>
+                <tr>
+                    <th scope="col" class="col-name">No</th>
+                    <th scope="col" class="col-name">Product</th>
+                    <th scope="col" class="col-price">Price</th>
+                    <th scope="col" class="col-status">Status</th>
+                    <th scope="col" class="col-date">Stock</th>
+                    <th scope="col" class="col-action text-end">Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                <% products.forEach((product, index) => { %>
+                    <tr>
+                        <td class="col-price"><span><%= index %></span></td>
+            
+                        <td class="col-name">
+                            <a class="itemside" href="#">
+                                <div class="left">
+                                    <img src="/uploads/product_images/<%= product.ProductImages[0] %>" class="img-sm img-thumbnail" alt="Item">
+                                </div>
+                                <div class="info">
+                                    <h6 class="mb-0"><%= product.ProductName %></h6>
+                                </div>
+                            </a>
+                        </td>
+                        <td class="col-price"><span><%= product.SalePrice %></span></td>
+                        <% if (product.isActive === true) { %>
+                            <td class="col-status"><span class="badge rounded-pill alert-success">Active</span></td>
+                        <% } else { %>
+                            <td class="col-status"><span class="badge rounded-pill alert-danger">Not active</span></td>
+                        <% } %>
+                        <td class="col-stock">
+                            <span class="stock-quantity-text" style="display: none;"><%= product.StockQuantity %></span>
+                            <input type="number" class="form-control stock-input stock-input-small" value="<%= product.StockQuantity %>" min="0" style="display: block;">
+                        </td>
+                        <td class="col-action text-end">
+                            <button class="btn btn-sm font-sm rounded btn-brand btn-outline-success btn-save-stock" data-productid="<%= product._id %>">
+                                <i class=""></i> Save
+                            </button>
+                        </td>
+                    </tr>
+                <% }) %>
+            </tbody>
+            
+        </table>
+          
+    </div>
+</div>
+</section
+    
+
+</body>
+
+
+
+
+
+  
+</html>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+
+<script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
+<script>
+
+$(document).ready(() => {
+    $('.btn-save-stock').on('click', function(event) {
+        event.preventDefault();
+        const saveButton = $(this);
+        const row = saveButton.closest('tr');
+        const productId = saveButton.data('productid');
+        const stockInput = row.find('.stock-input');
+        const stockQuantity = stockInput.val();
+
+        console.log(productId, stockQuantity);
+        // Your further logic here...
+
+            $.ajax({
+                url:'/admin/inventory_manage',
+                method:'patch',
+                data:{
+                    productId:productId,
+                    stockQuantity:Number(stockQuantity)
+                },
+                success:(response)=>{
+                    console.log(response);
+
+                    if(response.success){
+
+                        swal("Success", "Updated stock count", "success").then(()=>{
+                            location.reload()
+                        })
+
+                    }
+                },
+                error:(err)=>{
+                    sweetAlert("Oops...", "Not updated count", "error");
+                }
+
+            })
+        })
+    })
+
+
+</script>

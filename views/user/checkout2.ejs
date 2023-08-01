@@ -213,9 +213,7 @@
 									<div class="rs1-select2 rs2-select2 bor8 bg0 m-b-12 m-t-9">
 										<select id="coupon-select" class="js-select2" name="time">
                       
-                      <% if(cart.SelecedCoupon) {%>
-											<option><%=cart.SelecedCoupon%></option>
-                      <% } %>
+                    
                       <option>Select a coupon</option>
 
                       <%coupons.forEach((coupon)=>{ %>
@@ -573,7 +571,7 @@ title: error.message,
 });
 
 </script>
-<script>
+<!-- <script>
   // Retrieve the selected coupon from session or any other storage mechanism
   const selectedCoupon = '<%=cart.SelecedCoupon %>';
 
@@ -581,7 +579,7 @@ title: error.message,
   if (selectedCoupon) {
     $('#coupon-select').val(selectedCoupon).trigger('change');
   }
-</script>
+</script> -->
 
 <script>
   $(document).ready(()=>{

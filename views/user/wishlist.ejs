@@ -1,11 +1,37 @@
 <!-- <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script> -->
+
+<style>
+  .block2 {
+  /* Set a fixed height for the product block */
+  height: 400px; /* Adjust the value as needed */
+}
+.isotope-grid-wrapper {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between; /* Adjust as needed */
+}
+.block2-pic img {
+  width: 100%;
+  height: 200px; /* Set a fixed height for the images */
+  object-fit: cover; /* Maintain aspect ratio */
+}
+.isotope-item {
+  margin-bottom: 20px; /* Adjust as needed */
+}
+.row {
+  display: flex;
+  flex-wrap: wrap;
+  /* Use flexbox properties to control item height and alignment */
+}
+
+</style>
 <script src="/javascripts/sweetalert2.all.js"></script>
-</div>
 
 
 <div class="bg0 m-t-23 p-b-140">
     <div class="container">
-
+    
+      <div class="row isotope-grid-wrapper">
        <b><h1 style="font-size: 50px; " class="text-center" >WISHLIST</h1></b>
 
   
@@ -19,7 +45,7 @@
                 <!-- Block2 -->
                 <div class="block2">
                     <div class="block2-pic hov-img0">
-                        <img src="/uploads/product_images/<%=product.ProductImages[2]%>" alt="IMG-PRODUCT">
+                        <img src="/uploads/product_images/<%=product.ProductImages[0]%>" alt="IMG-PRODUCT">
 
                         <a href="/product-details?productId=<%=product.Slug%>&categoryId=<%= product.Category.Slug%>" class="block2-btn flex-c-m stext-103 cl2 size-102 bg0 bor2 hov-btn1 p-lr-15 trans-04 quickview " >
                             Quick View

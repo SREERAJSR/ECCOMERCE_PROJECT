@@ -130,7 +130,7 @@ z-index: 2
                             <% if (order.Status==='Pending' ||  order.Status === 'Placed' || order.Status==='Shipped' ){ %>
                               <button data-backdrop="false" class="btn btn-outline-danger"data-toggle="modal" data-target="#cancelModal<%= index %>" onclick="cancelOrder('<%=order.ProductId %>')"  >Cancel</button>
                               <button class="btn btn-outline-primary"data-toggle="modal" data-target="#returnModal" data-productid="<%= order.ProductId %>" disabled  >Return</button>
-                            <% }else if(order.Status==='Returned' || order.Status==='Cancelled'){ %>
+                            <% }else if(order.Status==='Returned' || order.Status==='Cancelled' || order.Status==='Cancel request' || order.Status==='Return request' ){ %>
                                 <button data-backdrop="false" class="btn btn-outline-danger"data-toggle="modal" data-target="#cancelModal<%= index %>" onclick="cancelOrder('<%=order.ProductId %>')" disabled >Cancel</button>
                             <button data-backdrop="false"  class="btn btn-outline-primary"data-toggle="modal" data-target="#returnModal<%= index %>" data-productid="<%= order.ProductId %>"  onclick="returnProduct('<%= order.ProductId %>')" disabled >Return</button>
                                 <% }else if(order.Status==='Delivered'){ %>
@@ -232,13 +232,23 @@ z-index: 2
 
             </ul>
 
-            <% }else{ %>
+            <% }else if(order.Status ==='Placed') { %>
               <ul id="progressbar-1" class="mx-0 mt-0 mb-5 px-0 pt-0 pb-4">
                 <li class="step0 active" id="step1"><span style="margin-left: 22px; margin-top: 12px;">PLACED</span></li>
-                <li class="step0 active text-center" id="step2"><span>Cancelled</span></li>
+                <li class="step0  text-center" id="step2"><span>Shipped</span></li>
                 <li class="step0 text-muted text-end" id="step3"><span style="margin-right: 22px;">DELIVERED</span></li>
               </ul>
-              <% } %>
+              <% }else{ %>
+                <ul id="progressbar-1" class="mx-0 mt-0 mb-5 px-0 pt-0 pb-4">
+                  <li class="step0 active" id="step1"><span style="margin-left: 22px; margin-top: 12px;">PLACED</span></li>
+                  <li class="step0  text-center" id="step2"><span>Shipped</span></li>
+                  <li class="step0 text-muted text-end" id="step3"><span style="margin-right: 22px;">DELIVERED</span></li>
+                </ul>
+
+                <% } %>
+
+
+
                     <% }) %>
                   
                    

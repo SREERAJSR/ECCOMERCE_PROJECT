@@ -20,82 +20,69 @@ const usedCoupon = require('../models/usedCoupons')
 
 module.exports={
 
-    addToCart:async(req,res)=>{
-
-        try{
-         
-          const {productId,qty} = req.body
-          const quantity = Number(qty)
-          const userId = req.session.user._id
+  addToCart: async (req, res) => {
+    try {
+      const { productId, qty } = req.body;
+      const quantity = Number(qty);
+      const userId = req.session.user._id;
   
-          if(req.session.user){      
+      if (req.session.user) {
+        // Find the user's existing cart or create a new one
+        const cart = await Cart.findOne({ UserId: userId }) || new Cart({ UserId: userId });
   
-           // Find the user's existing cart or create a new one
-      const cart = await Cart.findOne({ UserId: userId }) || new Cart({ UserId: userId });
+        // Check if the product is already in the cart
+        const existingProduct = cart.CartItems.find(item => item.ProductId.toString() === productId);
   
-          //check  if the product is already exist
+        // Fetch the product details
+        const product = await Product.findById(productId);
+        const price = Number(product.SalePrice);
+        const stockQuantity = product.StockQuantity;
   
-          const existingProduct =  cart.CartItems.find(item=> item.ProductId.toString()===productId)
-          
-          if (existingProduct) {
-            // If the product exists, update the quantity and total
-            existingProduct.Quantity += quantity;
-            const product = await Product.findById(existingProduct.ProductId);
-            const price = Number(product.SalePrice);
-            existingProduct.Total = existingProduct.Quantity * price;
-          } else {
-            // If the product doesn't exist, add it to the cart
-            const product = await Product.findById(productId);
-            const price = Number(product.SalePrice);
-            const total = quantity * price;
-            cart.CartItems.push({ ProductId: productId, Quantity: quantity, Total: total });
+        if (existingProduct) {
+          // If the product exists, update the quantity and total
+          const updatedQuantity = existingProduct.Quantity + quantity;
+          if (updatedQuantity > stockQuantity) {
+            return res.status(400).json({ message: 'Out of stock', error: 'The quantity requested exceeds the available stock.' });
           }
-    
-          // Calculate the total amount based on the updated cart items
-          let totalAmount = 0;
-          for (const item of cart.CartItems) {
-            totalAmount += item.Total;
+          existingProduct.Quantity = updatedQuantity;
+          existingProduct.Total = updatedQuantity * price;
+        } else {
+          // If the product doesn't exist, add it to the cart
+          if (quantity > stockQuantity) {
+            return res.status(400).json({ message: 'Out of stock', error: 'The quantity requested exceeds the available stock.' });
           }
-    
-          // Update the total amount in the cart
-          cart.SubTotal = totalAmount;
-          // Check if any coupons are used by the user
-      const UsedCoupons = await usedCoupon.findOne({ UserId: req.session.user._id });
-
-      if (UsedCoupons && UsedCoupons.Coupons.length > 0) {
-        // Iterate over the used coupons and calculate the discount amount
-        let discountAmount = 0;
-        for (const couponCode of UsedCoupons.Coupons) {
-          const coupon = await Coupon.findOne({ CouponCode: couponCode });
-          if (coupon) {
-            const couponDiscount = (coupon.Discount / 100) * totalAmount;
-            discountAmount += couponDiscount;
-          }
+          const total = quantity * price;
+          cart.CartItems.push({ ProductId: productId, Quantity: quantity, Total: total });
         }
-
-        // Subtract the discount amount from the FinalTotal
-        cart.FinalTotal = (totalAmount - discountAmount)+50;
+  
+        // Calculate the total amount based on the updated cart items
+        let totalAmount = 0;
+        for (const item of cart.CartItems) {
+          totalAmount += item.Total;
+        }
+  
+        // Update the total amount in the cart
+        cart.SubTotal = totalAmount;
+        cart.FinalTotal = totalAmount + 50;
+  
+        // Decrease the stock quantity of the product
+        product.StockQuantity -= quantity;
+        await product.save();
+  
+        // Save the updated cart
+        await cart.save();
+  
+        res.status(200).json({ message: 'Cart updated successfully', cart });
       } else {
-        // If no coupons are used, set the FinalTotal same as the SubTotal
-        cart.FinalTotal = totalAmount+50;
+        res.status(401).json({ message: 'User authentication failed' });
       }
-
-        
-          // Save the updated cart
-          await cart.save();
-    
-  
-       res.status(200).json({ message: 'Cart updated successfully', cart });
-    }else{
-      res.status(401).json({ message: 'User authentication failed' });
-  
-    }
-        }catch(error){
-           // Send an error response back to the AJAX request
+    } catch (error) {
+      // Send an error response back to the AJAX request
       res.status(500).json({ message: 'Error updating cart', error });
+    }
+  }
   
-      }
-    },
+  ,
     getShoppingCart:async(req,res)=>{
   
       try{
@@ -106,17 +93,19 @@ module.exports={
           path:'CartItems.ProductId',
           select:'ProductName ProductImages SalePrice ' 
         })
-        console.log(cart);
+        console.log(cart.CartItems,'from');
 
-        const coupons =  await Coupon.find()
-        res.render('user/shopping-cart', { u:true ,cart ,coupons })
+       
+        res.render('user/shopping-cart', { u:true ,cart  })
       }catch{ 
       }
       },
           updateQuantity:async(req,res)=>{
-            console.log(req.body);
-            const{quantityId,status}= req.body
+            console.log(req.body,'fffff');
+
+            const{quantityId,status,ProductId}= req.body
             const quantity = Number(req.body.quantity)
+            
             
             try {
             
@@ -125,50 +114,46 @@ module.exports={
         
             // Get the cart item from the CartItems array
             const cartItem = cart.CartItems.find((item) => item._id.toString() === quantityId);
-            if (cartItem) {
+           var product = await Product.findById(ProductId)
+            console.log(product,'hhh');
+            if (cartItem && product) {
               // Increment or decrement the quantity based on the status
+
               if (status === '+') {
                 cartItem.Quantity += 1
+                product.StockQuantity -= 1
+
+             
+
               } else if (status === '-') {
                 cartItem.Quantity -= 1
+                product.StockQuantity += 1 
               }
               // Ensure the quantity does not go below zero
             if (cartItem.Quantity < 0) {
               cartItem.Quantity = 0;
             }
             //COUPON APPPLIED LOOKING DB
+            if(product.StockQuantity< 0){
+              return res.status(400).json({ error: 'Out of stock', message: 'The quantity requested exceeds the available stock.' });
 
+                }
+            await product.save()
 
             
-      // Recalculate the total price
-      const product =  await Product.findById(cartItem.ProductId)
+      // Recalculate the total pri
       const price = Number(product.SalePrice)
       console.log(price);
             cartItem.Total = cartItem.Quantity * price;
             // Update the TotalAmount field by summing up the individual totals
             const totalAmount = cart.CartItems.reduce((sum, item) => sum + item.Total, 0);
             cart.SubTotal= totalAmount;
-//   // Check if any coupons are used by the user
-// const UsedCoupons = await usedCoupon.findOne({ UserId: req.session.user._id });
 
-// if (UsedCoupons && UsedCoupons.Coupons.length > 0) {
-//   // Iterate over the used coupons and calculate the discount amount
-//   let discountAmount = 0;
-//   for (const couponCode of UsedCoupons.Coupons) {
-//     const coupon = await Coupon.findOne({ CouponCode: couponCode });
-//     if (coupon) {
-//       const couponDiscount = (coupon.Discount / 100) * totalAmount;
-//       discountAmount += couponDiscount;
-//     }
-//   }
-//   // Subtract the discount amount from the FinalTotal
-//   cart.FinalTotal = (totalAmount - discountAmount)
-// } else {
-  // If no coupons are used, set the FinalTotal same as the SubTotal
-  cart.FinalTotal = totalAmount +50 
+        cart.FinalTotal = totalAmount +50 
 
 
             await cart.save(); 
+          
 
             // Send a success response back to the client
             res.status(200).json({ message: 'Quantity updated successfully.',updatedPrice: cartItem.Total, quantityId: quantityId,updateSubTotalAmount:cart.SubTotal , updateTotalAmount:cart.FinalTotal });
@@ -182,15 +167,20 @@ module.exports={
         }
           }  ,
      deleteCartItem: async (req, res) => {
-  const { cartId } = req.body;
-  try {
+       try {
+    const { cartId ,ProductId} = req.body;
+    
+    const product = await Product.findById(ProductId)
+if(!product){
+  return res.status(404).json({ error: 'product not found.' });
 
+}
     // Find the cart by its _id
     const userId = req.session.user._id;
     const cart = await Cart.findOne({ UserId: userId });
-    console.log(cart);
+    
 
-    if (!cart) {
+    if (!cart ) {
       // If the cart is not found, send an error response
       return res.status(404).json({ error: 'Cart not found.' });
     }
@@ -209,22 +199,25 @@ module.exports={
     // Remove the item from the CartItems array
     cart.CartItems.splice(itemIndex, 1);
 
+    product.StockQuantity += Number(deletedCartItem.Quantity)
+
     // Update the TotalAmount by subtracting the deleted item's total
     cart.SubTotal -= deletedItemTotal;
 
     // Check if any coupons are used by the user
-    const usedCoupons = await usedCoupon.findOne({ UserId: userId });
-    if (usedCoupons && usedCoupons.Coupons.length > 0) {
-      // Filter out the deleted coupon from the used coupons
-      usedCoupons.Coupons = usedCoupons.Coupons.filter((coupon) => coupon !== deletedCartItem.CouponCode);
-      await usedCoupons.save();
-    }
+    // const usedCoupons = await usedCoupon.findOne({ UserId: userId });
+    // if (usedCoupons && usedCoupons.Coupons.length > 0) {
+    //   // Filter out the deleted coupon from the used coupons
+    //   usedCoupons.Coupons = usedCoupons.Coupons.filter((coupon) => coupon !== deletedCartItem.CouponCode);
+    //   await usedCoupons.save();
+    // }
 
     // Update the FinalTotal by subtracting the deleted item's total
     cart.FinalTotal -= (deletedItemTotal);
     cart.FinalTotal -=50
 
     // Save the updated cart document
+    await product.save()
     await cart.save();
 
     // Send a success response back to the client
