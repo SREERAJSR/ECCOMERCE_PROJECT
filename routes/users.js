@@ -55,10 +55,9 @@ const limiter = rateLimiter({
 });
 /* GET users listing. */
 
-router.get("/login", getLogin);
+router.get("/login",authenticateForUser, getLogin);
 
 router.post("/login", postLogin);
-
 router.get("/", getHomePage)
 
 router.get("/view-products", getProductPage)

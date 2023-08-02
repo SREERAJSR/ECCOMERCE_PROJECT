@@ -1,188 +1,196 @@
 
-<div class="limiter">
-    <div class="container-login100">
-        <div class="wrap-login100">
-            <div class="login100-form-title" style="background-image: url(images/signup-cover.jpg);">
-                <span class="login100-form-title-1">
-                    Sign In
-                </span>
+    <div class="limiter">
+        <div class="container-login100">
+            <div class="wrap-login100">
+                <div class="login100-form-title" style="background-image: url(images/signup-cover.jpg);">
+                    <span class="login100-form-title-1">
+                        Sign In
+                    </span>
+                </div>
+
+                <form class="login100-form validate-form" action="/signup" method="post">
+                    <div class="wrap-input100 validate-input m-b-26" data-validate="Username is required">
+                        <span class="label-input100">Full Name</span>
+                        <input class="input100" type="text" name="username" id="contact-name" placeholder="Enter Full Name" onkeydown="validateName()" >
+                        <span class="focus-input100"></span>
+                    </div>
+                    <span id="name-error"></span>
+                    
+                    <div class="wrap-input100 validate-input m-b-18" data-validate = " number is required">
+                        <span class="label-input100">Phone</span>
+                        <input class="input100" id="phone" type="tel" name="phone" id="contact-phone" placeholder="Enter mobile " onkeyup="validatePhone()">
+                        <span class="focus-input100"></span>
+                    </div>
+                    <span id="phone-error"></span>
+                    
+                    <div class="wrap-input100 validate-input m-b-18" data-validate = "email is required">
+                        <span class="label-input100">Email</span>
+                        <input class="input100" type="email" name="email" id="contact-email" placeholder="Enter email" onkeyup="validateEmail()">
+                        <span class="focus-input100"></span>
+                    </div>
+                    <span id="email-error"></span>
+                    <div class="wrap-input100 validate-input m-b-18" data-validate = "Password is required">
+                        <span class="label-input100">Password</span>
+                        <input class="input100" type="password" name="password"  id="contact-password" placeholder="Enter password" onkeyup="validatePassword()" >
+                        <span class="focus-input100"></span>
+                    </div>
+                    <span id="password-error"></span>
+                    <div class="wrap-input100 validate-input m-b-18" data-validate = "Password is required">
+                        <span class="label-input100">Re-enter Password</span>
+                        <input class="input100" type="password" name="password-confirm"  id="contact-password-confirm" placeholder="Enter password" onkeyup="validatePasswordConfirmation()" >
+                        <span class="focus-input100"></span>
+                    </div>
+                    <span id="password-confirm-error"></span>
+                
+
+            
+                    <div class="container-login100-form-btn">
+                        <button class="login100-form-btn" onclick="return validateForm()" type="submit">
+                        Continue
+                        </button>
+                    </div>
+                    <span id="submit-error"></span>
+                    
+                </form>
             </div>
-
-            <form class="login100-form validate-form" action="/signup" method="post">
-                <div class="wrap-input100 validate-input m-b-26" data-validate="Username is required">
-                    <span class="label-input100">Username</span>
-                    <input class="input100" type="text" name="username" id="contact-name" placeholder="Enter username" onkeydown="validateName()" >
-                    <span class="focus-input100"></span>
-                </div>
-                <span id="name-error"></span>
-                
-                <div class="wrap-input100 validate-input m-b-18" data-validate = " number is required">
-                    <span class="label-input100">Phone</span>
-                    <input class="input100" id="phone" type="tel" name="phone" id="contact-phone" placeholder="Enter mobile " onkeyup="validatePhone()">
-                    <span class="focus-input100"></span>
-                </div>
-                <span id="phone-error"></span>
-                
-                <div class="wrap-input100 validate-input m-b-18" data-validate = "email is required">
-                    <span class="label-input100">Email</span>
-                    <input class="input100" type="email" name="email" id="contact-email" placeholder="Enter email" onkeyup="validateEmail()">
-                    <span class="focus-input100"></span>
-                </div>
-                <span id="email-error"></span>
-                <div class="wrap-input100 validate-input m-b-18" data-validate = "Password is required">
-                    <span class="label-input100">Password</span>
-                    <input class="input100" type="password" name="password"  id="contact-password" placeholder="Enter password" onkeyup="validatePassword()" >
-                    <span class="focus-input100"></span>
-                </div>
-                <span id="password-error"></span>
-                <div class="wrap-input100 validate-input m-b-18" data-validate = "Password is required">
-                    <span class="label-input100">Re-enter Password</span>
-                    <input class="input100" type="password" name="password-confirm"  id="contact-password-confirm" placeholder="Enter password" onkeyup="validatePasswordConfirmation()" >
-                    <span class="focus-input100"></span>
-                </div>
-                <span id="password-confirm-error"></span>
-               
-
-          
-                <div class="container-login100-form-btn">
-                    <button class="login100-form-btn" onclick="return validateForm()" type="submit">
-                    Continue
-                    </button>
-                </div>
-                <span id="submit-error"></span>
-                
-            </form>
         </div>
     </div>
-</div>
 
 
-<script>
-var nameError = document.getElementById('name-error');
-var phoneError = document.getElementById('phone-error');
-var emailError = document.getElementById('email-error');
-var passError  = document.getElementById('password-error');
-var passConfirmErr = document.getElementById('password-confirm-error');
-var submitError = document.getElementById('submit-error');
+    <script>
+    var nameError = document.getElementById('name-error');
+    var phoneError = document.getElementById('phone-error');
+    var emailError = document.getElementById('email-error');
+    var passError  = document.getElementById('password-error');
+    var passConfirmErr = document.getElementById('password-confirm-error');
+    var submitError = document.getElementById('submit-error');
 
 
-function validateName(){
+    function validateName(){
 
-var nameField = document.getElementById('contact-name').value;
+    var nameField = document.getElementById('contact-name').value;
 
-if(nameField.length == 0){
+    if(nameField.length == 0){
 
-    nameError.innerHTML="Name is required";
+        nameError.innerHTML="Name is required";
 
-    return false;
-
-}
-
-if(!nameField.match(/^[A-Za-z]*\s{1}[A-Za-z]+$/) ){
-    nameError.innerHTML="Write fullname";
-
-    return false;
-}else{
-    nameError.innerHTML='<i class="fa-solid fa-check"></i>';
-    return true;
-
-}
-
-
-}
-
-function validatePhone(){
-    
-    var phoneField = document.getElementById('contact-phone').value;
-
-    if(phoneField.length===0){
-
-        phoneError.innerHTML="Phone number is required";
         return false;
+
     }
-    if(phoneField.length !==10){
-        phoneError.innerHTML="Phone number should 10 digits";
-        return false;
-    }
-    if(!phoneField.match(/^[0-9]{10}$/)){
-        phoneError.innerHTML="Only digits please";
-        return false;
 
+    if(!nameField.match(/^[A-Za-z]*\s{1}[A-Za-z]+$/) ){
+        nameError.innerHTML="Write fullname";
+
+        return false;
     }else{
-        phoneError.innerHTML='<i class="fa-solid fa-check"></i>';
+        nameError.innerHTML='<i class="fa-solid fa-check"></i>';
+        return true;
+
+    }
+
+
+    }
+
+    function validatePhone(){
+        
+        var phoneField = document.getElementById('contact-phone').value;
+
+        if(phoneField.length===0){
+
+            phoneError.innerHTML="Phone number is required";
+            return false;
+        }
+        if(phoneField.length !==10){
+            phoneError.innerHTML="Phone number should 10 digits";
+            return false;
+        }
+        if(!phoneField.match(/^[0-9]{10}$/)){
+            phoneError.innerHTML="Only digits please";
+            return false;
+
+        }else{
+            phoneError.innerHTML='<i class="fa-solid fa-check"></i>';
+            return true;
+        }
+
+    }
+    function validateEmail(){
+
+    var emailField = document.getElementById('contact-email').value;
+
+    if(emailField.length==0)
+    {
+        emailError.innerHTML="Email is required";
+        return false;
+    }
+
+    if(!emailField.match(/^[A-Za-z\._\-0-9]*[@][A-Za-z]*[\.][a-z]{2,4}$/)){
+    emailError.innerHTML="invalid email";
+    return false;
+    }else{
+    emailError.innerHTML='<i class="fa-solid fa-check"></i>';
+    return true;
+    }
+    }
+
+    function validatePassword(){
+
+    var passField = document.getElementById('contact-password').value;
+
+  
+    if (!passField.match(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/)) {
+      passError.innerHTML = "Password should include at least one uppercase letter, one lowercase letter, one digit, and one special character";
+      return false;
+    }
+    if(passField.length <8){
+
+passError.innerHTML = "Password should be at least 8 characters long";
+return false;
+    }
+                passError.innerHTML='<i class="fa-solid fa-check"></i>';
+                return true
+            
+   
+        
+        
+        }
+
+    function validatePasswordConfirmation() {
+    var passField = document.getElementById('contact-password').value;
+    var passConfirmField = document.getElementById('contact-password-confirm').value;
+
+    if (passConfirmField.length == 0) {
+        passwordConfirmError.innerHTML = "Please confirm your password";
+        return false;
+    }
+
+    if (passField !== passConfirmField) {
+        passConfirmErr.innerHTML = "Passwords do not match";
+        return false;
+    }   
+    if (passField.length < 8) {
+        passwordConfirmError.innerHTML = "Password should be at least 8 characters long";
+        return false;
+    }  
+
+        passConfirmErr.innerHTML = '<i class="fa-solid fa-check"></i>';
         return true;
     }
 
-}
-function validateEmail(){
 
-var emailField = document.getElementById('contact-email').value;
 
-if(emailField.length==0)
-{
-    emailError.innerHTML="Email is required";
-    return false;
-}
 
-if(!emailField.match(/^[A-Za-z\._\-0-9]*[@][A-Za-z]*[\.][a-z]{2,4}$/)){
-emailError.innerHTML="invalid email";
-return false;
-}else{
-emailError.innerHTML='<i class="fa-solid fa-check"></i>';
-return true;
-}
-}
 
-function validatePassword(){
+    function validateForm()
+    {
+    if(!validateName() || !validatePhone() || !validateEmail()||!validatePassword() || !validatePasswordConfirmation()  ){
 
-var passField = document.getElementById('contact-password').value;
-
-if(passField.length <8){
-
-    passError.innerHTML = "Password should be at least 8 characters long";
-  return false;
-
-        }else{
-            passError.innerHTML='<i class="fa-solid fa-check"></i>';
-            return true
-        }
-//  if (!passField.match(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/)) {
-//   passError.innerHTML = "Password should include at least one uppercase letter, one lowercase letter, one digit, and one special character";
-//   return false;
-// }
-    
-    
+        submitError.innerHTML="Please fix these error to sumbit ";
+        return false;    
     }
 
- function validatePasswordConfirmation() {
-  var passField = document.getElementById('contact-password').value;
-  var passConfirmField = document.getElementById('contact-password-confirm').value;
+  submitError.innerHTML = ''; // Clear the error message if everything is valid
+  return true; // Return true to allow form submission
+    }
 
-  if (passConfirmField.length == 0) {
-    passwordConfirmError.innerHTML = "Please confirm your password";
-    return false;
-  }
-
-  if (passField !== passConfirmField) {
-    passConfirmErr.innerHTML = "Passwords do not match";
-    return false;
-  } else {
-    passConfirmErr.innerHTML = '<i class="fa-solid fa-check"></i>';
-    return true;
-  }
-}
-
-
-
-
-
- function validateForm()
-{
-if(!validateName() || !validatePhone() || !validateEmail()||!validatePassword() || !validatePasswordConfirmation()  ){
-
-    submitError.innerHTML="Please fix these error to sumbit ";
-    return false;    
-}
-}
-
-</script>
+    </script>

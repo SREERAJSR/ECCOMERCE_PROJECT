@@ -3,8 +3,6 @@ module.exports={
 
         authenticateSession:(req,res,next)=>{
             try {
-             
-                
                 if(req.session.user){
                    next()
                 }else{     
@@ -15,7 +13,6 @@ module.exports={
                 res.render('error',{message:error})
                 
             }
-      
     },
 authenticateAdmin:((req,res,next)=>{ 
 
@@ -51,23 +48,22 @@ authenticateForLogin:((req,res,next)=>{
 
 authenticateForUser:async(req,res,next)=>{
  try {
-    const phone = req.session.user.phone
-
-    const user = await User.findOne({phone:phone})
  
-     if(user.isActive){
-         next()
-     }else{
-         res.render('user/login',{u:false})
-     }
+    if(req.session.user){
+        res.redirect('/')
+    }
+    
+    next()
     
  } catch (error) {
     
-    rres.render('error',{message:error})
+    res.render('error',{message:error})
  }
 
   
-},
+}
+
+
 
 
     

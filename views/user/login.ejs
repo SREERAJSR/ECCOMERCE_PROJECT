@@ -26,13 +26,14 @@
 						<%if(emailErr){  %>
 						<span><%=emailErr  %></span>
 						<% } %>
-
+						
 						<div class="wrap-input100 validate-input m-b-18" data-validate = "Password is required">
 							<span class="label-input100">Password</span>
 							<input  class="input100" id="contact-password" onkeyup="validatePassword()" type="password" name="password" placeholder="Enter password">
 							<span class="focus-input100"></span>
 						</div>
 						<span id="password_err"></span>
+						
 						<% var passErr %>
 							<%if(passErr){  %>
 							<span><%=passErr  %></span>
@@ -69,7 +70,7 @@
 				</div>
 			</div>
 		</div>
-
+		
 		<script>
 			const passErr = document.getElementById('password_err')
 			const emailErr = document.getElementById('email_err')
@@ -97,23 +98,38 @@
 	function validatePassword(){
 
 		var passField = document.getElementById('contact-password').value;
-
+		 
+		if (!passField.match(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/)) {
+      passError.innerHTML = "Password should include at least one uppercase letter, one lowercase letter, one digit, and one special character";
+      return false;
+    }
 	if(passField.length <8){
 
 		passErr.innerHTML = "Password should be at least 8 characters long";
 	return false;
 
-			}else{
+			}
 				passErr.innerHTML='<i class="fa-solid fa-check"></i>';
 				return true
-			}
+			
 	}
 	function validateForm(){
-	if(  !validateEmail()||!validatePassword()){
+	if(  !validateEmail()||  !validatePassword()){
 
 		submitErr.innerHTML="Please fix these error to sumbit ";
 		return false;    
 	}
+	submitErr.innerHTML=''
+	return true
+
 	}
 
 	</script>
+
+
+
+            
+   
+        
+        
+	
