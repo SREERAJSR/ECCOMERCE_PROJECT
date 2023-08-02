@@ -805,11 +805,11 @@ a{
   color: #555555;
 }
 
-@media (min-width: 992px){
+/* @media (min-width: 992px){
   .menu-mobile {
     display: none;
   }
-}
+} */
 
 
 /*//////////////////////////////////////////////////////////////////
