@@ -16,24 +16,23 @@ module.exports={
                 
             }
     },
-authenticateAdmin:((req,res,next)=>{ 
+    authenticateAdmin:((req,res,next)=>{ 
 
-    try {
-        if(req.session.admin){
-            next()
-        }else{
-    
-            res.redirect('/admin/admin-login')
+        try {
+            if(req.session.admin){
+                next()
+            }else{
+                res.redirect('/admin/admin-login')
+            }
+            
+        } catch (error) {
+            res.render('error',{message:error})
+
+            
         }
-        
-    } catch (error) {
-        res.render('error',{message:error})
 
-        
-    }
-
-   
-}),
+    
+    }),
 authenticateForLogin:((req,res,next)=>{
     try {
         if(req.session.admin){

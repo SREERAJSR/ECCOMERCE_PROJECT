@@ -44,11 +44,11 @@ const  {uploadProduct,uploadCategory} = require("../middlewares/multer-config");
 
 router.get('/admin-login',authenticateForLogin, getLoginPage)
 
-router.get("/",  authenticateAdmin,getDashBoardPage)
 router.post('/admin-login',loginAdmin)
 
 
 router.get('/admin-logout',authenticateAdmin, logoutAdmin)
+router.get("/",  authenticateAdmin,getDashBoardPage)
 
 router.get("/user-manage",authenticateAdmin, findUser_info);
 

@@ -28,47 +28,51 @@ module.exports = {
     res.render("admin/admin-login", { admin_login: true ,loggedErr:false});
   },
 
-  loginAdmin: async (req, res) => {
+
+
+loginAdmin: async (req, res) => {
     try {
-      const { UserName, password } = req.body;
-  
-      const admin = await Admin.findOne({ Username: UserName });
-      if (!admin) {
-        const saltRounds = 10;
-        const hashedPassword = await bcrypt.hash(password, saltRounds);
-  
-        const newAdmin = new Admin({
-          Username: UserName,
-          Password: hashedPassword
-        });
-  
-        await newAdmin.save();
-  
-        // Successfully created a new admin
-        req.session.admin = true;
-        res.render('admin/admin-login', { admin_login: true, admin: true });
-      } else {
+        const { UserName, password } = req.body;
+
+        const admin = await Admin.findOne({ Username: UserName });
+
+        if (!admin) {
+            const saltRounds = 10;
+            const hashedPassword = await bcrypt.hash(password, saltRounds);
+
+            const newAdmin = new Admin({
+                Username: UserName,
+                Password: hashedPassword
+            });
+
+            await newAdmin.save();
+
+            // Successfully created a new admin
+            req.session.admin = true;
+            res.redirect('/admin/')
+        }
+
         const passwordMatch = await bcrypt.compare(password, admin.Password);
         if (passwordMatch) {
-          // Password matches, log in the admin
-          req.session.admin = true;
-          res.render('admin/dashboard', { admin_login: true,admin:true});
-        } else {
-          // Password doesn't match
-          const passwordErr = 'Invalid password';
-          const userNameErr = 'Invalid username';   
-          res.render('admin/admin-login', {
+            // Password matches, log in the admin
+            req.session.admin = true;
+            res.redirect('/admin/')
+          }
+
+        // Password doesn't match
+        const passwordErr = 'Invalid password';
+        const userNameErr = 'Invalid username';
+        return res.status(200).render('admin/admin-login', {
             passwordErr,
-            admin_login: true,
-            loggedErr: true
-          });
-        }
-      }
+            admin_login: true,    
+            loggedErr: true           
+        });
     } catch (error) {
-      console.log(error);
-      res.status(500).json({ message: 'An error occurred while logging in.' });
+        console.log(error);
+        return res.status(500).render('error', { message: error });
     }
-  },
+}
+,
   
       logoutAdmin:(req,res)=>{
  
@@ -82,34 +86,40 @@ module.exports = {
       },
       getDashBoardPage: async (req, res) => {
         try {
-          const order = await Order.find()   //promise all
-          if(order){
-          const userCount = await GetUserCount();
-          const orderCount = await GetOrderCount();
-          const productsCount = await GetProductsCount();
-          const totalRevenue = await GetTotalRevenue();
-          const  response = await GetMonthlyTotalOrderCount()
-          const {months,monthlyTotalOrderCount} = response
-          const result = await GetMonthlyTotalPlacedOrderCount()
-          const{monthlyTotalPlacedCount} = result
-          const monthlyTotalPendingCount = await GetMontlyTotalPendingOrderCount()
-          const total = totalRevenue;
-
-          console.log('dd', total);
-
-          res.render("admin/dashboard", { admin: true, userCount, orderCount, productsCount, total ,months,monthlyTotalOrderCount ,monthlyTotalPlacedCount,monthlyTotalPendingCount});
-          }else{
-            res.render("admin/dashboard", { admin: true });
-
-
-          }
+          console.log('HAI');
+            const [userCount, orderCount, productsCount, totalRevenue, response, result, monthlyTotalPendingCount] = await Promise.all([
+                GetUserCount(),
+                GetOrderCount(),
+                GetProductsCount(),
+                GetTotalRevenue(),
+                GetMonthlyTotalOrderCount(),
+                GetMonthlyTotalPlacedOrderCount(),
+                GetMontlyTotalPendingOrderCount()
+            ]);
+            const { months, monthlyTotalOrderCount } = response;
+            const { monthlyTotalPlacedCount } = result;
+            const total = totalRevenue;
+    
+            console.log('dd', total);
+    
+            res.status(200).render("admin/dashboard", {
+                admin: true,
+                userCount,
+                orderCount,
+                productsCount,
+                total,
+                months,
+                monthlyTotalOrderCount,
+                monthlyTotalPlacedCount,
+                monthlyTotalPendingCount
+            });
         } catch (error) {
-          // Handle the error
-          console.log(error);
-          res.status(500).send("Internal Server Error");
+            // Handle the error
+            console.log(error);
+          res.status(500).render('error',{message:error})
         }
-      }
-      
+    }
+  
 ,
   findUser_info: async (req, res) => {
     const users = await User.find({});
