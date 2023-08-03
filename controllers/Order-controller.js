@@ -293,6 +293,11 @@ console.log(response);
     }
 
 
+  }).catch((err)=>{
+
+    res.status(400).json({message:err})
+
+
   }) 
 }catch(err){
   console.log(err);

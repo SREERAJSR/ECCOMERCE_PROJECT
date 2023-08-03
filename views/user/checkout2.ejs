@@ -601,14 +601,18 @@ title: error.message,
     },
     body:JSON.stringify({addressId:OrderAddressId,paymentMethod:paymentMethod,TotalPrice:Total })
   }).then((response)=>{
+  
     if(response.status===200){
       console.log(response);
 
       return response.json()
     }else if(response.status ===201){
       return response.json()
+    }else if(response.status ===400){
+      return response.json()
     }
   }).then((response)=>{  
+   
 
     if(response && response.message){
       if(response.message==='Cod Order Sucess' || response.message==='Wallet Order Sucess'){
@@ -618,6 +622,12 @@ title: error.message,
         console.log(response.razorPayOrder);
         razorPayment(response.razorPayOrder)
  
+      }else if( response.message ==='Insufficient funds in wallet'){
+        Swal.fire({
+icon: 'error',
+title: response.message,  
+})
+
       }
 
     }
@@ -626,7 +636,8 @@ title: error.message,
 
 
   }).catch((err)=>{
-    console.log(err);
+   
+
   })
 
 
