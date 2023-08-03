@@ -89,15 +89,19 @@ module.exports={
   
         const userId = req.session.user._id
   
-        const cart = await Cart.findOne({UserId:userId}).populate({
+        const cart = await Cart.findOne({UserId:userId})
+        if(!cart){
+          console.log(cart);
+          res.render('user/shopping-cart', { u:true ,cart  })
+        }
+     
+        cart.populate({
           path:'CartItems.ProductId',
           select:'ProductName ProductImages SalePrice ' 
         })
-        console.log(cart.CartItems,'from');
-
-       
         res.render('user/shopping-cart', { u:true ,cart  })
-      }catch{ 
+      }catch(error){ 
+        res.render('error',{message:error})
       }
       },
           updateQuantity:async(req,res)=>{

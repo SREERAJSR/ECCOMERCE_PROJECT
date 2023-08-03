@@ -528,23 +528,23 @@ module.exports = {
   getWishlistPage: async (req, res) => {
     try {
       const userId = req.session.user._id;
-      let wishlist = await Wishlist.findOne({ UserId: userId })
-      let noProducts
-      if(!wishlist){
-        noProducts=true
-        res.render("user/wishlist", { u: true ,noProducts });
-
-      }
-   wishlist= await wishlist.populate({
+  
+      const wishlist = await Wishlist.findOne({ UserId: userId }).populate({
         path: "Products",
         select: "ProductName ProductImages SalePrice Category Slug",
       });
+  
+      if (!wishlist || wishlist.Products.length === 0) {
+        return res.render("user/wishlist", { u: true, noProducts: true });
+      }
+  
       const products = wishlist.Products;
-      res.render("user/wishlist", { products, u: true ,noProducts:false});
+      res.render("user/wishlist", { products, u: true, noProducts: false });
     } catch (error) {
- res.render('error',{message:error})
+      res.render('error', { message: error });
     }
-  },
+  }
+  ,
   checkWishlist: async (req, res) => {
     try {
       const { productId } = req.query;

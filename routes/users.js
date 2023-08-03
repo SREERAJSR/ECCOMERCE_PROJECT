@@ -116,13 +116,13 @@ router.delete('/remove_from_wishlist',authenticateSession ,removeFromWishlist)
 
 router.post('/add-to-cart',authenticateSession ,addToCart)
 
-router.get('/shopping-cart',authenticateSession ,authenticateSession,  getShoppingCart)
+router.get('/shopping-cart',authenticateSession,  getShoppingCart)
 
-router.patch('/updateQuantity',authenticateSession ,authenticateSession ,updateQuantity)
+router.patch('/updateQuantity',authenticateSession ,updateQuantity)
 
-router.delete('/deleteCartItem',authenticateSession ,authenticateSession,deleteCartItem)
+router.delete('/deleteCartItem',authenticateSession,deleteCartItem)
 
-router.post('/apply-coupon',authenticateSession ,authenticateSession ,applyCoupon)
+router.post('/apply-coupon',authenticateSession ,applyCoupon)
 
 router.get("/checkout",authenticateSession,getCheckoutPage)
 
