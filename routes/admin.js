@@ -44,7 +44,7 @@ const  {uploadProduct,uploadCategory} = require("../middlewares/multer-config");
 
 router.get('/admin-login',authenticateForLogin, getLoginPage)
 
-router.get("/", authenticateAdmin,getDashBoardPage)
+router.get("/",  authenticateAdmin,getDashBoardPage)
 router.post('/admin-login',loginAdmin)
 
 

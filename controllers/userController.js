@@ -528,14 +528,21 @@ module.exports = {
   getWishlistPage: async (req, res) => {
     try {
       const userId = req.session.user._id;
-      const wishlist = await Wishlist.findOne({ UserId: userId }).populate({
+      let wishlist = await Wishlist.findOne({ UserId: userId })
+      let noProducts
+      if(!wishlist){
+        noProducts=true
+        res.render("user/wishlist", { u: true ,noProducts });
+
+      }
+   wishlist= await wishlist.populate({
         path: "Products",
         select: "ProductName ProductImages SalePrice Category Slug",
       });
       const products = wishlist.Products;
-      res.render("user/wishlist", { products, u: true });
+      res.render("user/wishlist", { products, u: true ,noProducts:false});
     } catch (error) {
-      res.status(500).json({ error: "server error" });
+ res.render('error',{message:error})
     }
   },
   checkWishlist: async (req, res) => {

@@ -1,4 +1,6 @@
+const Cart = require("../models/cartSchema");
 const User = require("../models/userSchema");
+const Product = require("../models/productSchema");
 module.exports={
 
         authenticateSession:(req,res,next)=>{
@@ -61,6 +63,30 @@ authenticateForUser:async(req,res,next)=>{
  }
 
   
+},
+fetchUserRelatedData:async(req,res,next)=>{
+
+    try {
+        if(req.session.user){
+
+            const userDetails = await User.findById(req.session.user._id)
+    
+            res.locals.userData={
+                
+                userDetails :userDetails
+            }
+            next()
+        }else{
+            
+            next()
+        }
+
+        
+    } catch (error) {
+
+        res.render('error',{message:error})
+        
+    }
 }
 
 
@@ -68,3 +94,4 @@ authenticateForUser:async(req,res,next)=>{
 
     
 }
+

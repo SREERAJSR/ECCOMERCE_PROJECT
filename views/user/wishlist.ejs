@@ -30,14 +30,23 @@
 
 <div class="bg0 m-t-23 p-b-140">
     <div class="container">
-    
+      <% var noProducts %>
+      <% if(noProducts){ %>  
       <div class="row isotope-grid-wrapper">
-       <b><h1 style="font-size: 50px; " class="text-center" >WISHLIST</h1></b>
+       <b><h1 style="font-size: 50px; " class="text-center" >WISHLIST EMPTY</h1></b>
 
   
         <div class="row isotope-grid">
 
+
   
+
+            <% }else{ %>
+              <div class="row isotope-grid-wrapper">
+                <b><h1 style="font-size: 50px; " class="text-center" >WISHLIST EMPTY</h1></b>
+         
+           
+                 <div class="row isotope-grid">
 
           <% products.forEach((product)=>  { %>
 
@@ -74,7 +83,7 @@
             </div>
            <%  })  %>
 
-
+           <%  }%>
         </div>
 
         <!-- Load more -->

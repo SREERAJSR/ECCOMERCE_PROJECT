@@ -29,7 +29,13 @@ var usersRouter = require("./routes/users");
 
 app.use(expressLayouts);
 
-
+  app.use((req, res, next) => {
+    res.locals.userData = {
+      user: req.session.user, // Replace with your data
+      // ...other data you want to send
+    };
+    next();
+  });
  
 // Database connection
 

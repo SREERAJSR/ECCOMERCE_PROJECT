@@ -1,4 +1,4 @@
-const {authenticateSession,authenticateForUser} =require('../middlewares/middlware')
+const {authenticateSession,authenticateForUser,fetchUserRelatedData} =require('../middlewares/middlware')
 const rateLimiter =require('express-rate-limit')
 const User = require("../models/userSchema");
 var express = require("express");
@@ -58,7 +58,7 @@ const limiter = rateLimiter({
 router.get("/login",authenticateForUser, getLogin);
 
 router.post("/login", postLogin);
-router.get("/", getHomePage)
+router.get("/",getHomePage)
 
 router.get("/view-products", getProductPage)
 
