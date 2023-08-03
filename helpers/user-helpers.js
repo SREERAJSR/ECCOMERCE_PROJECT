@@ -335,6 +335,82 @@ console.log(error);
           
         }
     })
+  },
+  fetchCartDetails:(userId)=>{
+    return new Promise(async(resolve, reject) => {
+      
+
+      try {
+
+        console.log(userId);
+
+        const cart = await Cart.aggregate([
+          {
+            $match: {
+              UserId: userId
+            }
+          },
+          {
+            $unwind: "$CartItems"
+          },
+          {
+            $lookup: {
+              from: 'products',
+              let: { productId: "$CartItems.ProductId" },
+              pipeline: [
+                {
+                  $match: {
+                    $expr: {
+                      $eq: ["$_id", "$$productId"]
+                    }
+                  }
+                },
+                {
+                  $project: {
+                    ProductName: 1,
+                    ProductImages: 1
+                  }
+                }
+              ],
+              as: 'productDetails'
+            }
+          },
+          {
+            $addFields: {
+              productName: { $arrayElemAt: ['$productDetails.ProductName', 0] },
+              productImages: { $arrayElemAt: ['$productDetails.ProductImages', 0] }
+            }
+          },
+          {
+            $group: {
+              _id: null,
+              cartItems: {
+                $push: {
+                  productName: '$productName',
+                  productImages: '$productImages',
+                  quantity: '$CartItems.Quantity',
+                  total: '$CartItems.Total',
+                  subtotal: '$SubTotal'
+                }
+              },
+              count: { $sum: 1 }
+            }
+          }
+        ]);
+        
+        console.log(cart[0]);
+       
+
+        if(!cart){
+          reject('no cart for this user')
+        }
+       
+        resolve(cart[0])
+      } catch (error) {
+
+        reject(error)
+      }
+    })
   }
 
 };

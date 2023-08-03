@@ -94,7 +94,7 @@ module.exports={
         if(!cart){
           console.log(cart);
           console.log('hia');
-          res.render('user/shopping-cart', { u:true ,cart  })
+          res.render('user/shopping-cart', { u:true ,cart,userCheck:true   })
         }
      
        cart = await cart.populate({
@@ -102,7 +102,7 @@ module.exports={
           select:'ProductName ProductImages SalePrice ' 
         })
         console.log(cart);
-        res.render('user/shopping-cart', { u:true ,cart  })
+        res.render('user/shopping-cart', { u:true ,cart ,userCheck:true })
       }catch(error){ 
         res.status(500).render('error', { message:error  });
       }

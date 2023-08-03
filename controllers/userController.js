@@ -11,7 +11,8 @@ const {
   gettingOrderDetails,
   fetchOrderDetails,
   orderCancelChangeStatus,
-  orderReturnChangeStatus
+  orderReturnChangeStatus,
+  fetchCartDetails
 } = require("../helpers/user-helpers");
 const { findCategory } = require("../helpers/product-helpers");
 const { categoryWiseFiltering } = require("../helpers/product-helpers");
@@ -19,11 +20,14 @@ const bcrypt = require("bcrypt");
 const twilio = require("twilio");
 const { clearCache } = require("ejs");
 const { error } = require("jquery");
-const { default: mongoose } = require("mongoose");
+const { default: mongoose, trusted } = require("mongoose");
 const Address = require("../models/addressSchema");
 const Coupon = require("../models/couponSchema");
 
 module.exports = {
+
+
+
   getSignup: (req, res) => {
     // console.log(req.session.user.username);
     res.render("user/signup", { u: false });
@@ -92,6 +96,7 @@ module.exports = {
 
       if (passwordMatch) {
         req.session.user = user;
+
       }
 
       // const UserDetails = req.session.user;
@@ -321,7 +326,7 @@ module.exports = {
               gaming,
               office,
               students,
-              userDetails,
+             userCheck:true
             });
           } else {
             res.render("user/homepage", {
@@ -374,7 +379,7 @@ module.exports = {
               gaming,
               office,
               students,
-              userDetails,
+              userCheck:true
             });
           } else {
             res.render("user/view-products", {
@@ -406,7 +411,7 @@ module.exports = {
       ]);
 
       if (products) {
-        res.render("user/shop", { u: true, products });
+        res.render("user/shop", { u: true, products ,userCheck:true });
       } else {
         res.status(401).json({ message: "products not find" + err });
       }
@@ -504,7 +509,7 @@ module.exports = {
               u: true,
               product,
               catProd,
-              userDetails,
+              userCheck:true
             });
           } else {
             res.render("user/product-details", {
@@ -527,6 +532,8 @@ module.exports = {
 
   getWishlistPage: async (req, res) => {
     try {
+
+      
       const userId = req.session.user._id;
   
       const wishlist = await Wishlist.findOne({ UserId: userId }).populate({
@@ -535,11 +542,11 @@ module.exports = {
       });
   
       if (!wishlist || wishlist.Products.length === 0) {
-        return res.render("user/wishlist", { u: true, noProducts: true });
+        return res.render("user/wishlist", { u: true, noProducts: true  ,userCheck:true});
       }
   
       const products = wishlist.Products;
-      res.render("user/wishlist", { products, u: true, noProducts: false });
+      res.render("user/wishlist", { products, u: true, noProducts: false ,userCheck:true});
     } catch (error) {
       res.render('error', { message: error });
     }
@@ -660,24 +667,25 @@ module.exports = {
             defaultAddress,
             cart,
             coupons,
+            userCheck:true
           });
         }
       } else {
         if (addresses.length === 0) {
           console.log(addresses);
-          res.render("user/checkout2", { u: true, cart, coupons });
+          res.render("user/checkout2", { u: true, cart, coupons ,userCheck:trusted });
         } else {
           console.log("sreee");
-          res.render("user/checkout2", { u: true, addresses, cart, coupons });
+          res.render("user/checkout2", { u: true, addresses, cart, coupons ,userCheck:true });
         }
       }
 
       if (addresses.length === 0) {
         console.log(addresses);
-        res.render("user/checkout2", { u: true });
+        res.render("user/checkout2", { u: true ,userCheck:true});
       } else {
         console.log("sreee");
-        res.render("user/checkout2", { u: true, addresses, defaultAddress });
+        res.render("user/checkout2", { u: true, addresses, defaultAddress  ,userCheck:true});
       }
     } catch (error) {
       console.log(error);
@@ -802,6 +810,7 @@ module.exports = {
         cart,
         defaultAddress,
         addresses,
+        userCheck:true,
         user,
         orders: orders || null
       });
@@ -856,7 +865,7 @@ module.exports = {
 
      const orders = await fetchOrderDetails(orderId,userId)
 
-     res.render('user/order-details',{u:true,orders})
+     res.render('user/order-details',{u:true,orders,userCheck:true})
       }else{
         res.render('error_login',{u:true})
       }
