@@ -124,6 +124,24 @@ module.exports={
             ShippingAddress:user.DefaultAddress
  
       })
+      if (paymentMethod === 'Wallet') {
+        if (user.WalletTotalAmount >= TotalPrice) {
+          // Deduct the TotalPrice from WalletTotalAmount
+          user.WalletTotalAmount -= TotalPrice;
+
+          // Add transaction entry to the Wallet array
+          const transaction = {
+            amount: -TotalPrice,
+            transcation: 'debited',
+            timestamp: new Date(),
+          };
+          user.Wallet.push(transaction);
+        } else {
+          reject('Insufficient funds in wallet');
+          return;
+        }
+      }
+      await user.save()
       await newOrder.save().then((savedOrder)=>{
         resolve(savedOrder)
       })

@@ -603,9 +603,10 @@ const months = [
         return new Promise(async(resolve, reject) => {
 
             try {
+            
                 const userOrder = await Order.findOne({CustomerId:customerId,
                 OrderId:OrderId})
-                const user = await User.findById(customerId)
+                var user = await User.findById(customerId)
 
                 
             if(!userOrder){
@@ -617,32 +618,30 @@ const months = [
             console.log(userOrder,'aaaaa');;
 
             const productToUpdate = userOrder.Products.find(item => item.ProductId.equals(ProductId));
+            console.log(productToUpdate);
             let Price  = productToUpdate.Price * productToUpdate.Quantity
            
             if (!productToUpdate) {
                 return reject('Product not found in the order');
               }          
-              if(newStatus==='Returned' || (newStatus==='Cancelled' && paymentStatus==='Razor pay') ){
+              if(newStatus==='Returned' || ((newStatus==='Cancelled' && paymentStatus==='Razor pay')||(newStatus==='Cancelled' && paymentStatus==='Wallet')) ){
 
                 const product = await Product.findById(ProductId)
                 product.StockQuantity += productToUpdate.Quantity
-                  const wallet = await Wallet.findOne({ User: customerId });
-                  if(!wallet){
-                const  newWallet = new Wallet({
-                    User:customerId,
-                    Balance:Number(Price),
-                  })
-                  user.Wallet =Number(Price)
 
-                 await  newWallet.save()
-                }else{
-                  console.log('order.Price:', Price);
-                  wallet.Balance += Number(Price);
-                  console.log('wallet.Balance:', wallet.Balance);
-                  await wallet.save()
-                  user.Wallet = wallet.Balance
-                
-              }
+                const transactionType = userOrder.PaymentMethod === 'Razor pay' ||userOrder.PaymentMethod==='Wallet' ? 'credited' : 'debited';
+                const transaction = {
+                  amount: Number(userOrder.TotalAmount),
+                  type: transactionType,
+                  timestamp: new Date(),
+                };
+                user.WalletTotalAmount += transaction.amount;
+                user.Wallet.push({ 
+                  amount: transaction.amount,
+                  transcation: transaction.type,
+                  timestamp: transaction.timestamp,
+                });
+                await user.save();
               await product.save();
             }
               await user.save()
@@ -651,7 +650,7 @@ const months = [
               resolve('Order item status updated successfully');
                 
             } catch (error) {
-                console.log(error);
+                console.log(error,'sssss');
                 reject(error)
                 
             }

@@ -293,6 +293,7 @@
 											<option>Select a payment method</option>
 											<option>Razor pay</option>
                       <option>Cash on Delivery</option>
+                      <option>Wallet</option>
 										</select>
 										<div class="dropDownSelect2"></div>
 									</div>
@@ -610,7 +611,7 @@ title: error.message,
   }).then((response)=>{  
 
     if(response && response.message){
-      if(response.message==='Cod Order Sucess'){
+      if(response.message==='Cod Order Sucess' || response.message==='Wallet Order Sucess'){
         
         window.location.href='/order_success'
       }else if( response.message ==='order created'){

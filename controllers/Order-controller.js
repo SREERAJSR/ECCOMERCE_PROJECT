@@ -277,6 +277,13 @@ console.log(response);
         res.status(200).json({message:'Cod Order Sucess'})   
       })
 
+    }
+    else if(paymentMethod ==="Wallet"){
+      deleteCartProducts(req.session.user._id).then((response)=>{
+console.log(response);
+        res.status(200).json({message:'Wallet Order Sucess'})   
+      })
+
     }else{
       generateRazorPay(dbOrder.OrderId,dbOrder.TotalAmount).then((razorPayOrder)=>{
       

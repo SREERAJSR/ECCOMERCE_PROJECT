@@ -411,12 +411,18 @@ module.exports = {
       ]);
 
       if (products) {
-        res.render("user/shop", { u: true, products ,userCheck:true });
+        if(req.session.user){
+
+          res.render("user/shop", { u: true, products ,userCheck:true });
+        }else{
+          res.render("user/shop", { u: true, products ,userCheck:false });
+
+        }
       } else {
         res.status(401).json({ message: "products not find" + err });
       }
     } catch {
-      res.status(401).json({ message: "products to shop page error" + err });
+      res.status(401).json({ message:err });
     }
   },
   sortSearchFilterPagination: async (req, res) => {

@@ -34,9 +34,25 @@ const userSchema = new mongoose.Schema({
     type:mongoose.Schema.Types.ObjectId,
     ref:'Address'
   },
-  Wallet:{
+  Wallet:[{
+    amount:{
     type:Number,
-    ref:'Wallet',
+    default:0
+    },
+    transcation:{
+      type:String,
+      enum:['credited','debited']
+    },
+    timestamp: {
+      type: Date,
+      default: Date.now,
+      get: function (value) {
+        return moment(value).format('YYYY-MM-DD HH:mm:ss');
+      }
+    }
+  }],
+  WalletTotalAmount:{
+    type:Number,
     default:0
   }
 }, {
@@ -44,3 +60,4 @@ const userSchema = new mongoose.Schema({
 });
 
 module.exports = mongoose.model('User', userSchema);
+
