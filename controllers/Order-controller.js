@@ -89,19 +89,22 @@ module.exports={
   
         const userId = req.session.user._id
   
-        const cart = await Cart.findOne({UserId:userId})
+       let cart = await Cart.findOne({UserId:userId})
+   
         if(!cart){
           console.log(cart);
+          console.log('hia');
           res.render('user/shopping-cart', { u:true ,cart  })
         }
      
-        cart.populate({
+       cart = await cart.populate({
           path:'CartItems.ProductId',
           select:'ProductName ProductImages SalePrice ' 
         })
+        console.log(cart);
         res.render('user/shopping-cart', { u:true ,cart  })
       }catch(error){ 
-        res.render('error',{message:error})
+        res.status(500).render('error', { message:error  });
       }
       },
           updateQuantity:async(req,res)=>{

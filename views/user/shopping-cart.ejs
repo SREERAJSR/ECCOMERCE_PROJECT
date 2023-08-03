@@ -95,8 +95,9 @@
 										<th class="column-5">Delete</th>
 										<th class="column-6">Total </th>
 									
-									</tr>		
-									<% if (cart){ %>	
+									</tr>	
+									
+									<% if (cart){ %>
 						
 									<% cart.CartItems.forEach((item) => { %>
 										<tr class="table_row">
@@ -125,9 +126,9 @@
 										<td class="column-6  total-price-<%= item._id %>">₹<%= item.Total %></td>
 										</tr>
 									<% }) %>
-									
 									<% }else{ %>
-										
+
+
 										<% } %>
 								</table>
 							</div>
@@ -171,20 +172,17 @@
 									</span>
 								</div>
 
-							
-
 								<div class="size-209">
-									<% if(cart){ %>
+									<% if (cart){ %>
+									<span class="mtext-110 cl2" id="subtotalAmount">
+										₹<%=cart.SubTotal  %>
+									</span>
+									<% }else{ %>
 										<span class="mtext-110 cl2" id="subtotalAmount">
-											₹<%=cart.SubTotal  %>
+											₹0
 										</span>
-										<% } else{%>
-											<span class="mtext-110 cl2" id="subtotalAmount">
-												₹0
-											</span>
 
-											<% } %>
-									
+										<% } %>
 								</div>
 							</div>
 						
@@ -215,7 +213,7 @@
 
 								<div class="size-209 p-t-1">
 									<span class="mtext-110 cl2" id="totalAmount">
-										₹
+									
 									</span>
 								</div>
 							</div> -->
