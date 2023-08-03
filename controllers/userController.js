@@ -774,38 +774,44 @@ module.exports = {
 
   gettingUserProfilePage: async (req, res) => {
     try {
-      if (req.session.user) {
-        const userId = req.session.user._id;
-        const addresses = await Address.find({ UserId: req.session.user._id });
-        var cart = await Cart.findOne({ UserId: userId });
-        const user = await User.findById(userId);
-
-     const orders  = await gettingOrderDetails(req.session.user._id)
-        
-
-        if (user.DefaultAddress && cart) {
-          const addressId = user.DefaultAddress.toString();
-          var defaultAddress = await Address.findById(addressId);
-
-
-
-          res.render("user/user-profile", {
-            u: true,
-            cart,
-            defaultAddress,
-            addresses,
-            user,
-            orders
-          });
-        }
-        
-      } else {
-        res.render('error_login',{u:true})
+      if (!req.session.user) {
+        return res.render('error_login', { u: true });
       }
+  
+      const userId = req.session.user._id;
+  
+      const [user, addresses, cart, orders] = await Promise.all([
+        User.findById(userId),
+        Address.find({ UserId: userId }),
+        Cart.findOne({ UserId: userId }),
+        gettingOrderDetails(req.session.user._id).catch(err => {
+          console.error(err);
+          return null;
+        })
+      ]);
+  
+      let defaultAddress = null;
+  
+      if (user.DefaultAddress && cart) {
+        const addressId = user.DefaultAddress.toString();
+        defaultAddress = await Address.findById(addressId);
+      }
+  
+      res.render("user/user-profile", {
+        u: true,
+        cart,
+        defaultAddress,
+        addresses,
+        user,
+        orders: orders || null
+      });
     } catch (error) {
-      console.log(error);
+      console.error(error);
+      // Handle the error appropriately, e.g., show an error page
+      res.render('error', { message:error });
     }
-  },
+  }
+  ,
   updateUserProfileItems: async (req, res) => {
     try {
       console.log(req.body);
@@ -855,6 +861,7 @@ module.exports = {
         res.render('error_login',{u:true})
       }
     }catch(err){
+      res.render('error',{message:error})
 
     }
   },

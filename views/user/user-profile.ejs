@@ -283,6 +283,7 @@ hr.new1 {
 
                       <% var addresses %>
                     
+                      <% if(addresses.length>0){ %>
                     <div class="row">
                         <% addresses.forEach((address,index)=>{ %>
 
@@ -305,6 +306,24 @@ hr.new1 {
                           <%    })  %>
                           
                 </div>
+                <% }else{ %>
+                  <div class="row">
+                    
+
+                    <div class="col-sm-4">
+                        <div class="card">
+                          <div class="card-body">
+                            <h5 class="card-title">No address</h5>
+                          
+                          </div>
+                        </div>
+                      </div>
+                 
+                      
+            </div>
+
+
+                  <% } %>
             </div>
             <div class="tab-pane fade" id="account-social-links">
               <div class="card-body pb-2">
@@ -321,6 +340,8 @@ hr.new1 {
                     </tr>
                   </thead>
                   <tbody>
+
+                    <% if (orders){ %>
                     <% orders.forEach((order,index)=>{ %>
                     <tr>
                       <th scope="row"><%=index+1  %></th>
@@ -346,6 +367,14 @@ hr.new1 {
                     </tr>
             <%    }) %>
                     
+            <% }else { %>
+              <tr>
+              
+               
+              </tr>
+
+
+              <% } %>
                   </tbody>
                 </table>
                 
@@ -459,7 +488,7 @@ hr.new1 {
       <div class="modal fade" id="addAddressModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel"
       aria-hidden="true">
       <div class="modal-dialog " role="document">
-        <div class="modal-content">
+        <div class="modal-content" >
           <div class="modal-header text-center">
             <h4 class="modal-title w-100 font-weight-bold">Write to us</h4>
             <button type="button" class="close" data-dismiss="modal" aria-label="Close">

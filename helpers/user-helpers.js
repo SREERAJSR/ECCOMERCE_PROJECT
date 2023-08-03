@@ -127,7 +127,7 @@ module.exports = {
     })
  
   },
-          gettingOrderDetails:(userId)=>{
+          gettingOrderDetails:async(userId)=>{
             return new Promise(async(resolve,reject)=>{
               try{
                 
@@ -154,11 +154,12 @@ module.exports = {
               // Sort the orders array in descending order based on the Date field
       orders.sort((a, b) => new Date(b.Date) - new Date(a.Date));
               
-
-     if(!orders){
-      reject('no orders')
+     if(orders.length===0){
+      
+      reject('no orderss')
      }
       resolve(orders)
+
      
       }catch(err){
         console.log(err);
