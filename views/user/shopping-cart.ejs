@@ -352,15 +352,22 @@ Swal.fire({
 			</script>
 
 	
-		<script>
-			$(document).ready((event)=>{
+<script>
+    $(document).ready(() => {
+        $('#checkout-btn').on('click', (event) => {
+            event.preventDefault();
 
-
-			$('#checkout-btn').on('click',(event)=>{
-				event.preventDefault(	)
-				
-				location.href='/checkout'	
-			})
-			})
-		</script>
-				
+            // Check if there is at least one item in the cart
+            if ($('.table_row').length === 0) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Oops...',
+                    text: 'Your cart is empty! Add items to the cart before proceeding.',
+                });
+            } else {
+                // Proceed to checkout
+                location.href = '/checkout';
+            }
+        });
+    });
+</script>
