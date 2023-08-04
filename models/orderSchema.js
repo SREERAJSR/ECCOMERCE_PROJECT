@@ -70,6 +70,9 @@ const  orderSchema = mongoose.Schema({
     ShippingAddress:{
         type:mongoose.Schema.Types.ObjectId,
         ref:'User'
+    },
+    CouponUsed:{
+        type:String
     }
    
 

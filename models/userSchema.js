@@ -54,7 +54,12 @@ const userSchema = new mongoose.Schema({
   WalletTotalAmount:{
     type:Number,
     default:0
-  }
+  },
+  UsedCoupon:[
+    {
+      type:String
+    }
+  ]
 }, {
   versionKey: false,
 });

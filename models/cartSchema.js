@@ -34,10 +34,7 @@
                     type:Number,
                     default:0
             } ,
-            CouponUsed:[
-               { type:String}
-            ],
-            SelecedCoupon:{
+            SelectedCoupon:{
                 type:String
             }
            

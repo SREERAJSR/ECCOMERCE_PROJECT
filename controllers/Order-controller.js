@@ -11,7 +11,7 @@ const { error } = require("jquery");
 const { default: mongoose } = require("mongoose");
 const Cart = require('../models/cartSchema')
 const Coupon = require('../models/couponSchema')
-const {couponApplying,addingCouponToCart,
+const {applyCouponToCart,calculateFinalTotal,
   placingOrderInDb, generateRazorPay,
   verifiyingPayment,
   changeOrderStatus,
@@ -235,41 +235,60 @@ if(!product){
   }
 }
 ,
+applyCoupon :async (req, res) => {
+  try {
+    const { coupon } = req.body;
+    const userId = req.session.user._id;
 
-    applyCoupon:async(req,res)=>{
+    const dbCoupon = await Coupon.findOne({ CouponCode: coupon });
     
-      try{
-        const{coupon} = req.body
 
-        
-        const DbCoupon= await Coupon.findOne({CouponCode : coupon})      
-        if(!DbCoupon){
-          res.status(404).json({error:'coupon not found in database'})
-        }else{
-          const userId = req.session.user._id
-          couponApplying(userId,DbCoupon).then((resp)=>{
-            addingCouponToCart(coupon,userId).then((response)=>{
-         
-        
-              res.status(200).json({message:'coupon applied succesfully',response,resp})
-            }).catch((err)=>{
-              res.status(409).json({message:err})
-            })         
-          }).catch((err)=>{
-            console.log(err);
-            res.status(400).json({message :err})
-          })
-        }
-    }catch(error){
-      res.status(500).json({error:'Some internal Error'})
+    if (!dbCoupon) {
+      return res.status(404).json({ error: 'Coupon not found in database' });
     }
-  },
+    
+
+    const user = await User.findById(userId);
+    const cart = await Cart.findOne({ UserId: userId });
+
+    if (!cart) {
+      return res.status(404).json({ error: 'Cart not found for this user' });
+    }
+
+    if (user.UsedCoupon.includes(coupon)) {
+      return res.status(409).json({ error: 'Coupon already used' });
+    }
+
+    try {
+
+
+      const updatedCart = await applyCouponToCart(coupon, cart, dbCoupon);
+      const finalTotal = calculateFinalTotal(updatedCart);
+
+      console.log(updatedCart,finalTotal);
+      user.UsedCoupon.push(coupon);
+
+      await user.save();
+
+      return res.status(200).json({ message: 'Coupon applied successfully', cart: updatedCart, finalTotal });
+    } catch (error) {
+      if (error === 'Minimum amount not reached' || error === 'Coupon already used') {
+        return res.status(400).json({ error: error });
+      } else {
+        return res.status(500).json({ error: 'Some internal error' });
+      }
+    }
+  } catch (error) {
+    return res.status(500).json({ error: 'Some internal error' });
+  }
+}
+,
   placingOrder:async(req,res)=>{
 
 try{
-  const {addressId,paymentMethod,TotalPrice} = req.body
+  const {addressId,paymentMethod,TotalPrice,coupon} = req.body
   const userId = req.session.user._id
-  placingOrderInDb(addressId,paymentMethod,TotalPrice,userId).then((dbOrder)=>{
+  placingOrderInDb(addressId,paymentMethod,TotalPrice,userId,coupon).then((dbOrder)=>{
 
     if(paymentMethod ==="Cash on Delivery"){
       deleteCartProducts(req.session.user._id).then((response)=>{

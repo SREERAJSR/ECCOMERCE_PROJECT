@@ -19,75 +19,26 @@ var instance = new Razorpay({
 
 module.exports={
 
-    couponApplying:(userId,coupon)=>{
+ applyCouponToCart : async (coupon, cart, dbCoupon) => {
+    if (cart.FinalTotal >= dbCoupon.MinAmount && cart.FinalTotal <= dbCoupon.MaxAmount) {
+      const discountAmount = (dbCoupon.DiscountPercentage / 100) * cart.FinalTotal;
+      console.log(discountAmount,(dbCoupon.DiscountPercentage / 100));
+      console.log(cart.FinalTotal-discountAmount);
+     cart.FinalTotal = cart.FinalTotal - discountAmount
+     console.log(coupon);
+      cart.SelectedCoupon = coupon;
+      await cart.save();
+      return cart;
+    } else {
+      
+      throw 'Minimum amount not reached';
+    }
+  },
 
-        return new Promise (async(resolve,reject)=>{
-            
-            try{
-                const cart = await Cart.findOne({UserId:userId})
-                if( cart.SubTotal >= coupon.MinAmount && cart.SubTotal<coupon.MaxAmount){
-                    const discountAmount = (coupon.Discount / 100) * cart.SubTotal;
-                    const finalTotal = Math.abs(Math.floor(cart.SubTotal - discountAmount));
-                    cart.FinalTotal = finalTotal;
-                        const savedCart=await cart.save()
-                            resolve(savedCart)
-                }else{
-                    
-                 reject('mininum amount to reached')
-                }
-                
-            }catch(error){
-
-                reject(error)
-
-            }
-
-        })
-
-    },
-    addingCouponToCart: (coupon, UserId) => {
-        return new Promise(async (resolve, reject) => {
-          try {
-       
-            
-            const couponsUsed = await usedCoupon.findOne({ UserId: UserId });
-            const cart = await Cart.findOne({UserId:UserId})
-            
-            if (couponsUsed && cart) {
-              const couponIncluded = couponsUsed.Coupons.includes(coupon);
-              const couponExist = cart.CouponUsed.includes(coupon)
-              console.log(couponIncluded);
-              console.log("couponincart",couponExist);
-              
-              if (!couponIncluded && !couponExist) {
-                couponsUsed.Coupons.push(coupon);
-                cart.CouponUsed.push(coupon)
-                cart.SelecedCoupon=coupon
-                const savedCoupon = await couponsUsed.save() &&  cart.save()
-                resolve(savedCoupon);
-              } else {
-                reject('Coupon already used');
-              }
-            } else {
-                if(cart.CouponUsed.includes(coupon)){
-                    reject('Coupon already used')
-                }else{
-                    const couponAddingToUsedCoupons = new usedCoupon({
-                        UserId: UserId,
-                        Coupons: [coupon],
-                      });
-                      cart.CouponUsed.push(coupon)
-                      cart.SelecedCoupon=coupon
-                      const savedCoupon = await couponAddingToUsedCoupons.save() && cart.save()
-                      resolve(savedCoupon);
-                }
-            }
-          } catch (error) {
-            reject(error);
-          }
-        });
-      },
-      placingOrderInDb:(addressId,paymentMethod,TotalPrice,userId)=>{
+   calculateFinalTotal : (cart) => {
+    return cart.FinalTotal;
+  }  ,
+      placingOrderInDb:(addressId,paymentMethod,TotalPrice,userId,coupon)=>{
        
         return new Promise(async(resolve,reject)=>{
 
@@ -121,8 +72,8 @@ module.exports={
             TotalAmount:TotalPrice,
             PaymentMethod:paymentMethod,
             Products:products,
-            ShippingAddress:user.DefaultAddress
- 
+            ShippingAddress:user.DefaultAddress,
+            CouponUsed:coupon
       })
       if (paymentMethod === 'Wallet') {
         if (user.WalletTotalAmount >= TotalPrice) {

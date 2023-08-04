@@ -440,48 +440,38 @@ module.exports = {
 
   }
  , 
-   addingCoupon:async(req,res)=>{
+addingCoupon :async (req, res) => {
+  try {
+    const { couponcode, discount, validFromDate, validTillDate, min_amount, max_amount } = req.body;
 
-   console.log(req.body);
-   
-   const {couponcode, discount,validFromDate,validTillDate,min_amount,max_amount} = req.body
+    const existingCoupon = await Coupon.findOne({ CouponCode: { $regex: '^' + couponcode + '$', $options: 'i' } });
 
-try{
+    if (existingCoupon) {
+      const existing = 'Coupon already exists';
+      const coupons = await Coupon.find();
+      res.render('admin/add-coupon', { admin: true, existing, coupons });
+    } else {
+      const newCoupon = await new Coupon({
+        CouponCode: couponcode,
+        DiscountPercentage: discount, // Update to DiscountPercentage
+        ValidFromDate: validFromDate,
+        ValidTillDate: validTillDate,
+        MinAmount: min_amount,
+        MaxAmount: max_amount,
+      });
 
-  const coupon = await Coupon.findOne({ CouponCode: { $regex: '^' + couponcode + '$', $options: 'i' } });
+      await newCoupon.save();
 
-if(coupon){
-  const existing='is existing'
-  var coupons  = await Coupon.find()
-
-res.render('admin/add-coupon',{admin:true,existing,coupons})
-}else{
-  const newCoupon  = await new Coupon({
-    CouponCode: couponcode,
-    Discount:discount,
-    ValidFromDate:validFromDate,
-    ValidTillDate:validTillDate,
-    MinAmount:min_amount,
-    MaxAmount:max_amount
-  })
-  await newCoupon.save()
-
-  const success=' added succesfully'
-  var coupons  = await Coupon.find()
-
-
-res.render('admin/add-coupon',{admin:true,success,coupons})
-  
-}
-  }catch(error){
-    const ServerError='server error'
-    var coupons  = await Coupon.find()
-    res.render('admin/add-coupon',{admin:true,ServerError,coupons})
-
-
+      const success = 'Coupon added successfully';
+      const coupons = await Coupon.find();
+      res.render('admin/add-coupon', { admin: true, success, coupons });
+    }
+  } catch (error) {
+    const serverError = 'Server error';
+    const coupons = await Coupon.find();
+    res.render('admin/add-coupon', { admin: true, serverError, coupons });
   }
-  
- },
+},
  getInventoryManagementPage:async(req,res)=>{
 
   try {

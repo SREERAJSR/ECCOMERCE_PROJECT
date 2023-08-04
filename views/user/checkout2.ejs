@@ -260,7 +260,7 @@
             <% coupons.forEach((coupon)=>{ %> 
             <td><%=coupon.CouponCode  %> </td> 
             <td> 	₹<%=coupon.MinAmount  %></td>
-            <td><%=coupon.Discount %>%</td>
+            <td><%=coupon.DiscountPercentage %>%</td>
           </tr>
        
           <% }) %>
@@ -534,40 +534,42 @@ $('#apply-coupon').on('click', (event) => {
   body: JSON.stringify({ coupon: selectedCoupon })
   })
   .then((response) => {
-    if (response.status === 200) {
-    return response.json();
-    } else if (response.status === 400) {
-      console.log(response);
-    throw new Error("This coupon does not amount to the required minimum purchase.");
-    } else if(response.status===409) {
-      throw new Error('You already applied coupon')
-    }else{
-    throw new Error('Unexpected response');
-    }
-  })
-  .then((response) => {
-    console.log(response);
-    const { message } = response;
-    const FinalTotal = response.resp.FinalTotal
+  if (response.status === 200) {
+    response.json().then((data) => {
+      const { message, cart, finalTotal } = data;
 
-    console.log(FinalTotal);
-    Swal.fire({
-    position: 'top-end',
-    icon: 'success',
-    title: message,
-    showConfirmButton: false,
-    timer: 1500
+      console.log(finalTotal);
+
+      Swal.fire({
+        position: 'top-end',
+        icon: 'success',
+        title: message,
+        showConfirmButton: false,
+        timer: 1500
+      });
+
+      // Update the UI elements with the new final total
+      $('#totalAmount').text('₹' + finalTotal);
+      $('#coupon-status').text('Coupon applied successfully');
     });
-    $('#totalAmount').text('₹'+FinalTotal);
-    $('#coupon-status').text('Coupon applied successfully');
-  })
-  .catch((error) => {
-    console.log(error);
-    Swal.fire({
-icon: 'error',
-title: error.message,  
+  } else if (response.status === 400) {
+    console.log(response);
+    throw new Error("This coupon does not amount to the required minimum purchase.");
+  } else if (response.status === 409) {
+    throw new Error('You already applied coupon');
+  } else {
+    throw new Error('Unexpected response');
+  }
 })
+.catch((error) => {
+  console.log(error);
+  Swal.fire({
+    icon: 'error',
+    title: error.message
   });
+});
+
+
 });
 });
 
@@ -582,6 +584,8 @@ title: error.message,
       const OrderAddressId = $('#default_address').data('default_addressid');
             const paymentMethod = $('#payment_Method').val();
             const Total = $('#totalAmount').text().trim().replace('₹', '');
+            const selectedCoupon = $('#coupon-select').val();
+            console.log(selectedCoupon);
 
             if (paymentMethod === 'Select a payment method') {
                 sweetAlert("Select a Payment method", "Otherwise can't be processed", "error");
@@ -599,7 +603,7 @@ title: error.message,
     headers:{
       'Content-Type':'application/json'
     },
-    body:JSON.stringify({addressId:OrderAddressId,paymentMethod:paymentMethod,TotalPrice:Total })
+    body:JSON.stringify({addressId:OrderAddressId,paymentMethod:paymentMethod,TotalPrice:Total,coupon:selectedCoupon })
   }).then((response)=>{
   
     if(response.status===200){
