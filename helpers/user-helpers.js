@@ -261,27 +261,7 @@ let Price;
         return;
       }
 
-      // if(order.PaymentMethod==='Razor pay'){
-      //   const wallet = await Wallet.findOne({ User: userId });
-
-      //   if(!wallet){
-
-      //  const  newWallet = new Wallet({
-      //       User:userId,
-      //       Balance:Number(Price),
-      //     })
-      //     user.Wallet =Number(Price)
-
-      //    await  newWallet.save()
-      //   }else{
-      //     console.log('order.Price:', Price);
-      //     wallet.Balance += Number(Price);
-      //     console.log('wallet.Balance:', wallet.Balance);
-      //     await wallet.save()
-      //     user.Wallet = wallet.Balance
-      //   }
-      // }
-      // await user.save()
+     
       await order.save();
       resolve('Order status updated successfully.');
       } 
